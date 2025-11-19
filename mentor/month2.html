@@ -8,39 +8,76 @@
 </head>
 <body class="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-4">
     <div class="max-w-5xl mx-auto">
-        <!-- Header -->
+        <!-- Header with Back Button -->
         <div class="bg-white rounded-xl shadow-lg p-6 mb-6 border-t-4 border-blue-600">
-            <div class="flex items-center justify-between">
+            <div class="flex items-start justify-between mb-4">
                 <div class="flex items-center gap-3">
+                    <!-- Back Button -->
+                    <button onclick="window.location.href='../onboarding.html'" class="p-2 hover:bg-blue-50 rounded-lg transition-colors" title="Go Back">
+                        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                        </svg>
+                    </button>
                     <div class="bg-blue-100 p-3 rounded-lg">
                         <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
                         </svg>
                     </div>
                     <div>
-                        <h1 class="text-2xl font-bold text-gray-800">Mentor Dashboard - Month 2</h1>
-                        <p class="text-gray-600 text-sm">Exploration & Skill Development</p>
+                        <div class="flex items-center gap-2">
+                            <h1 class="text-2xl font-bold text-gray-800">Mentor Dashboard</h1>
+                            <span class="bg-blue-100 text-blue-700 text-xs font-semibold px-2 py-1 rounded">MENTOR</span>
+                        </div>
+                        <p class="text-gray-600 text-sm">Month 2 - Exploration & Skill Development</p>
                     </div>
                 </div>
-                <button onclick="saveData()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Save</button>
+                <button onclick="saveData()" class="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors shadow-md">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/>
+                    </svg>
+                    <span>Save</span>
+                </button>
             </div>
-            <div id="saveStatus" class="text-sm hidden mt-2"></div>
+            <div id="saveStatus" class="text-sm hidden"></div>
+        </div>
+
+        <!-- Davis,  Banner -->
+        <div class="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-lg shadow-md p-4 mb-6 border-l-4 border-yellow-500">
+            <div class="flex items-start gap-3">
+                <svg class="w-6 h-6 text-yellow-600 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                </svg>
+                <div>
+                    <p class="font-semibold text-gray-800 mb-1">💡 Remember This</p>
+                    <p class="text-sm text-gray-700 italic">"Stay hungry, stay curious, and stand corrected - as we all see the same crystal ball from different angles; yet we all play a role to mold and shape it."</p>
+                    <p class="text-xs text-gray-600 mt-1">— Davis's Advice</p>
+                </div>
+            </div>
         </div>
 
         <!-- Month Navigation -->
         <div class="grid grid-cols-3 gap-3 mb-6">
-            <a href="month1.html" class="p-4 rounded-lg shadow-md bg-white text-gray-800 hover:shadow-lg text-center">
-                <h3 class="font-bold">Month 1</h3>
+            <a href="month1.html" class="p-4 rounded-lg shadow-md bg-white text-gray-800 hover:shadow-lg transition-all text-center hover:bg-blue-50">
+                <svg class="w-6 h-6 mb-2 mx-auto text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                </svg>
+                <h3 class="text-sm font-bold">Month 1</h3>
                 <p class="text-xs text-gray-600">Foundation</p>
             </a>
             <button class="p-4 rounded-lg shadow-md bg-blue-600 text-white scale-105">
-                <h3 class="font-bold">Month 2</h3>
+                <svg class="w-6 h-6 mb-2 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                </svg>
+                <h3 class="text-sm font-bold">Month 2</h3>
                 <p class="text-xs opacity-75">Exploration</p>
             </button>
-            <button class="p-4 rounded-lg shadow-md bg-gray-200 text-gray-400 cursor-not-allowed">
-                <h3 class="font-bold">Month 3</h3>
-                <p class="text-xs">Coming Soon</p>
-            </button>
+            <a href="month3.html" class="p-4 rounded-lg shadow-md bg-blue-100 text-blue-700 hover:bg-blue-200 transition-all text-center cursor-pointer">
+                <svg class="w-6 h-6 mb-2 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+                </svg>
+                <h3 class="text-sm font-bold">Month 3</h3>
+                <p class="text-xs">Growth</p>
+            </a>
         </div>
 
         <!-- Content -->
@@ -48,7 +85,7 @@
 
         <!-- Footer -->
         <div class="mt-8 text-center text-sm text-gray-600 bg-white rounded-lg p-4 shadow">
-            <p>💙 AWS She Builds Mentorship Program 2025</p>
+            <p>💙 AWS She Builds Mentorship Program | Sep - Nov 2025</p>
         </div>
     </div>
 
@@ -73,7 +110,7 @@
             localStorage.setItem('mentor-month2-data', JSON.stringify(appData));
             const status = document.getElementById('saveStatus');
             status.className = 'text-sm text-green-600';
-            status.textContent = '✓ Saved!';
+            status.textContent = '✓ Progress saved!';
             status.classList.remove('hidden');
             setTimeout(() => status.classList.add('hidden'), 2000);
         }
@@ -121,18 +158,18 @@
         function renderSection(title, field, placeholder, key) {
             const isExpanded = expandedSections[key];
             return `
-                <div class="bg-white rounded-lg shadow-md mb-4 border">
-                    <button onclick="toggleSection('${key}')" class="w-full p-4 flex items-center justify-between hover:bg-blue-50">
-                        <h3 class="font-semibold">${title}</h3>
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="bg-white rounded-lg shadow-md mb-4 border border-gray-200">
+                    <button onclick="toggleSection('${key}')" class="w-full p-4 flex items-center justify-between hover:bg-blue-50 transition-colors">
+                        <h3 class="font-semibold text-gray-800">${title}</h3>
+                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${isExpanded ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7'}"/>
                         </svg>
                     </button>
                     ${isExpanded ? `
-                        <div class="p-6 border-t bg-gray-50">
+                        <div class="p-6 border-t border-gray-200 bg-gray-50">
                             <textarea onchange="updateField('${field}', this.value)" 
                                       placeholder="${placeholder}" 
-                                      class="w-full p-4 border rounded-lg h-40">${appData[field]}</textarea>
+                                      class="w-full p-4 border rounded-lg focus:ring-2 focus:ring-blue-500 h-40">${appData[field]}</textarea>
                         </div>
                     ` : ''}
                 </div>
@@ -142,25 +179,39 @@
         function renderMeetings() {
             const isExpanded = expandedSections['meetings'];
             return `
-                <div class="bg-white rounded-lg shadow-md mb-4 border">
-                    <button onclick="toggleSection('meetings')" class="w-full p-4 flex items-center justify-between hover:bg-blue-50">
-                        <h3 class="font-semibold">Meeting Logs</h3>
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="bg-white rounded-lg shadow-md mb-4 border border-gray-200">
+                    <button onclick="toggleSection('meetings')" class="w-full p-4 flex items-center justify-between hover:bg-blue-50 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                            <h3 class="font-semibold text-gray-800">Meeting Logs</h3>
+                        </div>
+                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${isExpanded ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7'}"/>
                         </svg>
                     </button>
                     ${isExpanded ? `
-                        <div class="p-6 border-t bg-gray-50">
-                            <button onclick="addMeeting()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 mb-4">Add Meeting</button>
-                            ${appData.meetingLogs.map(log => `
-                                <div class="bg-white p-4 rounded-lg border mb-3">
-                                    <input type="date" value="${log.date}" onchange="updateMeeting(${log.id}, 'date', this.value)" class="w-full p-2 border rounded mb-2">
-                                    <textarea onchange="updateMeeting(${log.id}, 'topics', this.value)" placeholder="Topics..." class="w-full p-2 border rounded mb-2 h-20">${log.topics}</textarea>
-                                    <textarea onchange="updateMeeting(${log.id}, 'guidance', this.value)" placeholder="Your guidance..." class="w-full p-2 border rounded h-20">${log.guidance}</textarea>
-                                    <button onclick="deleteMeeting(${log.id})" class="text-red-600 text-sm mt-2">Delete</button>
-                                </div>
-                            `).join('')}
-                            ${appData.meetingLogs.length === 0 ? '<p class="text-gray-500 text-center py-4">No meetings yet</p>' : ''}
+                        <div class="p-6 border-t border-gray-200 bg-gray-50">
+                            <button onclick="addMeeting()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 mb-4">
+                                Add Meeting
+                            </button>
+                            <div class="space-y-4">
+                                ${appData.meetingLogs.map(log => `
+                                    <div class="bg-white p-4 rounded-lg border shadow-sm">
+                                        <input type="date" value="${log.date}" onchange="updateMeeting(${log.id}, 'date', this.value)" 
+                                               class="w-full p-2 border rounded mb-2 focus:ring-2 focus:ring-blue-500">
+                                        <textarea onchange="updateMeeting(${log.id}, 'topics', this.value)" 
+                                                  placeholder="Topics discussed..." 
+                                                  class="w-full p-2 border rounded mb-2 h-20 focus:ring-2 focus:ring-blue-500">${log.topics}</textarea>
+                                        <textarea onchange="updateMeeting(${log.id}, 'guidance', this.value)" 
+                                                  placeholder="Your guidance and advice..." 
+                                                  class="w-full p-2 border rounded h-20 focus:ring-2 focus:ring-blue-500">${log.guidance}</textarea>
+                                        <button onclick="deleteMeeting(${log.id})" class="text-red-600 text-sm mt-2 hover:text-red-800">Delete</button>
+                                    </div>
+                                `).join('')}
+                                ${appData.meetingLogs.length === 0 ? '<p class="text-gray-500 text-center py-8">No meetings yet</p>' : ''}
+                            </div>
                         </div>
                     ` : ''}
                 </div>
