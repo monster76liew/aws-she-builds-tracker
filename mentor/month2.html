@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Month 2 - Mentor Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-4">
+    <div class="max-w-5xl mx-auto">
+        <!-- Header -->
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-6 border-t-4 border-blue-600">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="bg-blue-100 p-3 rounded-lg">
+                        <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-800">Mentor Dashboard - Month 2</h1>
+                        <p class="text-gray-600 text-sm">Exploration & Skill Development</p>
+                    </div>
+                </div>
+                <button onclick="saveData()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Save</button>
+            </div>
+            <div id="saveStatus" class="text-sm hidden mt-2"></div>
+        </div>
+
+        <!-- Month Navigation -->
+        <div class="grid grid-cols-3 gap-3 mb-6">
+            <a href="month1.html" class="p-4 rounded-lg shadow-md bg-white text-gray-800 hover:shadow-lg text-center">
+                <h3 class="font-bold">Month 1</h3>
+                <p class="text-xs text-gray-600">Foundation</p>
+            </a>
+            <button class="p-4 rounded-lg shadow-md bg-blue-600 text-white scale-105">
+                <h3 class="font-bold">Month 2</h3>
+                <p class="text-xs opacity-75">Exploration</p>
+            </button>
+            <button class="p-4 rounded-lg shadow-md bg-gray-200 text-gray-400 cursor-not-allowed">
+                <h3 class="font-bold">Month 3</h3>
+                <p class="text-xs">Coming Soon</p>
+            </button>
+        </div>
+
+        <!-- Content -->
+        <div id="sectionsContainer"></div>
+
+        <!-- Footer -->
+        <div class="mt-8 text-center text-sm text-gray-600 bg-white rounded-lg p-4 shadow">
+            <p>💙 AWS She Builds Mentorship Program 2025</p>
+        </div>
+    </div>
+
+    <script>
+        let appData = {
+            industryInsights: '',
+            networkingGuidance: '',
+            skillDevelopmentAdvice: '',
+            brandingFeedback: '',
+            meetingLogs: [],
+            monthlyObservations: ''
+        };
+
+        const expandedSections = {};
+
+        function loadData() {
+            const saved = localStorage.getItem('mentor-month2-data');
+            if (saved) appData = JSON.parse(saved);
+        }
+
+        function saveData() {
+            localStorage.setItem('mentor-month2-data', JSON.stringify(appData));
+            const status = document.getElementById('saveStatus');
+            status.className = 'text-sm text-green-600';
+            status.textContent = '✓ Saved!';
+            status.classList.remove('hidden');
+            setTimeout(() => status.classList.add('hidden'), 2000);
+        }
+
+        function toggleSection(key) {
+            expandedSections[key] = !expandedSections[key];
+            renderSections();
+        }
+
+        function updateField(field, value) {
+            appData[field] = value;
+        }
+
+        function addMeeting() {
+            appData.meetingLogs.push({
+                id: Date.now(),
+                date: new Date().toISOString().split('T')[0],
+                topics: '',
+                guidance: ''
+            });
+            renderSections();
+        }
+
+        function deleteMeeting(id) {
+            appData.meetingLogs = appData.meetingLogs.filter(m => m.id !== id);
+            renderSections();
+        }
+
+        function updateMeeting(id, field, value) {
+            const meeting = appData.meetingLogs.find(m => m.id === id);
+            if (meeting) meeting[field] = value;
+        }
+
+        function renderSections() {
+            document.getElementById('sectionsContainer').innerHTML = `
+                ${renderSection('Industry Research Guidance', 'industryInsights', 'Guide your mentee on industry research', 'industry')}
+                ${renderSection('Networking Guidance', 'networkingGuidance', 'Help your mentee expand their network', 'networking')}
+                ${renderSection('Skill Development Advice', 'skillDevelopmentAdvice', 'Advise on technical and soft skills', 'skills')}
+                ${renderSection('Professional Branding Feedback', 'brandingFeedback', 'Review LinkedIn and elevator pitches', 'branding')}
+                ${renderMeetings()}
+                ${renderSection('Monthly Observations', 'monthlyObservations', 'Overall Month 2 observations', 'observations')}
+            `;
+        }
+
+        function renderSection(title, field, placeholder, key) {
+            const isExpanded = expandedSections[key];
+            return `
+                <div class="bg-white rounded-lg shadow-md mb-4 border">
+                    <button onclick="toggleSection('${key}')" class="w-full p-4 flex items-center justify-between hover:bg-blue-50">
+                        <h3 class="font-semibold">${title}</h3>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${isExpanded ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7'}"/>
+                        </svg>
+                    </button>
+                    ${isExpanded ? `
+                        <div class="p-6 border-t bg-gray-50">
+                            <textarea onchange="updateField('${field}', this.value)" 
+                                      placeholder="${placeholder}" 
+                                      class="w-full p-4 border rounded-lg h-40">${appData[field]}</textarea>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        function renderMeetings() {
+            const isExpanded = expandedSections['meetings'];
+            return `
+                <div class="bg-white rounded-lg shadow-md mb-4 border">
+                    <button onclick="toggleSection('meetings')" class="w-full p-4 flex items-center justify-between hover:bg-blue-50">
+                        <h3 class="font-semibold">Meeting Logs</h3>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${isExpanded ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7'}"/>
+                        </svg>
+                    </button>
+                    ${isExpanded ? `
+                        <div class="p-6 border-t bg-gray-50">
+                            <button onclick="addMeeting()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 mb-4">Add Meeting</button>
+                            ${appData.meetingLogs.map(log => `
+                                <div class="bg-white p-4 rounded-lg border mb-3">
+                                    <input type="date" value="${log.date}" onchange="updateMeeting(${log.id}, 'date', this.value)" class="w-full p-2 border rounded mb-2">
+                                    <textarea onchange="updateMeeting(${log.id}, 'topics', this.value)" placeholder="Topics..." class="w-full p-2 border rounded mb-2 h-20">${log.topics}</textarea>
+                                    <textarea onchange="updateMeeting(${log.id}, 'guidance', this.value)" placeholder="Your guidance..." class="w-full p-2 border rounded h-20">${log.guidance}</textarea>
+                                    <button onclick="deleteMeeting(${log.id})" class="text-red-600 text-sm mt-2">Delete</button>
+                                </div>
+                            `).join('')}
+                            ${appData.meetingLogs.length === 0 ? '<p class="text-gray-500 text-center py-4">No meetings yet</p>' : ''}
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        loadData();
+        renderSections();
+    </script>
+</body>
+</html>

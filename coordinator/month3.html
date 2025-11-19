@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Month 3 - Coordinator Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 p-4">
+    <div class="max-w-6xl mx-auto">
+        <!-- Header -->
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-6 border-t-4 border-green-600">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="bg-green-100 p-3 rounded-lg">
+                        <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-800">Coordinator Dashboard - Month 3</h1>
+                        <p class="text-gray-600 text-sm">Apply, Grow & Thrive</p>
+                    </div>
+                </div>
+                <button onclick="saveData()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">Save</button>
+            </div>
+            <div id="saveStatus" class="text-sm hidden mt-2"></div>
+
+            <!-- Stats -->
+            <div class="grid grid-cols-3 gap-4 mt-4">
+                <div class="bg-green-50 p-4 rounded-lg">
+                    <span class="text-sm font-semibold">Completed Pairs</span>
+                    <p class="text-3xl font-bold text-green-600" id="completedPairs">0</p>
+                </div>
+                <div class="bg-blue-50 p-4 rounded-lg">
+                    <span class="text-sm font-semibold">Success Rate</span>
+                    <p class="text-3xl font-bold text-blue-600" id="successRate">0%</p>
+                </div>
+                <div class="bg-purple-50 p-4 rounded-lg">
+                    <span class="text-sm font-semibold">Graduation Event</span>
+                    <p class="text-xl font-bold text-purple-600" id="graduationStatus">Pending</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Month Navigation -->
+        <div class="grid grid-cols-3 gap-3 mb-6">
+            <a href="month1.html" class="p-4 rounded-lg shadow-md bg-white text-gray-800 hover:shadow-lg text-center">
+                <h3 class="font-bold">Month 1</h3>
+                <p class="text-xs text-gray-600">Foundation</p>
+            </a>
+            <a href="month2.html" class="p-4 rounded-lg shadow-md bg-white text-gray-800 hover:shadow-lg text-center">
+                <h3 class="font-bold">Month 2</h3>
+                <p class="text-xs text-gray-600">Exploration</p>
+            </a>
+            <button class="p-4 rounded-lg shadow-md bg-green-600 text-white scale-105">
+                <h3 class="font-bold">Month 3</h3>
+                <p class="text-xs opacity-75">Growth</p>
+            </button>
+        </div>
+
+        <!-- Content -->
+        <div id="sectionsContainer"></div>
+
+        <!-- Footer -->
+        <div class="mt-8 text-center text-sm text-gray-600 bg-white rounded-lg p-4 shadow">
+            <p>💚 AWS She Builds Mentorship Program 2025</p>
+            <p class="mt-1">🎉 Program Completion & Celebration!</p>
+        </div>
+    </div>
+
+    <script>
+        let appData = {
+            pairCompletions: [],
+            graduationEvent: {
+                date: '',
+                completed: false,
+                attendees: '',
+                highlights: ''
+            },
+            programReflection: '',
+            successStories: '',
+            lessonsLearned: '',
+            nextCohortPlanning: ''
+        };
+
+        const expandedSections = {};
+
+        function loadData() {
+            const saved = localStorage.getItem('coordinator-month3-data');
+            if (saved) {
+                appData = JSON.parse(saved);
+                updateStats();
+            }
+        }
+
+        function saveData() {
+            localStorage.setItem('coordinator-month3-data', JSON.stringify(appData));
+            const status = document.getElementById('saveStatus');
+            status.className = 'text-sm text-green-600';
+            status.textContent = '✓ Saved!';
+            status.classList.remove('hidden');
+            setTimeout(() => status.classList.add('hidden'), 2000);
+        }
+
+        function toggleSection(key) {
+            expandedSections[key] = !expandedSections[key];
+            renderSections();
+        }
+
+        function updateField(path, value) {
+            const keys = path.split('.');
+            let obj = appData;
+            for (let i = 0; i < keys.length - 1; i++) {
+                obj = obj[keys[i]];
+            }
+            obj[keys[keys.length - 1]] = value;
+            updateStats();
+        }
+
+        function addPairCompletion() {
+            appData.pairCompletions.push({
+                id: Date.now(),
+                pair: '',
+                completed: false,
+                feedback: ''
+            });
+            renderSections();
+            updateStats();
+        }
+
+        function deletePairCompletion(id) {
+            appData.pairCompletions = appData.pairCompletions.filter(p => p.id !== id);
+            renderSections();
+            updateStats();
+        }
+
+        function updatePairCompletion(id, field, value) {
+            const pair = appData.pairCompletions.find(p => p.id === id);
+            if (pair) {
+                pair[field] = field === 'completed' ? value : value;
+                updateStats();
+            }
+        }
+
+        function updateStats() {
+            const completed = appData.pairCompletions.filter(p => p.completed).length;
+            const total = appData.pairCompletions.length;
+            const successRate = total > 0 ? Math.round((completed / total) * 100) : 0;
+            
+            document.getElementById('completedPairs').textContent = completed + '/' + total;
+            document.getElementById('successRate').textContent = successRate + '%';
+            document.getElementById('graduationStatus').textContent = appData.graduationEvent.completed ? '✓ Done' : 'Pending';
+        }
+
+        function renderSections() {
+            document.getElementById('sectionsContainer').innerHTML = `
+                ${renderPairCompletions()}
+                ${renderGraduation()}
+                ${renderSection('Program Reflection', 'programReflection', 'Overall program reflections', 'reflection')}
+                ${renderSection('Success Stories', 'successStories', 'Highlight success stories', 'success')}
+                ${renderSection('Lessons Learned', 'lessonsLearned', 'What worked and what to improve', 'lessons')}
+                ${renderSection('Next Cohort Planning', 'nextCohortPlanning', 'Ideas for the next cohort', 'nextcohort')}
+            `;
+        }
+
+        function renderPairCompletions() {
+            const isExpanded = expandedSections['pairs'];
+            return `
+                <div class="bg-white rounded-lg shadow-md mb-4 border">
+                    <button onclick="toggleSection('pairs')" class="w-full p-4 flex items-center justify-between hover:bg-green-50">
+                        <h3 class="font-semibold">Pair Completions</h3>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${isExpanded ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7'}"/>
+                        </svg>
+                    </button>
+                    ${isExpanded ? `
+                        <div class="p-6 border-t bg-gray-50">
+                            <button onclick="addPairCompletion()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 mb-4">Add Pair</button>
+                            ${appData.pairCompletions.map(pair => `
+                                <div class="bg-white p-4 rounded-lg border mb-3">
+                                    <div class="flex items-center gap-3 mb-2">
+                                        <input type="checkbox" ${pair.completed ? 'checked' : ''} 
+                                               onchange="updatePairCompletion(${pair.id}, 'completed', this.checked)" 
+                                               class="w-5 h-5 cursor-pointer">
+                                        <input type="text" value="${pair.pair}" 
+                                               onchange="updatePairCompletion(${pair.id}, 'pair', this.value)" 
+                                               placeholder="Mentor-Mentee pair" class="flex-1 p-2 border rounded">
+                                    </div>
+                                    <textarea onchange="updatePairCompletion(${pair.id}, 'feedback', this.value)" 
+                                              placeholder="Completion feedback..." 
+                                              class="w-full p-2 border rounded h-20">${pair.feedback}</textarea>
+                                    <button onclick="deletePairCompletion(${pair.id})" class="text-red-600 text-sm mt-2">Delete</button>
+                                </div>
+                            `).join('')}
+                            ${appData.pairCompletions.length === 0 ? '<p class="text-gray-500 text-center py-4">No pairs added yet</p>' : ''}
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        function renderGraduation() {
+            const isExpanded = expandedSections['graduation'];
+            return `
+                <div class="bg-white rounded-lg shadow-md mb-4 border">
+                    <button onclick="toggleSection('graduation')" class="w-full p-4 flex items-center justify-between hover:bg-green-50">
+                        <h3 class="font-semibold">Graduation Event</h3>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${isExpanded ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7'}"/>
+                        </svg>
+                    </button>
+                    ${isExpanded ? `
+                        <div class="p-6 border-t bg-gray-50">
+                            <div class="space-y-4">
+                                <div class="flex items-center gap-3">
+                                    <input type="checkbox" ${appData.graduationEvent.completed ? 'checked' : ''} 
+                                           onchange="updateField('graduationEvent.completed', this.checked)" 
+                                           class="w-5 h-5 cursor-pointer">
+                                    <label class="font-semibold">Event Completed</label>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-1">Event Date</label>
+                                    <input type="date" value="${appData.graduationEvent.date}" 
+                                           onchange="updateField('graduationEvent.date', this.value)" 
+                                           class="w-full p-2 border rounded">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-1">Attendees</label>
+                                    <textarea onchange="updateField('graduationEvent.attendees', this.value)" 
+                                              placeholder="Number and names of attendees..." 
+                                              class="w-full p-3 border rounded h-20">${appData.graduationEvent.attendees}</textarea>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-1">Event Highlights</label>
+                                    <textarea onchange="updateField('graduationEvent.highlights', this.value)" 
+                                              placeholder="Key moments and highlights..." 
+                                              class="w-full p-3 border rounded h-32">${appData.graduationEvent.highlights}</textarea>
+                                </div>
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        function renderSection(title, field, placeholder, key) {
+            const isExpanded = expandedSections[key];
+            return `
+                <div class="bg-white rounded-lg shadow-md mb-4 border">
+                    <button onclick="toggleSection('${key}')" class="w-full p-4 flex items-center justify-between hover:bg-green-50">
+                        <h3 class="font-semibold">${title}</h3>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${isExpanded ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7'}"/>
+                        </svg>
+                    </button>
+                    ${isExpanded ? `
+                        <div class="p-6 border-t bg-gray-50">
+                            <textarea onchange="updateField('${field}', this.value)" 
+                                      placeholder="${placeholder}" 
+                                      class="w-full p-4 border rounded-lg h-40">${appData[field]}</textarea>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        loadData();
+        renderSections();
+        updateStats();
+    </script>
+</body>
+</html>

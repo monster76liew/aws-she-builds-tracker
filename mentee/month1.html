@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Month 1 - Mentee Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .section-collapsed { display: none; }
+        .section-expanded { display: block; }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 p-4">
+    <div class="max-w-5xl mx-auto">
+        <!-- Header -->
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-6 border-t-4 border-purple-600">
+            <div class="flex items-start justify-between mb-4">
+                <div class="flex items-center gap-3">
+                    <div class="bg-purple-100 p-3 rounded-lg">
+                        <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h1 class="text-2xl font-bold text-gray-800">Mentee Dashboard</h1>
+                            <span class="bg-purple-100 text-purple-700 text-xs font-semibold px-2 py-1 rounded">MENTEE</span>
+                        </div>
+                        <p class="text-gray-600 text-sm">AWS She Builds Mentorship Program 2025</p>
+                    </div>
+                </div>
+                <button onclick="saveData()" class="flex items-center gap-2 bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors shadow-md">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/>
+                    </svg>
+                    <span>Save</span>
+                </button>
+            </div>
+            <div id="saveStatus" class="text-sm hidden"></div>
+        </div>
+
+        <!-- Month Navigation -->
+        <div class="grid grid-cols-3 gap-3 mb-6">
+            <button class="p-4 rounded-lg shadow-md bg-purple-600 text-white scale-105">
+                <svg class="w-6 h-6 mb-2 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                </svg>
+                <h3 class="text-sm font-bold">Month 1</h3>
+                <p class="text-xs opacity-75">Foundation</p>
+            </button>
+            <button class="p-4 rounded-lg shadow-md bg-gray-200 text-gray-400 cursor-not-allowed">
+                <svg class="w-6 h-6 mb-2 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                </svg>
+                <h3 class="text-sm font-bold">Month 2</h3>
+                <p class="text-xs opacity-75">Coming Soon</p>
+            </button>
+            <button class="p-4 rounded-lg shadow-md bg-gray-200 text-gray-400 cursor-not-allowed">
+                <svg class="w-6 h-6 mb-2 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+                </svg>
+                <h3 class="text-sm font-bold">Month 3</h3>
+                <p class="text-xs opacity-75">Coming Soon</p>
+            </button>
+        </div>
+
+        <!-- Content Sections -->
+        <div id="sectionsContainer"></div>
+
+        <!-- Footer -->
+        <div class="mt-8 text-center text-sm text-gray-600 bg-white rounded-lg p-4 shadow">
+            <p>💜 AWS She Builds Mentorship Program | Sep - Nov 2025</p>
+            <p class="mt-1">All assignments are optional. Complete what serves your journey best!</p>
+        </div>
+    </div>
+
+    <script>
+        // Data structure
+        let appData = {
+            personalMission: '',
+            strengths: ['', '', '', '', ''],
+            developmentAreas: ['', '', ''],
+            learningPreferences: '',
+            smartGoals: {
+                shortTerm: [
+                    { goal: '', metric: '', completed: false },
+                    { goal: '', metric: '', completed: false },
+                    { goal: '', metric: '', completed: false }
+                ],
+                longTerm: [
+                    { goal: '', metric: '', completed: false },
+                    { goal: '', metric: '', completed: false }
+                ]
+            },
+            northStar: {
+                '20years': { fulfillment: '', financial: '', relationship: '', myself: '' },
+                '10years': { fulfillment: '', financial: '', relationship: '', myself: '' },
+                '5years': { fulfillment: '', financial: '', relationship: '', myself: '' },
+                '3years': { fulfillment: '', financial: '', relationship: '', myself: '' },
+                '1year': { fulfillment: '', financial: '', relationship: '', myself: '' }
+            },
+            pressRelease: {
+                headline: '',
+                subheading: '',
+                paragraph: '',
+                quotes: ['', '', '']
+            },
+            meetingLogs: []
+        };
+
+        const expandedSections = {};
+
+        // Load data from localStorage
+        function loadData() {
+            const saved = localStorage.getItem('mentee-month1-data');
+            if (saved) {
+                appData = JSON.parse(saved);
+            }
+        }
+
+        // Save data to localStorage
+        function saveData() {
+            localStorage.setItem('mentee-month1-data', JSON.stringify(appData));
+            const status = document.getElementById('saveStatus');
+            status.className = 'text-sm text-green-600';
+            status.textContent = '✓ Progress saved!';
+            status.classList.remove('hidden');
+            setTimeout(() => status.classList.add('hidden'), 2000);
+        }
+
+        // Toggle section
+        function toggleSection(key) {
+            expandedSections[key] = !expandedSections[key];
+            renderSections();
+        }
+
+        // Update simple field
+        function updateField(field, value) {
+            appData[field] = value;
+        }
+
+        // Update array field
+        function updateArray(field, index, value) {
+            appData[field][index] = value;
+        }
+
+        // Update nested field
+        function updateNested(path, value) {
+            const keys = path.split('.');
+            let obj = appData;
+            for (let i = 0; i < keys.length - 1; i++) {
+                obj = obj[keys[i]];
+            }
+            obj[keys[keys.length - 1]] = value;
+        }
+
+        // Add meeting log
+        function addMeeting() {
+            appData.meetingLogs.push({
+                id: Date.now(),
+                date: new Date().toISOString().split('T')[0],
+                week: '',
+                topics: '',
+                nextSteps: '',
+                mentorAdvice: ''
+            });
+            renderSections();
+        }
+
+        // Delete meeting
+        function deleteMeeting(id) {
+            appData.meetingLogs = appData.meetingLogs.filter(m => m.id !== id);
+            renderSections();
+        }
+
+        // Update meeting
+        function updateMeeting(id, field, value) {
+            const meeting = appData.meetingLogs.find(m => m.id === id);
+            if (meeting) meeting[field] = value;
+        }
+
+        // Render all sections
+        function renderSections() {
+            const container = document.getElementById('sectionsContainer');
+            container.innerHTML = `
+                ${renderMeetingLogs()}
+                ${renderPersonalMission()}
+                ${renderNorthStar()}
+                ${renderSmartGoals()}
+                ${renderSkills()}
+                ${renderPressRelease()}
+            `;
+        }
+
+        // Render Meeting Logs
+        function renderMeetingLogs() {
+            const isExpanded = expandedSections['meetings'];
+            return `
+                <div class="bg-white rounded-lg shadow-md mb-4 overflow-hidden border border-gray-200">
+                    <button onclick="toggleSection('meetings')" class="w-full p-4 flex items-center justify-between hover:bg-purple-50 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                            <h3 class="text-lg font-semibold text-gray-800">Meeting Logs</h3>
+                        </div>
+                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${isExpanded ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7'}"/>
+                        </svg>
+                    </button>
+                    ${isExpanded ? `
+                    <div class="p-6 border-t border-gray-200 bg-gray-50">
+                        <button onclick="addMeeting()" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 mb-4">
+                            Add New Meeting
+                        </button>
+                        <div class="space-y-4">
+                            ${appData.meetingLogs.map(log => `
+                                <div class="bg-white p-4 rounded-lg border shadow-sm">
+                                    <div class="grid md:grid-cols-2 gap-3 mb-3">
+                                        <input type="date" value="${log.date}" onchange="updateMeeting(${log.id}, 'date', this.value)" 
+                                               class="p-2 border rounded focus:ring-2 focus:ring-purple-500">
+                                        <input type="text" value="${log.week}" onchange="updateMeeting(${log.id}, 'week', this.value)" 
+                                               placeholder="Week #" class="p-2 border rounded focus:ring-2 focus:ring-purple-500">
+                                    </div>
+                                    <textarea onchange="updateMeeting(${log.id}, 'topics', this.value)" 
+                                              placeholder="What we talked about..." class="w-full p-2 border rounded mb-2 h-20">${log.topics}</textarea>
+                                    <textarea onchange="updateMeeting(${log.id}, 'nextSteps', this.value)" 
+                                              placeholder="What I will do next..." class="w-full p-2 border rounded mb-2 h-20">${log.nextSteps}</textarea>
+                                    <textarea onchange="updateMeeting(${log.id}, 'mentorAdvice', this.value)" 
+                                              placeholder="Mentor's advice..." class="w-full p-2 border rounded mb-2 h-20">${log.mentorAdvice}</textarea>
+                                    <button onclick="deleteMeeting(${log.id})" class="text-red-600 text-sm hover:text-red-800">Delete</button>
+                                </div>
+                            `).join('')}
+                            ${appData.meetingLogs.length === 0 ? '<p class="text-gray-500 text-center py-8">No meetings yet</p>' : ''}
+                        </div>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        // Render Personal Mission
+        function renderPersonalMission() {
+            const isExpanded = expandedSections['mission'];
+            return `
+                <div class="bg-white rounded-lg shadow-md mb-4 overflow-hidden border border-gray-200">
+                    <button onclick="toggleSection('mission')" class="w-full p-4 flex items-center justify-between hover:bg-purple-50 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            <h3 class="text-lg font-semibold text-gray-800">Personal Mission Statement</h3>
+                        </div>
+                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${isExpanded ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7'}"/>
+                        </svg>
+                    </button>
+                    ${isExpanded ? `
+                    <div class="p-6 border-t border-gray-200 bg-gray-50">
+                        <p class="text-sm text-gray-600 bg-purple-50 p-3 rounded mb-3">
+                            Write a short statement (max 150 words) about what's most important to you.
+                        </p>
+                        <textarea onchange="updateField('personalMission', this.value)" 
+                                  placeholder="My personal mission is to..." 
+                                  class="w-full p-4 border rounded-lg focus:ring-2 focus:ring-purple-500 h-40" 
+                                  maxlength="750">${appData.personalMission}</textarea>
+                        <p class="text-sm text-gray-500 mt-2">${appData.personalMission.length}/750 characters</p>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        // Render SMART Goals (simplified version - you can expand this)
+        function renderSmartGoals() {
+            const isExpanded = expandedSections['smart'];
+            return `
+                <div class="bg-white rounded-lg shadow-md mb-4 overflow-hidden border border-gray-200">
+                    <button onclick="toggleSection('smart')" class="w-full p-4 flex items-center justify-between hover:bg-purple-50 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            <h3 class="text-lg font-semibold text-gray-800">SMART Goals</h3>
+                        </div>
+                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${isExpanded ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7'}"/>
+                        </svg>
+                    </button>
+                    ${isExpanded ? `
+                    <div class="p-6 border-t border-gray-200 bg-gray-50">
+                        <h4 class="font-bold mb-3">Short-Term Goals (3-month)</h4>
+                        ${appData.smartGoals.shortTerm.map((goal, idx) => `
+                            <div class="bg-white p-4 rounded-lg border mb-3">
+                                <input type="text" value="${goal.goal}" 
+                                       onchange="updateNested('smartGoals.shortTerm.${idx}.goal', this.value)"
+                                       placeholder="Goal ${idx + 1}" class="w-full p-3 border rounded-lg mb-2">
+                                <input type="text" value="${goal.metric}" 
+                                       onchange="updateNested('smartGoals.shortTerm.${idx}.metric', this.value)"
+                                       placeholder="Success metric" class="w-full p-3 border rounded-lg">
+                            </div>
+                        `).join('')}
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        // Render Skills (simplified)
+        function renderSkills() {
+            const isExpanded = expandedSections['skills'];
+            return `
+                <div class="bg-white rounded-lg shadow-md mb-4 overflow-hidden border border-gray-200">
+                    <button onclick="toggleSection('skills')" class="w-full p-4 flex items-center justify-between hover:bg-purple-50 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                            </svg>
+                            <h3 class="text-lg font-semibold text-gray-800">Skill Assessment</h3>
+                        </div>
+                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${isExpanded ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7'}"/>
+                        </svg>
+                    </button>
+                    ${isExpanded ? `
+                    <div class="p-6 border-t border-gray-200 bg-gray-50">
+                        <h4 class="font-bold mb-3 text-green-700">💪 Top 5 Strengths</h4>
+                        ${appData.strengths.map((strength, idx) => `
+                            <input type="text" value="${strength}" 
+                                   onchange="updateArray('strengths', ${idx}, this.value)"
+                                   placeholder="Strength ${idx + 1}" class="w-full p-3 border rounded-lg mb-2 focus:ring-2 focus:ring-green-500">
+                        `).join('')}
+                        <h4 class="font-bold mb-3 mt-6 text-orange-700">🎯 Top 3 Development Areas</h4>
+                        ${appData.developmentAreas.map((area, idx) => `
+                            <input type="text" value="${area}" 
+                                   onchange="updateArray('developmentAreas', ${idx}, this.value)"
+                                   placeholder="Development Area ${idx + 1}" class="w-full p-3 border rounded-lg mb-2 focus:ring-2 focus:ring-orange-500">
+                        `).join('')}
+                        <h4 class="font-bold mb-3 mt-6 text-blue-700">📚 Learning Preferences</h4>
+                        <textarea onchange="updateField('learningPreferences', this.value)" 
+                                  placeholder="How do you learn best?" 
+                                  class="w-full p-4 border rounded-lg focus:ring-2 focus:ring-blue-500 h-32">${appData.learningPreferences}</textarea>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        // Render North Star Vision
+        function renderNorthStar() {
+            const isExpanded = expandedSections['northstar'];
+            const timeframes = [
+                { key: '20years', label: '20 Years Ahead' },
+                { key: '10years', label: '10 Years Ahead' },
+                { key: '5years', label: '5 Years Ahead' },
+                { key: '3years', label: '3 Years Ahead' },
+                { key: '1year', label: '1 Year Ahead' }
+            ];
+            
+            return `
+                <div class="bg-white rounded-lg shadow-md mb-4 overflow-hidden border border-gray-200">
+                    <button onclick="toggleSection('northstar')" class="w-full p-4 flex items-center justify-between hover:bg-purple-50 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+                            </svg>
+                            <h3 class="text-lg font-semibold text-gray-800">North Star Vision - Working Backwards</h3>
+                        </div>
+                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${isExpanded ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7'}"/>
+                        </svg>
+                    </button>
+                    ${isExpanded ? `
+                    <div class="p-6 border-t border-gray-200 bg-gray-50">
+                        <p class="text-sm text-gray-600 bg-purple-50 p-3 rounded mb-4">
+                            Imagine yourself in the future and work backwards. Describe your life across 4 areas.
+                        </p>
+                        ${timeframes.map(tf => `
+                            <div class="mb-6 p-4 bg-white rounded-lg border border-purple-200">
+                                <h4 class="font-bold text-lg mb-4 text-purple-800">${tf.label}</h4>
+                                <div class="grid md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-semibold mb-2">✨ Fulfillment (What I Do)</label>
+                                        <textarea onchange="updateNested('northStar.${tf.key}.fulfillment', this.value)" 
+                                                  placeholder="Describe..." class="w-full p-3 border rounded-lg h-24">${appData.northStar[tf.key].fulfillment}</textarea>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-semibold mb-2">💰 Financial (Money)</label>
+                                        <textarea onchange="updateNested('northStar.${tf.key}.financial', this.value)" 
+                                                  placeholder="Describe..." class="w-full p-3 border rounded-lg h-24">${appData.northStar[tf.key].financial}</textarea>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-semibold mb-2">❤️ Relationship</label>
+                                        <textarea onchange="updateNested('northStar.${tf.key}.relationship', this.value)" 
+                                                  placeholder="Describe..." class="w-full p-3 border rounded-lg h-24">${appData.northStar[tf.key].relationship}</textarea>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-semibold mb-2">🌱 Myself (Health & Growth)</label>
+                                        <textarea onchange="updateNested('northStar.${tf.key}.myself', this.value)" 
+                                                  placeholder="Describe..." class="w-full p-3 border rounded-lg h-24">${appData.northStar[tf.key].myself}</textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        // Render Press Release
+        function renderPressRelease() {
+            const isExpanded = expandedSections['pressrelease'];
+            return `
+                <div class="bg-white rounded-lg shadow-md mb-4 overflow-hidden border border-gray-200">
+                    <button onclick="toggleSection('pressrelease')" class="w-full p-4 flex items-center justify-between hover:bg-purple-50 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                            <h3 class="text-lg font-semibold text-gray-800">Future Self Press Release</h3>
+                        </div>
+                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${isExpanded ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7'}"/>
+                        </svg>
+                    </button>
+                    ${isExpanded ? `
+                    <div class="p-6 border-t border-gray-200 bg-gray-50">
+                        <p class="text-sm text-gray-600 bg-purple-50 p-3 rounded mb-4">
+                            Imagine a press release about your future achievements. What would the headline be? What would people say?
+                        </p>
+                        
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-semibold mb-2">📰 Headline</label>
+                                <input type="text" value="${appData.pressRelease.headline}" 
+                                       onchange="updateNested('pressRelease.headline', this.value)"
+                                       placeholder="Your exciting future achievement headline" 
+                                       class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-purple-500">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-semibold mb-2">📝 Sub-heading</label>
+                                <input type="text" value="${appData.pressRelease.subheading}" 
+                                       onchange="updateNested('pressRelease.subheading', this.value)"
+                                       placeholder="Supporting headline" 
+                                       class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-purple-500">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-semibold mb-2">📄 First Paragraph (Your Elevator Pitch)</label>
+                                <textarea onchange="updateNested('pressRelease.paragraph', this.value)" 
+                                          placeholder="Describe your achievements, impact, and key milestones..." 
+                                          class="w-full p-4 border rounded-lg focus:ring-2 focus:ring-purple-500 h-32">${appData.pressRelease.paragraph}</textarea>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-semibold mb-2">💬 Fictional Quotes (2-3 people in your future life)</label>
+                                <p class="text-xs text-gray-500 mb-2">What would family, friends, colleagues say about you?</p>
+                                ${appData.pressRelease.quotes.map((quote, idx) => `
+                                    <textarea onchange="updateNested('pressRelease.quotes.${idx}', this.value)" 
+                                              placeholder="Quote ${idx + 1}: Person's Name, Relationship" 
+                                              class="w-full p-3 border rounded-lg mb-2 focus:ring-2 focus:ring-purple-500 h-24">${quote}</textarea>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        // Initialize
+        loadData();
+        renderSections();
+    </script>
+</body>
+</html>

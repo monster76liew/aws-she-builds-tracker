@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Month 1 - Coordinator Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 p-4">
+    <div class="max-w-6xl mx-auto">
+        <!-- Header -->
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-6 border-t-4 border-green-600">
+            <div class="flex items-start justify-between mb-4">
+                <div class="flex items-center gap-3">
+                    <div class="bg-green-100 p-3 rounded-lg">
+                        <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h1 class="text-2xl font-bold text-gray-800">Coordinator Dashboard</h1>
+                            <span class="bg-green-100 text-green-700 text-xs font-semibold px-2 py-1 rounded">COORDINATOR</span>
+                        </div>
+                        <p class="text-gray-600 text-sm">AWS She Builds Mentorship Program 2025</p>
+                    </div>
+                </div>
+                <button onclick="saveData()" class="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors shadow-md">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/>
+                    </svg>
+                    <span>Save</span>
+                </button>
+            </div>
+            <div id="saveStatus" class="text-sm hidden"></div>
+
+            <!-- Program Stats -->
+            <div class="grid grid-cols-3 gap-4 mt-4">
+                <div class="bg-green-50 p-4 rounded-lg">
+                    <div class="flex items-center gap-2 mb-2">
+                        <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                        </svg>
+                        <span class="text-sm font-semibold text-gray-700">Active Pairs</span>
+                    </div>
+                    <p class="text-3xl font-bold text-green-600" id="activePairs">0</p>
+                </div>
+                <div class="bg-blue-50 p-4 rounded-lg">
+                    <div class="flex items-center gap-2 mb-2">
+                        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                        </svg>
+                        <span class="text-sm font-semibold text-gray-700">Avg Progress</span>
+                    </div>
+                    <p class="text-3xl font-bold text-blue-600" id="avgProgress">0%</p>
+                </div>
+                <div class="bg-purple-50 p-4 rounded-lg">
+                    <div class="flex items-center gap-2 mb-2">
+                        <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        <span class="text-sm font-semibold text-gray-700">Events Done</span>
+                    </div>
+                    <p class="text-3xl font-bold text-purple-600" id="eventsDone">0/3</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Month Navigation -->
+        <div class="grid grid-cols-3 gap-3 mb-6">
+            <button class="p-4 rounded-lg shadow-md bg-green-600 text-white scale-105">
+                <svg class="w-6 h-6 mb-2 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                </svg>
+                <h3 class="text-sm font-bold">Month 1</h3>
+                <p class="text-xs opacity-75">Foundation</p>
+            </button>
+            <button class="p-4 rounded-lg shadow-md bg-gray-200 text-gray-400 cursor-not-allowed">
+                <svg class="w-6 h-6 mb-2 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                </svg>
+                <h3 class="text-sm font-bold">Month 2</h3>
+                <p class="text-xs opacity-75">Coming Soon</p>
+            </button>
+            <button class="p-4 rounded-lg shadow-md bg-gray-200 text-gray-400 cursor-not-allowed">
+                <svg class="w-6 h-6 mb-2 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+                </svg>
+                <h3 class="text-sm font-bold">Month 3</h3>
+                <p class="text-xs opacity-75">Coming Soon</p>
+            </button>
+        </div>
+
+        <!-- Content -->
+        <div id="sectionsContainer"></div>
+
+        <!-- Footer -->
+        <div class="mt-8 text-center text-sm text-gray-600 bg-white rounded-lg p-4 shadow">
+            <p>💚 AWS She Builds Mentorship Program | Sep - Nov 2025</p>
+            <p class="mt-1">Empowering women in tech!</p>
+        </div>
+    </div>
+
+    <script>
+        let appData = {
+            pairs: [],
+            events: [
+                { id: 1, name: 'Kick-Off Event', date: '', week: 1, mandatory: true, completed: false },
+                { id: 2, name: 'Working Backwards Session', date: '', week: 3, mandatory: false, completed: false },
+                { id: 3, name: 'Mid Program Event', date: '', week: 6, mandatory: true, completed: false }
+            ],
+            programNotes: '',
+            challenges: ''
+        };
+
+        const expandedSections = {};
+
+        function loadData() {
+            const saved = localStorage.getItem('coordinator-month1-data');
+            if (saved) {
+                appData = JSON.parse(saved);
+                updateStats();
+            }
+        }
+
+        function saveData() {
+            localStorage.setItem('coordinator-month1-data', JSON.stringify(appData));
+            const status = document.getElementById('saveStatus');
+            status.className = 'text-sm text-green-600';
+            status.textContent = '✓ Progress saved!';
+            status.classList.remove('hidden');
+            setTimeout(() => status.classList.add('hidden'), 2000);
+        }
+
+        function toggleSection(key) {
+            expandedSections[key] = !expandedSections[key];
+            renderSections();
+        }
+
+        function updateField(field, value) {
+            appData[field] = value;
+        }
+
+        function addPair() {
+            appData.pairs.push({
+                id: Date.now(),
+                mentee: '',
+                mentor: '',
+                progress: 0,
+                lastMeeting: '',
+                status: 'active',
+                notes: ''
+            });
+            renderSections();
+            updateStats();
+        }
+
+        function deletePair(id) {
+            appData.pairs = appData.pairs.filter(p => p.id !== id);
+            renderSections();
+            updateStats();
+        }
+
+        function updatePair(id, field, value) {
+            const pair = appData.pairs.find(p => p.id === id);
+            if (pair) {
+                pair[field] = field === 'progress' ? parseInt(value) || 0 : value;
+                updateStats();
+            }
+        }
+
+        function toggleEvent(id) {
+            const event = appData.events.find(e => e.id === id);
+            if (event) {
+                event.completed = !event.completed;
+                updateStats();
+                renderSections();
+            }
+        }
+
+        function updateEvent(id, field, value) {
+            const event = appData.events.find(e => e.id === id);
+            if (event) event[field] = value;
+        }
+
+        function updateStats() {
+            const activePairs = appData.pairs.filter(p => p.status === 'active').length;
+            const avgProgress = appData.pairs.length > 0 
+                ? Math.round(appData.pairs.reduce((sum, p) => sum + p.progress, 0) / appData.pairs.length)
+                : 0;
+            const completedEvents = appData.events.filter(e => e.completed).length;
+            
+            document.getElementById('activePairs').textContent = activePairs;
+            document.getElementById('avgProgress').textContent = avgProgress + '%';
+            document.getElementById('eventsDone').textContent = completedEvents + '/' + appData.events.length;
+        }
+
+        function renderSections() {
+            const container = document.getElementById('sectionsContainer');
+            container.innerHTML = `
+                ${renderPairs()}
+                ${renderEvents()}
+                ${renderNotes()}
+                ${renderChallenges()}
+            `;
+        }
+
+        function renderPairs() {
+            const isExpanded = expandedSections['pairs'];
+            return `
+                <div class="bg-white rounded-lg shadow-md mb-4 border border-gray-200">
+                    <button onclick="toggleSection('pairs')" class="w-full p-4 flex items-center justify-between hover:bg-green-50">
+                        <h3 class="text-lg font-semibold">Mentor-Mentee Pairs</h3>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${isExpanded ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7'}"/>
+                        </svg>
+                    </button>
+                    ${isExpanded ? `
+                    <div class="p-6 border-t bg-gray-50">
+                        <button onclick="addPair()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 mb-4">Add Pair</button>
+                        <div class="space-y-4">
+                            ${appData.pairs.map(pair => `
+                                <div class="bg-white p-4 rounded-lg border shadow-sm">
+                                    <div class="grid md:grid-cols-2 gap-4 mb-3">
+                                        <div>
+                                            <label class="text-xs font-medium">Mentee</label>
+                                            <input type="text" value="${pair.mentee}" onchange="updatePair(${pair.id}, 'mentee', this.value)" placeholder="Mentee name" class="w-full p-2 border rounded">
+                                        </div>
+                                        <div>
+                                            <label class="text-xs font-medium">Mentor</label>
+                                            <input type="text" value="${pair.mentor}" onchange="updatePair(${pair.id}, 'mentor', this.value)" placeholder="Mentor name" class="w-full p-2 border rounded">
+                                        </div>
+                                    </div>
+                                    <div class="grid md:grid-cols-3 gap-4 mb-3">
+                                        <div>
+                                            <label class="text-xs font-medium">Progress (%)</label>
+                                            <input type="number" min="0" max="100" value="${pair.progress}" onchange="updatePair(${pair.id}, 'progress', this.value)" class="w-full p-2 border rounded">
+                                        </div>
+                                        <div>
+                                            <label class="text-xs font-medium">Last Meeting</label>
+                                            <input type="date" value="${pair.lastMeeting}" onchange="updatePair(${pair.id}, 'lastMeeting', this.value)" class="w-full p-2 border rounded">
+                                        </div>
+                                        <div>
+                                            <label class="text-xs font-medium">Status</label>
+                                            <select value="${pair.status}" onchange="updatePair(${pair.id}, 'status', this.value)" class="w-full p-2 border rounded">
+                                                <option value="active">Active</option>
+                                                <option value="inactive">Inactive</option>
+                                                <option value="issues">Issues</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <textarea onchange="updatePair(${pair.id}, 'notes', this.value)" placeholder="Notes..." class="w-full p-2 border rounded h-20 mb-2">${pair.notes}</textarea>
+                                    <button onclick="deletePair(${pair.id})" class="text-red-600 text-sm">Remove</button>
+                                </div>
+                            `).join('')}
+                            ${appData.pairs.length === 0 ? '<p class="text-gray-500 text-center py-8">No pairs added yet</p>' : ''}
+                        </div>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        function renderEvents() {
+            const isExpanded = expandedSections['events'];
+            return `
+                <div class="bg-white rounded-lg shadow-md mb-4 border border-gray-200">
+                    <button onclick="toggleSection('events')" class="w-full p-4 flex items-center justify-between hover:bg-green-50">
+                        <h3 class="text-lg font-semibold">Program Events</h3>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${isExpanded ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7'}"/>
+                        </svg>
+                    </button>
+                    ${isExpanded ? `
+                    <div class="p-6 border-t bg-gray-50">
+                        <div class="space-y-3">
+                            ${appData.events.map(event => `
+                                <div class="bg-white p-4 rounded-lg border">
+                                    <div class="flex items-center justify-between mb-3">
+                                        <div class="flex items-center gap-3">
+                                            <input type="checkbox" ${event.completed ? 'checked' : ''} onchange="toggleEvent(${event.id})" class="w-5 h-5 cursor-pointer">
+                                            <div>
+                                                <h4 class="font-semibold">${event.name}</h4>
+                                                <div class="flex gap-2 mt-1">
+                                                    <span class="text-xs bg-gray-100 px-2 py-1 rounded">Week ${event.week}</span>
+                                                    <span class="text-xs px-2 py-1 rounded ${event.mandatory ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'}">${event.mandatory ? 'Mandatory' : 'Optional'}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        ${event.completed ? '<svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>' : ''}
+                                    </div>
+                                    <input type="date" value="${event.date}" onchange="updateEvent(${event.id}, 'date', this.value)" class="w-full p-2 border rounded">
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        function renderNotes() {
+            const isExpanded = expandedSections['notes'];
+            return `
+                <div class="bg-white rounded-lg shadow-md mb-4 border border-gray-200">
+                    <button onclick="toggleSection('notes')" class="w-full p-4 flex items-center justify-between hover:bg-green-50">
+                        <h3 class="text-lg font-semibold">Program Notes</h3>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${isExpanded ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7'}"/>
+                        </svg>
+                    </button>
+                    ${isExpanded ? `
+                    <div class="p-6 border-t bg-gray-50">
+                        <textarea onchange="updateField('programNotes', this.value)" placeholder="Program notes..." class="w-full p-4 border rounded-lg h-40">${appData.programNotes}</textarea>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        function renderChallenges() {
+            const isExpanded = expandedSections['challenges'];
+            return `
+                <div class="bg-white rounded-lg shadow-md mb-4 border border-gray-200">
+                    <button onclick="toggleSection('challenges')" class="w-full p-4 flex items-center justify-between hover:bg-green-50">
+                        <h3 class="text-lg font-semibold">Challenges & Action Items</h3>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${isExpanded ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7'}"/>
+                        </svg>
+                    </button>
+                    ${isExpanded ? `
+                    <div class="p-6 border-t bg-gray-50">
+                        <textarea onchange="updateField('challenges', this.value)" placeholder="Challenges..." class="w-full p-4 border rounded-lg h-40">${appData.challenges}</textarea>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        loadData();
+        renderSections();
+        updateStats();
+    </script>
+</body>
+</html>

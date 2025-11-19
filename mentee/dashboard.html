@@ -1,0 +1,11 @@
+function selectRole(role) {
+    localStorage.setItem('userRole', role);
+    
+    if (role === 'mentee') {
+        window.location.href = 'mentee/month1.html';  // Changed from dashboard.html
+    } else if (role === 'mentor') {
+        window.location.href = 'mentor/month1.html';  // Changed from dashboard.html
+    } else if (role === 'coordinator') {
+        window.location.href = 'coordinator/month1.html';  // Changed from dashboard.html
+    }
+}
