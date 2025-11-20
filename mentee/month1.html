@@ -71,20 +71,6 @@
         <div class="mt-8 text-center text-sm text-gray-600 bg-white rounded-lg p-4 shadow">
             <p>💜 AWS She Builds Mentorship Program | Sep - Nov 2025</p>
             <p class="mt-1">All assignments are optional. Complete what serves your journey best!</p>
-            <div class="mt-4 pt-4 border-t border-gray-200">
-                <p class="text-xs italic text-gray-500">"Stay hungry, stay curious, and stand corrected as we all see the same crystal ball from different angles; yet we all play a role to mold and shape it."</p>
-                <p class="text-xs text-gray-400 mt-1">- Davis, AWS She Builds Mentor</p>
-            </div>
-        </div>
-
-        <!-- Back to Home Button -->
-        <div class="text-center mt-4 mb-8">
-            <a href="../index.html" class="inline-flex items-center gap-2 text-purple-600 hover:text-purple-800 transition-colors">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-                </svg>
-                Back to Home
-            </a>
         </div>
     </div>
 
@@ -165,13 +151,7 @@
             for (let i = 0; i < keys.length - 1; i++) {
                 obj = obj[keys[i]];
             }
-            // Handle array index in path
-            const lastKey = keys[keys.length - 1];
-            if (!isNaN(lastKey)) {
-                obj[parseInt(lastKey)] = value;
-            } else {
-                obj[lastKey] = value;
-            }
+            obj[keys[keys.length - 1]] = value;
         }
 
         // Add meeting log
@@ -205,10 +185,8 @@
             container.innerHTML = `
                 ${renderMeetingLogs()}
                 ${renderPersonalMission()}
-                ${renderNorthStar()}
                 ${renderSmartGoals()}
                 ${renderSkills()}
-                ${renderPressRelease()}
             `;
         }
 
@@ -344,146 +322,18 @@
                     </button>
                     ${isExpanded ? `
                     <div class="p-6 border-t border-gray-200 bg-gray-50">
-                        <h4 class="font-bold mb-3 text-green-700">💪 Top 5 Strengths</h4>
+                        <h4 class="font-bold mb-3">Top 5 Strengths</h4>
                         ${appData.strengths.map((strength, idx) => `
                             <input type="text" value="${strength}" 
                                    onchange="updateArray('strengths', ${idx}, this.value)"
-                                   placeholder="Strength ${idx + 1}" class="w-full p-3 border rounded-lg mb-2 focus:ring-2 focus:ring-green-500">
+                                   placeholder="Strength ${idx + 1}" class="w-full p-3 border rounded-lg mb-2">
                         `).join('')}
-                        <h4 class="font-bold mb-3 mt-6 text-orange-700">🎯 Top 3 Development Areas</h4>
+                        <h4 class="font-bold mb-3 mt-6">Top 3 Development Areas</h4>
                         ${appData.developmentAreas.map((area, idx) => `
                             <input type="text" value="${area}" 
                                    onchange="updateArray('developmentAreas', ${idx}, this.value)"
-                                   placeholder="Development Area ${idx + 1}" class="w-full p-3 border rounded-lg mb-2 focus:ring-2 focus:ring-orange-500">
+                                   placeholder="Development Area ${idx + 1}" class="w-full p-3 border rounded-lg mb-2">
                         `).join('')}
-                        <h4 class="font-bold mb-3 mt-6 text-blue-700">📚 Learning Preferences</h4>
-                        <textarea onchange="updateField('learningPreferences', this.value)" 
-                                  placeholder="How do you learn best?" 
-                                  class="w-full p-4 border rounded-lg focus:ring-2 focus:ring-blue-500 h-32">${appData.learningPreferences}</textarea>
-                    </div>
-                    ` : ''}
-                </div>
-            `;
-        }
-
-        // Render North Star Vision
-        function renderNorthStar() {
-            const isExpanded = expandedSections['northstar'];
-            const timeframes = [
-                { key: '20years', label: '20 Years Ahead' },
-                { key: '10years', label: '10 Years Ahead' },
-                { key: '5years', label: '5 Years Ahead' },
-                { key: '3years', label: '3 Years Ahead' },
-                { key: '1year', label: '1 Year Ahead' }
-            ];
-            
-            return `
-                <div class="bg-white rounded-lg shadow-md mb-4 overflow-hidden border border-gray-200">
-                    <button onclick="toggleSection('northstar')" class="w-full p-4 flex items-center justify-between hover:bg-purple-50 transition-colors">
-                        <div class="flex items-center gap-3">
-                            <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
-                            </svg>
-                            <h3 class="text-lg font-semibold text-gray-800">North Star Vision - Working Backwards</h3>
-                        </div>
-                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${isExpanded ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7'}"/>
-                        </svg>
-                    </button>
-                    ${isExpanded ? `
-                    <div class="p-6 border-t border-gray-200 bg-gray-50">
-                        <p class="text-sm text-gray-600 bg-purple-50 p-3 rounded mb-4">
-                            Imagine yourself in the future and work backwards. Describe your life across 4 areas.
-                        </p>
-                        ${timeframes.map(tf => `
-                            <div class="mb-6 p-4 bg-white rounded-lg border border-purple-200">
-                                <h4 class="font-bold text-lg mb-4 text-purple-800">${tf.label}</h4>
-                                <div class="grid md:grid-cols-2 gap-4">
-                                    <div>
-                                        <label class="block text-sm font-semibold mb-2">✨ Fulfillment (What I Do)</label>
-                                        <textarea onchange="updateNested('northStar.${tf.key}.fulfillment', this.value)" 
-                                                  placeholder="Describe..." class="w-full p-3 border rounded-lg h-24">${appData.northStar[tf.key].fulfillment}</textarea>
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-semibold mb-2">💰 Financial (Money)</label>
-                                        <textarea onchange="updateNested('northStar.${tf.key}.financial', this.value)" 
-                                                  placeholder="Describe..." class="w-full p-3 border rounded-lg h-24">${appData.northStar[tf.key].financial}</textarea>
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-semibold mb-2">❤️ Relationship</label>
-                                        <textarea onchange="updateNested('northStar.${tf.key}.relationship', this.value)" 
-                                                  placeholder="Describe..." class="w-full p-3 border rounded-lg h-24">${appData.northStar[tf.key].relationship}</textarea>
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-semibold mb-2">🌱 Myself (Health & Growth)</label>
-                                        <textarea onchange="updateNested('northStar.${tf.key}.myself', this.value)" 
-                                                  placeholder="Describe..." class="w-full p-3 border rounded-lg h-24">${appData.northStar[tf.key].myself}</textarea>
-                                    </div>
-                                </div>
-                            </div>
-                        `).join('')}
-                    </div>
-                    ` : ''}
-                </div>
-            `;
-        }
-
-        // Render Press Release
-        function renderPressRelease() {
-            const isExpanded = expandedSections['pressrelease'];
-            return `
-                <div class="bg-white rounded-lg shadow-md mb-4 overflow-hidden border border-gray-200">
-                    <button onclick="toggleSection('pressrelease')" class="w-full p-4 flex items-center justify-between hover:bg-purple-50 transition-colors">
-                        <div class="flex items-center gap-3">
-                            <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                            </svg>
-                            <h3 class="text-lg font-semibold text-gray-800">Future Self Press Release</h3>
-                        </div>
-                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${isExpanded ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7'}"/>
-                        </svg>
-                    </button>
-                    ${isExpanded ? `
-                    <div class="p-6 border-t border-gray-200 bg-gray-50">
-                        <p class="text-sm text-gray-600 bg-purple-50 p-3 rounded mb-4">
-                            Imagine a press release about your future achievements. What would the headline be? What would people say?
-                        </p>
-                        
-                        <div class="space-y-4">
-                            <div>
-                                <label class="block text-sm font-semibold mb-2">📰 Headline</label>
-                                <input type="text" value="${appData.pressRelease.headline}" 
-                                       onchange="updateNested('pressRelease.headline', this.value)"
-                                       placeholder="Your exciting future achievement headline" 
-                                       class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-purple-500">
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-semibold mb-2">📝 Sub-heading</label>
-                                <input type="text" value="${appData.pressRelease.subheading}" 
-                                       onchange="updateNested('pressRelease.subheading', this.value)"
-                                       placeholder="Supporting headline" 
-                                       class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-purple-500">
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-semibold mb-2">📄 First Paragraph (Your Elevator Pitch)</label>
-                                <textarea onchange="updateNested('pressRelease.paragraph', this.value)" 
-                                          placeholder="Describe your achievements, impact, and key milestones..." 
-                                          class="w-full p-4 border rounded-lg focus:ring-2 focus:ring-purple-500 h-32">${appData.pressRelease.paragraph}</textarea>
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-semibold mb-2">💬 Fictional Quotes (2-3 people in your future life)</label>
-                                <p class="text-xs text-gray-500 mb-2">What would family, friends, colleagues say about you?</p>
-                                ${appData.pressRelease.quotes.map((quote, idx) => `
-                                    <textarea onchange="updateNested('pressRelease.quotes.${idx}', this.value)" 
-                                              placeholder="Quote ${idx + 1}: Person's Name, Relationship" 
-                                              class="w-full p-3 border rounded-lg mb-2 focus:ring-2 focus:ring-purple-500 h-24">${quote}</textarea>
-                                `).join('')}
-                            </div>
-                        </div>
                     </div>
                     ` : ''}
                 </div>
