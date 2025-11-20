@@ -41,6 +41,7 @@
 
         <!-- Month Navigation -->
         <div class="grid grid-cols-3 gap-3 mb-6">
+            <!-- Month 1 - Active -->
             <button class="p-4 rounded-lg shadow-md bg-purple-600 text-white scale-105">
                 <svg class="w-6 h-6 mb-2 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
@@ -48,19 +49,23 @@
                 <h3 class="text-sm font-bold">Month 1</h3>
                 <p class="text-xs opacity-75">Foundation</p>
             </button>
-            <button class="p-4 rounded-lg shadow-md bg-gray-200 text-gray-400 cursor-not-allowed">
+            
+            <!-- Month 2 - Clickable -->
+            <button onclick="window.location.href='month2.html'" class="p-4 rounded-lg shadow-md bg-blue-100 text-blue-600 hover:bg-blue-200 hover:scale-105 transition-all">
                 <svg class="w-6 h-6 mb-2 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
                 </svg>
                 <h3 class="text-sm font-bold">Month 2</h3>
-                <p class="text-xs opacity-75">Coming Soon</p>
+                <p class="text-xs opacity-75">Exploration</p>
             </button>
-            <button class="p-4 rounded-lg shadow-md bg-gray-200 text-gray-400 cursor-not-allowed">
+            
+            <!-- Month 3 - Clickable -->
+            <button onclick="window.location.href='month3.html'" class="p-4 rounded-lg shadow-md bg-green-100 text-green-600 hover:bg-green-200 hover:scale-105 transition-all">
                 <svg class="w-6 h-6 mb-2 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
                 </svg>
                 <h3 class="text-sm font-bold">Month 3</h3>
-                <p class="text-xs opacity-75">Coming Soon</p>
+                <p class="text-xs opacity-75">Apply & Thrive</p>
             </button>
         </div>
 
@@ -187,6 +192,7 @@
                 ${renderPersonalMission()}
                 ${renderSmartGoals()}
                 ${renderSkills()}
+                ${renderNorthStar()}
             `;
         }
 
@@ -221,15 +227,15 @@
                                                placeholder="Week #" class="p-2 border rounded focus:ring-2 focus:ring-purple-500">
                                     </div>
                                     <textarea onchange="updateMeeting(${log.id}, 'topics', this.value)" 
-                                              placeholder="What we talked about..." class="w-full p-2 border rounded mb-2 h-20">${log.topics}</textarea>
+                                              placeholder="What we talked about..." class="w-full p-2 border rounded mb-2 h-20 focus:ring-2 focus:ring-purple-500">${log.topics}</textarea>
                                     <textarea onchange="updateMeeting(${log.id}, 'nextSteps', this.value)" 
-                                              placeholder="What I will do next..." class="w-full p-2 border rounded mb-2 h-20">${log.nextSteps}</textarea>
+                                              placeholder="What I will do next..." class="w-full p-2 border rounded mb-2 h-20 focus:ring-2 focus:ring-purple-500">${log.nextSteps}</textarea>
                                     <textarea onchange="updateMeeting(${log.id}, 'mentorAdvice', this.value)" 
-                                              placeholder="Mentor's advice..." class="w-full p-2 border rounded mb-2 h-20">${log.mentorAdvice}</textarea>
+                                              placeholder="Mentor's advice..." class="w-full p-2 border rounded mb-2 h-20 focus:ring-2 focus:ring-purple-500">${log.mentorAdvice}</textarea>
                                     <button onclick="deleteMeeting(${log.id})" class="text-red-600 text-sm hover:text-red-800">Delete</button>
                                 </div>
                             `).join('')}
-                            ${appData.meetingLogs.length === 0 ? '<p class="text-gray-500 text-center py-8">No meetings yet</p>' : ''}
+                            ${appData.meetingLogs.length === 0 ? '<p class="text-gray-500 text-center py-8">No meetings yet. Click "Add New Meeting" to start!</p>' : ''}
                         </div>
                     </div>
                     ` : ''}
@@ -256,7 +262,7 @@
                     ${isExpanded ? `
                     <div class="p-6 border-t border-gray-200 bg-gray-50">
                         <p class="text-sm text-gray-600 bg-purple-50 p-3 rounded mb-3">
-                            Write a short statement (max 150 words) about what's most important to you.
+                            💡 Write a short statement (max 150 words) about what's most important to you in your career and life.
                         </p>
                         <textarea onchange="updateField('personalMission', this.value)" 
                                   placeholder="My personal mission is to..." 
@@ -269,7 +275,7 @@
             `;
         }
 
-        // Render SMART Goals (simplified version - you can expand this)
+        // Render SMART Goals
         function renderSmartGoals() {
             const isExpanded = expandedSections['smart'];
             return `
@@ -287,15 +293,39 @@
                     </button>
                     ${isExpanded ? `
                     <div class="p-6 border-t border-gray-200 bg-gray-50">
-                        <h4 class="font-bold mb-3">Short-Term Goals (3-month)</h4>
+                        <div class="bg-blue-50 p-3 rounded mb-4">
+                            <p class="text-sm text-gray-700"><strong>SMART</strong> = Specific, Measurable, Achievable, Relevant, Time-bound</p>
+                        </div>
+                        
+                        <h4 class="font-bold mb-3 text-purple-600">Short-Term Goals (3-month)</h4>
                         ${appData.smartGoals.shortTerm.map((goal, idx) => `
                             <div class="bg-white p-4 rounded-lg border mb-3">
+                                <label class="text-xs text-gray-600 font-semibold">Goal ${idx + 1}</label>
                                 <input type="text" value="${goal.goal}" 
                                        onchange="updateNested('smartGoals.shortTerm.${idx}.goal', this.value)"
-                                       placeholder="Goal ${idx + 1}" class="w-full p-3 border rounded-lg mb-2">
+                                       placeholder="e.g., Complete AWS Cloud Practitioner certification" 
+                                       class="w-full p-3 border rounded-lg mb-2 focus:ring-2 focus:ring-purple-500">
+                                <label class="text-xs text-gray-600 font-semibold">Success Metric</label>
                                 <input type="text" value="${goal.metric}" 
                                        onchange="updateNested('smartGoals.shortTerm.${idx}.metric', this.value)"
-                                       placeholder="Success metric" class="w-full p-3 border rounded-lg">
+                                       placeholder="e.g., Pass exam by end of Month 3" 
+                                       class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-purple-500">
+                            </div>
+                        `).join('')}
+                        
+                        <h4 class="font-bold mb-3 mt-6 text-purple-600">Long-Term Goals (6-12 months)</h4>
+                        ${appData.smartGoals.longTerm.map((goal, idx) => `
+                            <div class="bg-white p-4 rounded-lg border mb-3">
+                                <label class="text-xs text-gray-600 font-semibold">Goal ${idx + 1}</label>
+                                <input type="text" value="${goal.goal}" 
+                                       onchange="updateNested('smartGoals.longTerm.${idx}.goal', this.value)"
+                                       placeholder="e.g., Transition to cloud engineering role" 
+                                       class="w-full p-3 border rounded-lg mb-2 focus:ring-2 focus:ring-purple-500">
+                                <label class="text-xs text-gray-600 font-semibold">Success Metric</label>
+                                <input type="text" value="${goal.metric}" 
+                                       onchange="updateNested('smartGoals.longTerm.${idx}.metric', this.value)"
+                                       placeholder="e.g., Secure cloud role by December 2025" 
+                                       class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-purple-500">
                             </div>
                         `).join('')}
                     </div>
@@ -304,7 +334,7 @@
             `;
         }
 
-        // Render Skills (simplified)
+        // Render Skills
         function renderSkills() {
             const isExpanded = expandedSections['skills'];
             return `
@@ -322,17 +352,95 @@
                     </button>
                     ${isExpanded ? `
                     <div class="p-6 border-t border-gray-200 bg-gray-50">
-                        <h4 class="font-bold mb-3">Top 5 Strengths</h4>
+                        <div class="bg-green-50 p-3 rounded mb-4">
+                            <h4 class="font-bold text-green-800 mb-2">💪 Top 5 Strengths</h4>
+                            <p class="text-sm text-gray-700">What are you naturally good at?</p>
+                        </div>
                         ${appData.strengths.map((strength, idx) => `
                             <input type="text" value="${strength}" 
                                    onchange="updateArray('strengths', ${idx}, this.value)"
-                                   placeholder="Strength ${idx + 1}" class="w-full p-3 border rounded-lg mb-2">
+                                   placeholder="Strength ${idx + 1} (e.g., Problem solving, Communication)" 
+                                   class="w-full p-3 border rounded-lg mb-2 focus:ring-2 focus:ring-purple-500">
                         `).join('')}
-                        <h4 class="font-bold mb-3 mt-6">Top 3 Development Areas</h4>
+                        
+                        <div class="bg-yellow-50 p-3 rounded mb-4 mt-6">
+                            <h4 class="font-bold text-yellow-800 mb-2">🎯 Top 3 Development Areas</h4>
+                            <p class="text-sm text-gray-700">What skills do you want to improve?</p>
+                        </div>
                         ${appData.developmentAreas.map((area, idx) => `
                             <input type="text" value="${area}" 
                                    onchange="updateArray('developmentAreas', ${idx}, this.value)"
-                                   placeholder="Development Area ${idx + 1}" class="w-full p-3 border rounded-lg mb-2">
+                                   placeholder="Development Area ${idx + 1} (e.g., Public speaking, AWS Lambda)" 
+                                   class="w-full p-3 border rounded-lg mb-2 focus:ring-2 focus:ring-purple-500">
+                        `).join('')}
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        // Render North Star Vision
+        function renderNorthStar() {
+            const isExpanded = expandedSections['northstar'];
+            const timeframes = [
+                { key: '1year', label: '1 Year' },
+                { key: '3years', label: '3 Years' },
+                { key: '5years', label: '5 Years' },
+                { key: '10years', label: '10 Years' },
+                { key: '20years', label: '20 Years' }
+            ];
+            
+            return `
+                <div class="bg-white rounded-lg shadow-md mb-4 overflow-hidden border border-gray-200">
+                    <button onclick="toggleSection('northstar')" class="w-full p-4 flex items-center justify-between hover:bg-purple-50 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+                            </svg>
+                            <h3 class="text-lg font-semibold text-gray-800">North Star Vision - Working Backwards</h3>
+                        </div>
+                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${isExpanded ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7'}"/>
+                        </svg>
+                    </button>
+                    ${isExpanded ? `
+                    <div class="p-6 border-t border-gray-200 bg-gray-50">
+                        <div class="bg-purple-50 p-4 rounded mb-4">
+                            <p class="text-sm text-gray-700">
+                                ⭐ <strong>Envision your future</strong> across 4 key areas: Fulfillment, Financial, Relationships, and Personal Growth. Start with 20 years and work backwards!
+                            </p>
+                        </div>
+                        
+                        ${timeframes.reverse().map(tf => `
+                            <div class="bg-white p-4 rounded-lg border-2 mb-4">
+                                <h4 class="font-bold text-lg text-purple-600 mb-3">${tf.label} Vision</h4>
+                                <div class="grid md:grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="text-xs text-gray-600 font-semibold">💼 Fulfillment (Career)</label>
+                                        <textarea onchange="updateNested('northStar.${tf.key}.fulfillment', this.value)" 
+                                                  placeholder="What career success looks like..." 
+                                                  class="w-full p-3 border rounded-lg h-24 focus:ring-2 focus:ring-purple-500">${appData.northStar[tf.key].fulfillment}</textarea>
+                                    </div>
+                                    <div>
+                                        <label class="text-xs text-gray-600 font-semibold">💰 Financial</label>
+                                        <textarea onchange="updateNested('northStar.${tf.key}.financial', this.value)" 
+                                                  placeholder="Financial goals and stability..." 
+                                                  class="w-full p-3 border rounded-lg h-24 focus:ring-2 focus:ring-purple-500">${appData.northStar[tf.key].financial}</textarea>
+                                    </div>
+                                    <div>
+                                        <label class="text-xs text-gray-600 font-semibold">❤️ Relationships</label>
+                                        <textarea onchange="updateNested('northStar.${tf.key}.relationship', this.value)" 
+                                                  placeholder="Personal and professional relationships..." 
+                                                  class="w-full p-3 border rounded-lg h-24 focus:ring-2 focus:ring-purple-500">${appData.northStar[tf.key].relationship}</textarea>
+                                    </div>
+                                    <div>
+                                        <label class="text-xs text-gray-600 font-semibold">🌟 Myself (Personal Growth)</label>
+                                        <textarea onchange="updateNested('northStar.${tf.key}.myself', this.value)" 
+                                                  placeholder="Who you want to become..." 
+                                                  class="w-full p-3 border rounded-lg h-24 focus:ring-2 focus:ring-purple-500">${appData.northStar[tf.key].myself}</textarea>
+                                    </div>
+                                </div>
+                            </div>
                         `).join('')}
                     </div>
                     ` : ''}
