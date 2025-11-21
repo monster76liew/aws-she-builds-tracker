@@ -1,1355 +1,505 @@
-import React, { useState, useEffect } from 'react';
-import { Calendar, Target, CheckCircle2, Award, ChevronDown, ChevronUp, Save, BookOpen, Star, TrendingUp, Users } from 'lucide-react';
-
-const MentorshipTracker = () => {
-  const [activeMonth, setActiveMonth] = useState(1);
-  const [expandedSections, setExpandedSections] = useState({});
-  const [saveStatus, setSaveStatus] = useState('');
-  
-  const [data, setData] = useState({
-    personalMission: '',
-    strengths: ['', '', '', '', ''],
-    developmentAreas: ['', '', ''],
-    learningPreferences: '',
-    smartGoals: {
-      shortTerm: [
-        { goal: '', metric: '', completed: false },
-        { goal: '', metric: '', completed: false },
-        { goal: '', metric: '', completed: false }
-      ],
-      longTerm: [
-        { goal: '', metric: '', completed: false },
-        { goal: '', metric: '', completed: false }
-      ]
-    },
-    meetingLogs: [],
-    // Month 2 Data
-    industryResearch: [
-      { company: '', summary: '', skills: '', trends: '' },
-      { company: '', summary: '', skills: '', trends: '' },
-      { company: '', summary: '', skills: '', trends: '' }
-    ],
-    industryTrends: '',
-    networkingPlan: {
-      professionals: [
-        { name: '', notes: '' },
-        { name: '', notes: '' },
-        { name: '', notes: '' },
-        { name: '', notes: '' },
-        { name: '', notes: '' }
-      ],
-      events: [
-        { name: '', notes: '' },
-        { name: '', notes: '' }
-      ],
-      goals: ['', '', '']
-    },
-    skillRoadmap: {
-      technical: [
-        { skill: '', method: '', timeline: '' },
-        { skill: '', method: '', timeline: '' },
-        { skill: '', method: '', timeline: '' }
-      ],
-      soft: [
-        { skill: '', method: '', timeline: '' },
-        { skill: '', method: '', timeline: '' },
-        { skill: '', method: '', timeline: '' }
-      ]
-    },
-    linkedinChecklist: {
-      photo: false,
-      headline: false,
-      summary: false,
-      experience: false,
-      skills: false
-    },
-    elevatorPitch: {
-      thirty: '',
-      sixty: '',
-      ninety: ''
-    },
-    portfolioIdeas: ['', '', ''],
-    // Month 3 Data
-    actionPlan90: {
-      actions: ['', '', ''],
-      weeklyGoals: Array(12).fill(''),
-      resources: ['', '', '', '', '']
-    },
-    projects: [
-      { situation: '', task: '', action: '', result: '', lesson: '', feedback: '' },
-      { situation: '', task: '', action: '', result: '', lesson: '', feedback: '' }
-    ],
-    networkingMonth3: {
-      stayInTouch: [
-        { name: '', notes: '' },
-        { name: '', notes: '' },
-        { name: '', notes: '' }
-      ],
-      newConnections: [
-        { name: '', notes: '' },
-        { name: '', notes: '' }
-      ],
-      givingBack: ['', '', '']
-    },
-    learningPlan: [
-      { skill: '', method: '', checkDate: '' },
-      { skill: '', method: '', checkDate: '' }
-    ],
-    successMetrics: ['', '']
-  });
-
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        const result = await window.storage.get('mentee-data-simple');
-        if (result && result.value) {
-          const loadedData = JSON.parse(result.value);
-          // Ensure Month 3 data exists
-          if (!loadedData.actionPlan90) {
-            loadedData.actionPlan90 = {
-              actions: ['', '', ''],
-              weeklyGoals: Array(12).fill(''),
-              resources: ['', '', '', '', '']
-            };
-          }
-          if (!loadedData.projects) {
-            loadedData.projects = [
-              { situation: '', task: '', action: '', result: '', lesson: '', feedback: '' },
-              { situation: '', task: '', action: '', result: '', lesson: '', feedback: '' }
-            ];
-          }
-          if (!loadedData.networkingMonth3) {
-            loadedData.networkingMonth3 = {
-              stayInTouch: [
-                { name: '', notes: '' },
-                { name: '', notes: '' },
-                { name: '', notes: '' }
-              ],
-              newConnections: [
-                { name: '', notes: '' },
-                { name: '', notes: '' }
-              ],
-              givingBack: ['', '', '']
-            };
-          }
-          if (!loadedData.learningPlan) {
-            loadedData.learningPlan = [
-              { skill: '', method: '', checkDate: '' },
-              { skill: '', method: '', checkDate: '' }
-            ];
-          }
-          if (!loadedData.successMetrics) {
-            loadedData.successMetrics = ['', ''];
-          }
-          setData(loadedData);
-        }
-      } catch (error) {
-        console.log('Starting fresh');
-      }
-    };
-    loadData();
-  }, []);
-
-  const saveData = async () => {
-    try {
-      await window.storage.set('mentee-data-simple', JSON.stringify(data));
-      setSaveStatus('saved');
-      setTimeout(() => setSaveStatus(''), 2000);
-    } catch (error) {
-      setSaveStatus('error');
-    }
-  };
-
-  const toggleSection = (section) => {
-    setExpandedSections(prev => ({ ...prev, [section]: !prev[section] }));
-  };
-
-  const updateField = (path, value) => {
-    setData(prev => {
-      const newData = { ...prev };
-      const keys = path.split('.');
-      let current = newData;
-      for (let i = 0; i < keys.length - 1; i++) {
-        current = current[keys[i]];
-      }
-      current[keys[keys.length - 1]] = value;
-      return newData;
-    });
-  };
-
-  const updateArray = (path, index, value) => {
-    setData(prev => {
-      const newData = { ...prev };
-      const keys = path.split('.');
-      let current = newData;
-      for (let i = 0; i < keys.length - 1; i++) {
-        current = current[keys[i]];
-      }
-      current[keys[keys.length - 1]][index] = value;
-      return newData;
-    });
-  };
-
-  const updateArrayItem = (path, index, field, value) => {
-    setData(prev => {
-      const newData = { ...prev };
-      const keys = path.split('.');
-      let current = newData;
-      
-      // Navigate to the parent object
-      for (let i = 0; i < keys.length - 1; i++) {
-        if (!current[keys[i]]) {
-          current[keys[i]] = {};
-        }
-        current = current[keys[i]];
-      }
-      
-      // Get the array
-      const arrayKey = keys[keys.length - 1];
-      if (!current[arrayKey]) {
-        current[arrayKey] = [];
-      }
-      
-      // Update the specific item
-      if (!current[arrayKey][index]) {
-        current[arrayKey][index] = {};
-      }
-      current[arrayKey][index][field] = value;
-      
-      return newData;
-    });
-  };
-
-  const updateGoal = (type, index, field, value) => {
-    setData(prev => ({
-      ...prev,
-      smartGoals: {
-        ...prev.smartGoals,
-        [type]: prev.smartGoals[type].map((goal, i) => 
-          i === index ? { ...goal, [field]: value } : goal
-        )
-      }
-    }));
-  };
-
-  const addMeeting = () => {
-    const newLog = {
-      id: Date.now(),
-      date: new Date().toISOString().split('T')[0],
-      week: '',
-      topics: '',
-      nextSteps: '',
-      mentorAdvice: ''
-    };
-    setData(prev => ({
-      ...prev,
-      meetingLogs: [...prev.meetingLogs, newLog]
-    }));
-  };
-
-  const updateMeeting = (id, field, value) => {
-    setData(prev => ({
-      ...prev,
-      meetingLogs: prev.meetingLogs.map(log =>
-        log.id === id ? { ...log, [field]: value } : log
-      )
-    }));
-  };
-
-  const deleteMeeting = (id) => {
-    setData(prev => ({
-      ...prev,
-      meetingLogs: prev.meetingLogs.filter(log => log.id !== id)
-    }));
-  };
-
-  const Section = ({ title, children, sectionKey, icon: Icon }) => (
-    <div className="bg-white rounded-lg shadow-md mb-4 overflow-hidden border border-gray-200">
-      <button
-        onClick={() => toggleSection(sectionKey)}
-        className="w-full p-4 flex items-center justify-between hover:bg-purple-50 transition-colors"
-      >
-        <div className="flex items-center gap-3">
-          {Icon && <Icon className="w-5 h-5 text-purple-600" />}
-          <h3 className="text-lg font-semibold text-gray-800">{title}</h3>
-        </div>
-        {expandedSections[sectionKey] ? 
-          <ChevronUp className="w-5 h-5 text-gray-600" /> : 
-          <ChevronDown className="w-5 h-5 text-gray-600" />
-        }
-      </button>
-      {expandedSections[sectionKey] && (
-        <div className="p-6 border-t border-gray-200 bg-gray-50">
-          {children}
-        </div>
-      )}
-    </div>
-  );
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 p-4 md:p-8">
-      <div className="max-w-5xl mx-auto">
-        {/* Header */}
-        <div className="bg-white rounded-xl shadow-lg p-6 mb-6 border-t-4 border-purple-600">
-          <div className="flex items-start justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <div className="bg-purple-100 p-3 rounded-lg">
-                <Award className="w-8 h-8 text-purple-600" />
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Mentee Dashboard</h1>
-                  <span className="bg-purple-100 text-purple-700 text-xs font-semibold px-2 py-1 rounded">MENTEE</span>
-                </div>
-                <p className="text-gray-600 text-sm">AWS She Builds Mentorship Program 2025</p>
-              </div>
-            </div>
-            <button
-              onClick={saveData}
-              className="flex items-center gap-2 bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors shadow-md"
-            >
-              <Save className="w-4 h-4" />
-              <span className="hidden md:inline">Save</span>
-            </button>
-          </div>
-          
-          {saveStatus && (
-            <div className={`text-sm ${saveStatus === 'saved' ? 'text-green-600' : 'text-red-600'}`}>
-              {saveStatus === 'saved' ? '✓ Progress saved!' : '✗ Error saving'}
-            </div>
-          )}
-        </div>
-
-        {/* Month Navigation */}
-        <div className="grid grid-cols-3 gap-3 mb-6">
-          {[
-            { id: 1, title: 'Month 1', subtitle: 'Foundation', icon: BookOpen },
-            { id: 2, title: 'Month 2', subtitle: 'Exploration', icon: TrendingUp },
-            { id: 3, title: 'Month 3', subtitle: 'Growth', icon: Star }
-          ].map(month => {
-            const Icon = month.icon;
-            const isActive = activeMonth === month.id;
-            const bgColor = isActive ? (month.id === 1 ? 'bg-purple-600' : month.id === 2 ? 'bg-blue-600' : 'bg-green-600') : month.locked ? 'bg-gray-200' : 'bg-white';
-            const textColor = isActive ? 'text-white' : month.locked ? 'text-gray-400' : 'text-gray-800';
-            const iconColor = isActive ? 'text-white' : month.locked ? 'text-gray-400' : (month.id === 1 ? 'text-purple-600' : month.id === 2 ? 'text-blue-600' : 'text-green-600');
-            
-            return (
-              <button
-                key={month.id}
-                onClick={() => !month.locked && setActiveMonth(month.id)}
-                disabled={month.locked}
-                className={`p-4 rounded-lg shadow-md transition-all ${bgColor} ${textColor} ${
-                  isActive ? 'scale-105' : month.locked ? 'cursor-not-allowed' : 'hover:shadow-lg'
-                }`}
-              >
-                <Icon className={`w-6 h-6 mb-2 mx-auto ${iconColor}`} />
-                <h3 className="text-sm font-bold">{month.title}</h3>
-                <p className="text-xs opacity-75">{month.subtitle}</p>
-                {month.locked && <p className="text-xs mt-1">Coming Soon</p>}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Month 1 Content */}
-        {activeMonth === 1 && (
-          <div className="space-y-4">
-            {/* Meeting Logs */}
-            <Section title="Meeting Logs" sectionKey="meetings" icon={Calendar}>
-              <div className="mb-4">
-                <button
-                  onClick={addMeeting}
-                  className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors flex items-center gap-2"
-                >
-                  <Calendar className="w-4 h-4" />
-                  Add New Meeting
-                </button>
-              </div>
-              
-              <div className="space-y-4">
-                {data.meetingLogs.map(log => (
-                  <div key={log.id} className="bg-white p-4 rounded-lg border border-purple-200 shadow-sm">
-                    <div className="grid md:grid-cols-2 gap-3 mb-3">
-                      <input
-                        type="date"
-                        value={log.date}
-                        onChange={(e) => updateMeeting(log.id, 'date', e.target.value)}
-                        className="p-2 border border-gray-300 rounded focus:ring-2 focus:ring-purple-500"
-                      />
-                      <input
-                        type="text"
-                        value={log.week}
-                        onChange={(e) => updateMeeting(log.id, 'week', e.target.value)}
-                        placeholder="Week #"
-                        className="p-2 border border-gray-300 rounded focus:ring-2 focus:ring-purple-500"
-                      />
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Month 3 - Mentee Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 p-4">
+    <div class="max-w-5xl mx-auto">
+        <!-- Header -->
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-6 border-t-4 border-green-600">
+            <div class="flex items-start justify-between mb-4">
+                <div class="flex items-center gap-3">
+                    <div class="bg-green-100 p-3 rounded-lg">
+                        <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+                        </svg>
                     </div>
-                    <textarea
-                      value={log.topics}
-                      onChange={(e) => updateMeeting(log.id, 'topics', e.target.value)}
-                      placeholder="What we talked about..."
-                      className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-purple-500 mb-2 h-20"
-                    />
-                    <textarea
-                      value={log.nextSteps}
-                      onChange={(e) => updateMeeting(log.id, 'nextSteps', e.target.value)}
-                      placeholder="What I will do next..."
-                      className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-purple-500 mb-2 h-20"
-                    />
-                    <textarea
-                      value={log.mentorAdvice}
-                      onChange={(e) => updateMeeting(log.id, 'mentorAdvice', e.target.value)}
-                      placeholder="Mentor's advice..."
-                      className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-purple-500 mb-2 h-20"
-                    />
-                    <button
-                      onClick={() => deleteMeeting(log.id)}
-                      className="text-red-600 text-sm hover:text-red-800"
-                    >
-                      Delete
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h1 class="text-2xl font-bold text-gray-800">Mentee Dashboard</h1>
+                            <span class="bg-purple-100 text-purple-700 text-xs font-semibold px-2 py-1 rounded">MENTEE</span>
+                        </div>
+                        <p class="text-gray-600 text-sm">AWS She Builds Mentorship Program 2025</p>
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <a href="../index.html" class="flex items-center gap-1 text-sm text-gray-600 hover:text-purple-600 px-3 py-2 rounded-lg hover:bg-purple-50">
+                        ← Home
+                    </a>
+                    <button onclick="saveData()" class="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors shadow-md">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/>
+                        </svg>
+                        <span>Save</span>
                     </button>
-                  </div>
-                ))}
-                {data.meetingLogs.length === 0 && (
-                  <p className="text-gray-500 text-center py-8">No meetings yet. Click "Add New Meeting" to start!</p>
-                )}
-              </div>
-            </Section>
-
-            {/* Personal Mission */}
-            <Section title="Personal Mission Statement" sectionKey="mission" icon={Target}>
-              <p className="text-sm text-gray-600 bg-purple-50 p-3 rounded mb-3">
-                Write a short statement (max 150 words) about what's most important to you and what you want to achieve.
-              </p>
-              <textarea
-                value={data.personalMission}
-                onChange={(e) => updateField('personalMission', e.target.value)}
-                placeholder="My personal mission is to..."
-                className="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 h-40"
-                maxLength={750}
-              />
-              <p className="text-sm text-gray-500 mt-2">{data.personalMission.length}/750 characters</p>
-            </Section>
-
-            {/* SMART Goals */}
-            <Section title="SMART Goals" sectionKey="smart" icon={Target}>
-              <p className="text-sm text-gray-600 bg-purple-50 p-3 rounded mb-4">
-                SMART = Specific, Measurable, Attainable, Relevant, Time-bound
-              </p>
-              
-              <div className="mb-6">
-                <h4 className="font-bold text-lg mb-3">📅 Short-Term Goals (3-month)</h4>
-                {data.smartGoals.shortTerm.map((item, idx) => (
-                  <div key={idx} className="bg-white p-4 rounded-lg border mb-3">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="bg-purple-100 text-purple-700 px-2 py-1 rounded text-sm font-semibold">
-                        Goal {idx + 1}
-                      </span>
-                      <input
-                        type="checkbox"
-                        checked={item.completed}
-                        onChange={(e) => updateGoal('shortTerm', idx, 'completed', e.target.checked)}
-                        className="w-5 h-5"
-                      />
-                    </div>
-                    <input
-                      type="text"
-                      value={item.goal}
-                      onChange={(e) => updateGoal('shortTerm', idx, 'goal', e.target.value)}
-                      placeholder="What do you want to achieve?"
-                      className="w-full p-3 border rounded-lg mb-2 focus:ring-2 focus:ring-purple-500"
-                    />
-                    <input
-                      type="text"
-                      value={item.metric}
-                      onChange={(e) => updateGoal('shortTerm', idx, 'metric', e.target.value)}
-                      placeholder="How will you measure success?"
-                      className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-purple-500"
-                    />
-                  </div>
-                ))}
-              </div>
-
-              <div>
-                <h4 className="font-bold text-lg mb-3">🎯 Long-Term Goals (1-year)</h4>
-                {data.smartGoals.longTerm.map((item, idx) => (
-                  <div key={idx} className="bg-white p-4 rounded-lg border mb-3">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded text-sm font-semibold">
-                        Goal {idx + 1}
-                      </span>
-                      <input
-                        type="checkbox"
-                        checked={item.completed}
-                        onChange={(e) => updateGoal('longTerm', idx, 'completed', e.target.checked)}
-                        className="w-5 h-5"
-                      />
-                    </div>
-                    <input
-                      type="text"
-                      value={item.goal}
-                      onChange={(e) => updateGoal('longTerm', idx, 'goal', e.target.value)}
-                      placeholder="What do you want to achieve?"
-                      className="w-full p-3 border rounded-lg mb-2 focus:ring-2 focus:ring-blue-500"
-                    />
-                    <input
-                      type="text"
-                      value={item.metric}
-                      onChange={(e) => updateGoal('longTerm', idx, 'metric', e.target.value)}
-                      placeholder="How will you measure success?"
-                      className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-                ))}
-              </div>
-            </Section>
-
-            {/* Skills */}
-            <Section title="Skill Assessment" sectionKey="skills" icon={TrendingUp}>
-              <div className="mb-6">
-                <h4 className="font-bold mb-3 text-green-700">💪 Top 5 Strengths</h4>
-                {data.strengths.map((strength, idx) => (
-                  <input
-                    key={idx}
-                    type="text"
-                    value={strength}
-                    onChange={(e) => updateArray('strengths', idx, e.target.value)}
-                    placeholder={`Strength ${idx + 1}`}
-                    className="w-full p-3 border rounded-lg mb-2 focus:ring-2 focus:ring-green-500"
-                  />
-                ))}
-              </div>
-
-              <div className="mb-6">
-                <h4 className="font-bold mb-3 text-orange-700">🎯 Top 3 Development Areas</h4>
-                {data.developmentAreas.map((area, idx) => (
-                  <input
-                    key={idx}
-                    type="text"
-                    value={area}
-                    onChange={(e) => updateArray('developmentAreas', idx, e.target.value)}
-                    placeholder={`Development Area ${idx + 1}`}
-                    className="w-full p-3 border rounded-lg mb-2 focus:ring-2 focus:ring-orange-500"
-                  />
-                ))}
-              </div>
-
-              <div>
-                <h4 className="font-bold mb-3 text-blue-700">📚 Learning Preferences</h4>
-                <textarea
-                  value={data.learningPreferences}
-                  onChange={(e) => updateField('learningPreferences', e.target.value)}
-                  placeholder="How do you learn best? (e.g., hands-on, videos, reading)"
-                  className="w-full p-4 border rounded-lg focus:ring-2 focus:ring-blue-500 h-32"
-                />
-              </div>
-            </Section>
-          </div>
-        )}
-
-        {/* Month 2 Content */}
-        {activeMonth === 2 && (
-          <div className="space-y-4">
-            {/* Industry Research */}
-            <Section title="Industry Research (3 Companies/Roles)" sectionKey="research" icon={BookOpen}>
-              <p className="text-sm text-gray-600 bg-blue-50 p-3 rounded mb-4">
-                Research 3 companies or job roles that interest you. For each, write a short summary (max 150 words) covering what they do, required skills, and industry trends.
-              </p>
-              
-              {data.industryResearch.map((item, idx) => (
-                <div key={idx} className="mb-6 p-4 bg-white rounded-lg border border-blue-200 shadow-sm">
-                  <h4 className="font-bold text-lg mb-3 text-blue-700">Company/Role {idx + 1}</h4>
-                  
-                  <div className="space-y-3">
-                    <div>
-                      <label className="block text-sm font-semibold mb-2">Company or Job Role Name</label>
-                      <input
-                        type="text"
-                        value={item.company}
-                        onChange={(e) => updateArrayItem('industryResearch', idx, 'company', e.target.value)}
-                        placeholder="e.g., Amazon Web Services, Cloud Architect"
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-semibold mb-2">Summary (max 150 words)</label>
-                      <p className="text-xs text-gray-500 mb-1">What does the company do or what does the job role involve?</p>
-                      <textarea
-                        value={item.summary}
-                        onChange={(e) => updateArrayItem('industryResearch', idx, 'summary', e.target.value)}
-                        placeholder="Describe what the company does or what the job role involves..."
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 h-24 resize-none"
-                        maxLength={750}
-                      />
-                      <p className="text-xs text-gray-500 mt-1">{item.summary.length}/750 characters (~150 words)</p>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-semibold mb-2">Required Skills or Qualifications</label>
-                      <textarea
-                        value={item.skills}
-                        onChange={(e) => updateArrayItem('industryResearch', idx, 'skills', e.target.value)}
-                        placeholder="What skills or qualifications are needed?"
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 h-20 resize-none"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-semibold mb-2">Industry Trends or Changes</label>
-                      <textarea
-                        value={item.trends}
-                        onChange={(e) => updateArrayItem('industryResearch', idx, 'trends', e.target.value)}
-                        placeholder="Any interesting trends or changes in the industry?"
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 h-20 resize-none"
-                      />
-                    </div>
-                  </div>
                 </div>
-              ))}
-
-              <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-                <label className="block text-sm font-semibold mb-2 text-blue-900">
-                  📊 What I've Learned About Where the Industry is Heading (max 50 words)
-                </label>
-                <textarea
-                  value={data.industryTrends}
-                  onChange={(e) => updateField('industryTrends', e.target.value)}
-                  placeholder="Summary of overall industry trends based on your research..."
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 h-24 resize-none"
-                  maxLength={250}
-                />
-                <p className="text-xs text-gray-500 mt-1">{data.industryTrends.length}/250 characters</p>
-              </div>
-            </Section>
-
-            {/* Networking Action Plan */}
-            <Section title="Networking Action Plan" sectionKey="networking" icon={Users}>
-              <p className="text-sm text-gray-600 bg-blue-50 p-3 rounded mb-4">
-                Build your professional network by identifying people to connect with, events to attend, and setting clear networking goals.
-              </p>
-
-              {/* 5 Professionals to Connect With */}
-              <div className="mb-6">
-                <h4 className="font-bold text-lg mb-3 text-blue-700">👥 5 Professionals to Connect With</h4>
-                <p className="text-sm text-gray-600 mb-3">People in your field, alumni, or speakers from events</p>
-                
-                <div className="space-y-3">
-                  {data.networkingPlan && data.networkingPlan.professionals && data.networkingPlan.professionals.map((prof, idx) => (
-                    <div key={idx} className="bg-white p-3 rounded-lg border border-gray-300 shadow-sm">
-                      <div className="grid md:grid-cols-2 gap-3">
-                        <div>
-                          <label className="block text-xs font-semibold mb-1 text-gray-700">Name</label>
-                          <input
-                            type="text"
-                            value={prof.name}
-                            onChange={(e) => updateArrayItem('networkingPlan.professionals', idx, 'name', e.target.value)}
-                            placeholder={`Professional ${idx + 1} name`}
-                            className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-xs font-semibold mb-1 text-gray-700">Notes</label>
-                          <input
-                            type="text"
-                            value={prof.notes}
-                            onChange={(e) => updateArrayItem('networkingPlan.professionals', idx, 'notes', e.target.value)}
-                            placeholder="Role, company, why connect"
-                            className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* 2 Networking Events/Groups */}
-              <div className="mb-6">
-                <h4 className="font-bold text-lg mb-3 text-blue-700">📅 2 Networking Events or Groups to Join</h4>
-                <p className="text-sm text-gray-600 mb-3">LinkedIn groups, local meetups, or online webinars</p>
-                
-                <div className="space-y-3">
-                  {data.networkingPlan && data.networkingPlan.events && data.networkingPlan.events.map((event, idx) => (
-                    <div key={idx} className="bg-white p-3 rounded-lg border border-gray-300 shadow-sm">
-                      <div className="grid md:grid-cols-2 gap-3">
-                        <div>
-                          <label className="block text-xs font-semibold mb-1 text-gray-700">Event or Group Name</label>
-                          <input
-                            type="text"
-                            value={event.name}
-                            onChange={(e) => updateArrayItem('networkingPlan.events', idx, 'name', e.target.value)}
-                            placeholder={`Event/Group ${idx + 1}`}
-                            className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-xs font-semibold mb-1 text-gray-700">Notes</label>
-                          <input
-                            type="text"
-                            value={event.notes}
-                            onChange={(e) => updateArrayItem('networkingPlan.events', idx, 'notes', e.target.value)}
-                            placeholder="Date, link, focus area"
-                            className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* 2-3 Networking Goals */}
-              <div>
-                <h4 className="font-bold text-lg mb-3 text-blue-700">🎯 2-3 Networking Goals for Next Month</h4>
-                <p className="text-sm text-gray-600 mb-3">Example: Connect with 3 new people each week</p>
-                
-                <div className="space-y-2">
-                  {data.networkingPlan && data.networkingPlan.goals && data.networkingPlan.goals.map((goal, idx) => (
-                    <div key={idx} className="bg-white p-3 rounded-lg border border-gray-300 shadow-sm">
-                      <label className="block text-xs font-semibold mb-1 text-gray-700">Goal {idx + 1}</label>
-                      <input
-                        type="text"
-                        value={goal}
-                        onChange={(e) => {
-                          const newGoals = [...data.networkingPlan.goals];
-                          newGoals[idx] = e.target.value;
-                          updateField('networkingPlan.goals', newGoals);
-                        }}
-                        placeholder={`Networking goal ${idx + 1}`}
-                        className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </Section>
-
-            {/* Skill Development Roadmap */}
-            <Section title="Skill Development Roadmap" sectionKey="skillroadmap" icon={TrendingUp}>
-              <p className="text-sm text-gray-600 bg-blue-50 p-3 rounded mb-4">
-                Identify the top 3 technical and 3 soft skills you want to improve. For each skill, note how you'll learn it and when you plan to practice.
-              </p>
-
-              {/* Technical Skills */}
-              <div className="mb-6">
-                <h4 className="font-bold text-lg mb-3 text-purple-700">💻 Technical Skills</h4>
-                <p className="text-sm text-gray-600 mb-3">Coding, cloud tools, data analysis, etc.</p>
-                
-                <div className="space-y-3">
-                  {data.skillRoadmap && data.skillRoadmap.technical && data.skillRoadmap.technical.map((skill, idx) => (
-                    <div key={idx} className="bg-purple-50 p-4 rounded-lg border border-purple-200">
-                      <h5 className="font-semibold text-sm mb-3 text-purple-800">Technical Skill {idx + 1}</h5>
-                      <div className="space-y-2">
-                        <div>
-                          <label className="block text-xs font-semibold mb-1 text-gray-700">Skill to Improve</label>
-                          <input
-                            type="text"
-                            value={skill.skill}
-                            onChange={(e) => updateArrayItem('skillRoadmap.technical', idx, 'skill', e.target.value)}
-                            placeholder="e.g., Python, AWS Cloud, SQL"
-                            className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-purple-500"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-xs font-semibold mb-1 text-gray-700">How I Will Learn It</label>
-                          <input
-                            type="text"
-                            value={skill.method}
-                            onChange={(e) => updateArrayItem('skillRoadmap.technical', idx, 'method', e.target.value)}
-                            placeholder="e.g., Take online course, build practice project"
-                            className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-purple-500"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-xs font-semibold mb-1 text-gray-700">When I Plan to Do It</label>
-                          <input
-                            type="text"
-                            value={skill.timeline}
-                            onChange={(e) => updateArrayItem('skillRoadmap.technical', idx, 'timeline', e.target.value)}
-                            placeholder="e.g., Next week, by end of month"
-                            className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-purple-500"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Soft Skills */}
-              <div>
-                <h4 className="font-bold text-lg mb-3 text-green-700">🤝 Soft Skills</h4>
-                <p className="text-sm text-gray-600 mb-3">Teamwork, communication, leadership, etc.</p>
-                
-                <div className="space-y-3">
-                  {data.skillRoadmap && data.skillRoadmap.soft && data.skillRoadmap.soft.map((skill, idx) => (
-                    <div key={idx} className="bg-green-50 p-4 rounded-lg border border-green-200">
-                      <h5 className="font-semibold text-sm mb-3 text-green-800">Soft Skill {idx + 1}</h5>
-                      <div className="space-y-2">
-                        <div>
-                          <label className="block text-xs font-semibold mb-1 text-gray-700">Skill to Improve</label>
-                          <input
-                            type="text"
-                            value={skill.skill}
-                            onChange={(e) => updateArrayItem('skillRoadmap.soft', idx, 'skill', e.target.value)}
-                            placeholder="e.g., Public speaking, teamwork, time management"
-                            className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-green-500"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-xs font-semibold mb-1 text-gray-700">How I Will Learn It</label>
-                          <input
-                            type="text"
-                            value={skill.method}
-                            onChange={(e) => updateArrayItem('skillRoadmap.soft', idx, 'method', e.target.value)}
-                            placeholder="e.g., Ask for feedback at work, join Toastmasters"
-                            className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-green-500"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-xs font-semibold mb-1 text-gray-700">When I Plan to Do It</label>
-                          <input
-                            type="text"
-                            value={skill.timeline}
-                            onChange={(e) => updateArrayItem('skillRoadmap.soft', idx, 'timeline', e.target.value)}
-                            placeholder="e.g., Next week, by end of month"
-                            className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-green-500"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </Section>
-
-            {/* Professional Brand Audit */}
-            <Section title="Professional Brand Audit" sectionKey="brand" icon={Star}>
-              <p className="text-sm text-gray-600 bg-blue-50 p-3 rounded mb-4">
-                Review your online presence and create compelling elevator pitches to introduce yourself professionally.
-              </p>
-
-              {/* LinkedIn Profile Checklist */}
-              <div className="mb-6">
-                <h4 className="font-bold text-lg mb-3 text-blue-700">✅ LinkedIn Profile Checklist</h4>
-                <p className="text-sm text-gray-600 mb-3">Check off items that are up to date and clearly show your career interests</p>
-                
-                <div className="space-y-2">
-                  {[
-                    { key: 'photo', label: '📷 Professional Photo' },
-                    { key: 'headline', label: '📝 Headline (your current role/expertise)' },
-                    { key: 'summary', label: '📄 Summary (your story and goals)' },
-                    { key: 'experience', label: '💼 Work Experience' },
-                    { key: 'skills', label: '⚡ Skills Section' }
-                  ].map(item => (
-                    <label 
-                      key={item.key} 
-                      className="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-300 hover:border-blue-400 cursor-pointer transition-colors"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={data.linkedinChecklist && data.linkedinChecklist[item.key]}
-                        onChange={(e) => updateField(`linkedinChecklist.${item.key}`, e.target.checked)}
-                        className="w-5 h-5 text-blue-600 cursor-pointer rounded"
-                      />
-                      <span className={`${data.linkedinChecklist && data.linkedinChecklist[item.key] ? 'text-gray-800 font-medium' : 'text-gray-600'}`}>
-                        {item.label}
-                      </span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              {/* Elevator Pitches */}
-              <div className="mb-6">
-                <h4 className="font-bold text-lg mb-3 text-purple-700">🎤 Elevator Pitches</h4>
-                <p className="text-sm text-gray-600 mb-3">Prepare 3 versions of your introduction for different situations</p>
-                
-                <div className="space-y-4">
-                  {/* 30 Second Pitch */}
-                  <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
-                    <label className="block text-sm font-bold mb-2 text-purple-800">⚡ 30 Seconds (Quick Intro)</label>
-                    <p className="text-xs text-gray-600 mb-2">
-                      Template: "Hi, I'm [Name]. I'm a [Role] with [X] years in [Area]. I enjoy [Passion] and am looking to [Goal]."
-                    </p>
-                    <textarea
-                      value={data.elevatorPitch && data.elevatorPitch.thirty}
-                      onChange={(e) => updateField('elevatorPitch.thirty', e.target.value)}
-                      placeholder="Example: Hi, I'm Sarah. I'm a software engineer with 2 years in cloud computing. I love building user-friendly apps and am looking to connect with other women in tech."
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 h-24 resize-none"
-                    />
-                  </div>
-
-                  {/* 60 Second Pitch */}
-                  <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-                    <label className="block text-sm font-bold mb-2 text-blue-800">💬 60 Seconds (More Detail)</label>
-                    <p className="text-xs text-gray-600 mb-2">
-                      Add: Notable projects, what you enjoy about your work, and current goal.
-                    </p>
-                    <textarea
-                      value={data.elevatorPitch && data.elevatorPitch.sixty}
-                      onChange={(e) => updateField('elevatorPitch.sixty', e.target.value)}
-                      placeholder="Expand on your intro with specific achievements and what you enjoy about your work..."
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 h-32 resize-none"
-                    />
-                  </div>
-
-                  {/* 90 Second Pitch */}
-                  <div className="bg-green-50 p-4 rounded-lg border border-green-200">
-                    <label className="block text-sm font-bold mb-2 text-green-800">📖 90 Seconds (Full Story)</label>
-                    <p className="text-xs text-gray-600 mb-2">
-                      Add: Your journey, proud achievement, current interests, growth goals, and what you'd like from the listener.
-                    </p>
-                    <textarea
-                      value={data.elevatorPitch && data.elevatorPitch.ninety}
-                      onChange={(e) => updateField('elevatorPitch.ninety', e.target.value)}
-                      placeholder="Tell your complete professional story - how you started, your proudest achievement, what excites you, and where you're heading..."
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 h-40 resize-none"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Portfolio Ideas */}
-              <div>
-                <h4 className="font-bold text-lg mb-3 text-green-700">💡 Portfolio or Project Ideas to Showcase</h4>
-                <p className="text-sm text-gray-600 mb-3">GitHub link, blog, presentation, or project you could showcase</p>
-                
-                <div className="space-y-2">
-                  {data.portfolioIdeas && data.portfolioIdeas.map((idea, idx) => (
-                    <div key={idx} className="bg-white p-3 rounded-lg border border-gray-300 shadow-sm">
-                      <label className="block text-xs font-semibold mb-1 text-gray-700">Idea {idx + 1}</label>
-                      <input
-                        type="text"
-                        value={idea}
-                        onChange={(e) => {
-                          const newIdeas = [...data.portfolioIdeas];
-                          newIdeas[idx] = e.target.value;
-                          updateField('portfolioIdeas', newIdeas);
-                        }}
-                        placeholder={`Portfolio idea ${idx + 1} (e.g., GitHub repo, blog post, presentation)`}
-                        className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-green-500"
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </Section>
-          </div>
-        )}
-
-        {/* Month 3 Content */}
-        {activeMonth === 3 && (
-          <div className="space-y-4">
-            {/* 90-Day Action Plan */}
-            <Section title="90-Day Action Plan" sectionKey="actionplan" icon={Target}>
-              <p className="text-sm text-gray-600 bg-green-50 p-3 rounded mb-4">
-                Plan your next 90 days with specific actions, weekly goals, and resources you'll need to succeed.
-              </p>
-
-              {/* Three Actions */}
-              <div className="mb-6">
-                <h4 className="font-bold text-lg mb-3 text-green-700">🎯 Three Things I Will Do in the Next 90 Days</h4>
-                <p className="text-sm text-gray-600 mb-3">Set 3 major actions or milestones you want to accomplish</p>
-                
-                <div className="space-y-3">
-                  {data.actionPlan90.actions.map((action, idx) => (
-                    <div key={idx} className="bg-white p-4 rounded-lg border border-green-200 shadow-sm">
-                      <label className="block text-sm font-semibold mb-2 text-gray-700">Action {idx + 1}</label>
-                      <input
-                        type="text"
-                        value={action}
-                        onChange={(e) => {
-                          const newActions = [...data.actionPlan90.actions];
-                          newActions[idx] = e.target.value;
-                          updateField('actionPlan90.actions', newActions);
-                        }}
-                        placeholder={`Major action or milestone ${idx + 1}`}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Weekly Goals */}
-              <div className="mb-6">
-                <h4 className="font-bold text-lg mb-3 text-blue-700">📅 Weekly Goals (Weeks 1-12)</h4>
-                <p className="text-sm text-gray-600 mb-3">Set a specific goal for each week of the program</p>
-                
-                <div className="grid md:grid-cols-2 gap-3">
-                  {data.actionPlan90.weeklyGoals.map((goal, idx) => (
-                    <div key={idx} className="bg-blue-50 p-3 rounded-lg border border-blue-200">
-                      <label className="block text-xs font-semibold mb-1 text-blue-800">Week {idx + 1}</label>
-                      <input
-                        type="text"
-                        value={goal}
-                        onChange={(e) => {
-                          const newGoals = [...data.actionPlan90.weeklyGoals];
-                          newGoals[idx] = e.target.value;
-                          updateField('actionPlan90.weeklyGoals', newGoals);
-                        }}
-                        placeholder={`Week ${idx + 1} goal`}
-                        className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Resources Needed */}
-              <div>
-                <h4 className="font-bold text-lg mb-3 text-purple-700">🛠️ Resources or Help I Would Need</h4>
-                <p className="text-sm text-gray-600 mb-3">List the resources, tools, or support you'll need to achieve your goals</p>
-                
-                <div className="space-y-2">
-                  {data.actionPlan90.resources.map((resource, idx) => (
-                    <div key={idx} className="bg-purple-50 p-3 rounded-lg border border-purple-200">
-                      <label className="block text-xs font-semibold mb-1 text-purple-800">Resource {idx + 1}</label>
-                      <input
-                        type="text"
-                        value={resource}
-                        onChange={(e) => {
-                          const newResources = [...data.actionPlan90.resources];
-                          newResources[idx] = e.target.value;
-                          updateField('actionPlan90.resources', newResources);
-                        }}
-                        placeholder={`Resource, tool, or help needed ${idx + 1}`}
-                        className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-purple-500"
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </Section>
-
-            {/* Professional Portfolio - STAR Format */}
-            <Section title="Professional Portfolio (STAR Format)" sectionKey="portfolio" icon={Award}>
-              <p className="text-sm text-gray-600 bg-green-50 p-3 rounded mb-4">
-                Document 1-2 projects using the STAR format: Situation, Task, Action, Result, Lesson Learned, and Feedback received.
-              </p>
-
-              {data.projects && data.projects.map((project, idx) => (
-                <div key={idx} className="mb-6 p-5 bg-white rounded-lg border border-green-200 shadow-md">
-                  <h4 className="font-bold text-xl mb-4 text-green-700 flex items-center gap-2">
-                    <Award className="w-5 h-5" />
-                    Project {idx + 1}
-                  </h4>
-                  
-                  <div className="space-y-4">
-                    {/* Situation */}
-                    <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-                      <label className="block text-sm font-bold mb-2 text-blue-800">
-                        📍 Situation
-                      </label>
-                      <p className="text-xs text-gray-600 mb-2">What was the context or background?</p>
-                      <textarea
-                        value={project.situation}
-                        onChange={(e) => updateArrayItem('projects', idx, 'situation', e.target.value)}
-                        placeholder="Describe the context, background, or challenge you were facing..."
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 h-24 resize-none"
-                      />
-                    </div>
-
-                    {/* Task */}
-                    <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
-                      <label className="block text-sm font-bold mb-2 text-purple-800">
-                        📋 Task
-                      </label>
-                      <p className="text-xs text-gray-600 mb-2">What was your responsibility or goal?</p>
-                      <textarea
-                        value={project.task}
-                        onChange={(e) => updateArrayItem('projects', idx, 'task', e.target.value)}
-                        placeholder="What were you tasked with doing? What was your specific responsibility?"
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 h-24 resize-none"
-                      />
-                    </div>
-
-                    {/* Action */}
-                    <div className="bg-orange-50 p-4 rounded-lg border border-orange-200">
-                      <label className="block text-sm font-bold mb-2 text-orange-800">
-                        ⚡ Action
-                      </label>
-                      <p className="text-xs text-gray-600 mb-2">What specific actions did you take?</p>
-                      <textarea
-                        value={project.action}
-                        onChange={(e) => updateArrayItem('projects', idx, 'action', e.target.value)}
-                        placeholder="What steps did you take? What approach did you use? Be specific about your actions..."
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 h-24 resize-none"
-                      />
-                    </div>
-
-                    {/* Result */}
-                    <div className="bg-green-50 p-4 rounded-lg border border-green-200">
-                      <label className="block text-sm font-bold mb-2 text-green-800">
-                        ✅ Result
-                      </label>
-                      <p className="text-xs text-gray-600 mb-2">What was the outcome? Include metrics if possible.</p>
-                      <textarea
-                        value={project.result}
-                        onChange={(e) => updateArrayItem('projects', idx, 'result', e.target.value)}
-                        placeholder="What was the outcome? What impact did your actions have? Include numbers or metrics if possible..."
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 h-24 resize-none"
-                      />
-                    </div>
-
-                    {/* Lesson Learned */}
-                    <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
-                      <label className="block text-sm font-bold mb-2 text-yellow-800">
-                        💡 Lesson Learned
-                      </label>
-                      <p className="text-xs text-gray-600 mb-2">What did you learn from this experience?</p>
-                      <textarea
-                        value={project.lesson}
-                        onChange={(e) => updateArrayItem('projects', idx, 'lesson', e.target.value)}
-                        placeholder="What insights did you gain? What would you do differently? What skills did you develop?"
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 h-24 resize-none"
-                      />
-                    </div>
-
-                    {/* Feedback */}
-                    <div className="bg-pink-50 p-4 rounded-lg border border-pink-200">
-                      <label className="block text-sm font-bold mb-2 text-pink-800">
-                        💬 Feedback
-                      </label>
-                      <p className="text-xs text-gray-600 mb-2">What feedback did you receive from colleagues or mentors?</p>
-                      <textarea
-                        value={project.feedback}
-                        onChange={(e) => updateArrayItem('projects', idx, 'feedback', e.target.value)}
-                        placeholder="What did colleagues, managers, or team members say about your work?"
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 h-24 resize-none"
-                      />
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </Section>
-
-            {/* Extended Networking Plan */}
-            <Section title="Extended Networking Plan" sectionKey="networkingm3" icon={Users}>
-              <p className="text-sm text-gray-600 bg-green-50 p-3 rounded mb-4">
-                Build lasting professional relationships by staying connected, making new connections, and giving back to your community.
-              </p>
-
-              {/* People to Stay in Touch With */}
-              <div className="mb-6">
-                <h4 className="font-bold text-lg mb-3 text-blue-700">👋 3 People to Stay in Touch With</h4>
-                <p className="text-sm text-gray-600 mb-3">Who from your network should you maintain regular contact with?</p>
-                
-                <div className="space-y-3">
-                  {data.networkingMonth3 && data.networkingMonth3.stayInTouch && data.networkingMonth3.stayInTouch.map((person, idx) => (
-                    <div key={idx} className="bg-blue-50 p-4 rounded-lg border border-blue-200 shadow-sm">
-                      <div className="grid md:grid-cols-2 gap-3">
-                        <div>
-                          <label className="block text-xs font-semibold mb-1 text-blue-800">Name</label>
-                          <input
-                            type="text"
-                            value={person.name}
-                            onChange={(e) => updateArrayItem('networkingMonth3.stayInTouch', idx, 'name', e.target.value)}
-                            placeholder={`Person ${idx + 1} name`}
-                            className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-xs font-semibold mb-1 text-blue-800">How to Stay Connected</label>
-                          <input
-                            type="text"
-                            value={person.notes}
-                            onChange={(e) => updateArrayItem('networkingMonth3.stayInTouch', idx, 'notes', e.target.value)}
-                            placeholder="e.g., Monthly coffee chat, LinkedIn messages"
-                            className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* New Connections to Make */}
-              <div className="mb-6">
-                <h4 className="font-bold text-lg mb-3 text-purple-700">🤝 2 New Connections to Make</h4>
-                <p className="text-sm text-gray-600 mb-3">Who would you like to connect with in the coming months?</p>
-                
-                <div className="space-y-3">
-                  {data.networkingMonth3 && data.networkingMonth3.newConnections && data.networkingMonth3.newConnections.map((person, idx) => (
-                    <div key={idx} className="bg-purple-50 p-4 rounded-lg border border-purple-200 shadow-sm">
-                      <div className="grid md:grid-cols-2 gap-3">
-                        <div>
-                          <label className="block text-xs font-semibold mb-1 text-purple-800">Person or Group</label>
-                          <input
-                            type="text"
-                            value={person.name}
-                            onChange={(e) => updateArrayItem('networkingMonth3.newConnections', idx, 'name', e.target.value)}
-                            placeholder={`Connection ${idx + 1}`}
-                            className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-purple-500"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-xs font-semibold mb-1 text-purple-800">Why Connect</label>
-                          <input
-                            type="text"
-                            value={person.notes}
-                            onChange={(e) => updateArrayItem('networkingMonth3.newConnections', idx, 'notes', e.target.value)}
-                            placeholder="What you hope to learn or share"
-                            className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-purple-500"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Giving Back */}
-              <div>
-                <h4 className="font-bold text-lg mb-3 text-green-700">💝 Giving Back - How I Will Help Others</h4>
-                <p className="text-sm text-gray-600 mb-3">Ways you can mentor, share knowledge, or support others in tech</p>
-                
-                <div className="space-y-3">
-                  {data.networkingMonth3 && data.networkingMonth3.givingBack && data.networkingMonth3.givingBack.map((way, idx) => (
-                    <div key={idx} className="bg-green-50 p-4 rounded-lg border border-green-200 shadow-sm">
-                      <label className="block text-xs font-semibold mb-1 text-green-800">Way {idx + 1}</label>
-                      <input
-                        type="text"
-                        value={way}
-                        onChange={(e) => {
-                          const newWays = [...data.networkingMonth3.givingBack];
-                          newWays[idx] = e.target.value;
-                          updateField('networkingMonth3.givingBack', newWays);
-                        }}
-                        placeholder="e.g., Mentoring junior developers, writing blog posts, speaking at events"
-                        className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-green-500"
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </Section>
-
-            {/* Learning Plan */}
-            <Section title="Learning Plan" sectionKey="learningplan" icon={BookOpen}>
-              <p className="text-sm text-gray-600 bg-green-50 p-3 rounded mb-4">
-                Identify 2 skills you want to improve, how you'll learn them, and when you'll check your progress.
-              </p>
-
-              <div className="space-y-4">
-                {data.learningPlan && data.learningPlan.map((item, idx) => (
-                  <div key={idx} className="bg-white p-5 rounded-lg border border-blue-200 shadow-md">
-                    <h4 className="font-bold text-lg mb-4 text-blue-700 flex items-center gap-2">
-                      <BookOpen className="w-5 h-5" />
-                      Skill {idx + 1}
-                    </h4>
-                    
-                    <div className="space-y-3">
-                      <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
-                        <label className="block text-sm font-bold mb-2 text-purple-800">
-                          📚 Skill to Improve
-                        </label>
-                        <input
-                          type="text"
-                          value={item.skill}
-                          onChange={(e) => updateArrayItem('learningPlan', idx, 'skill', e.target.value)}
-                          placeholder="e.g., AWS Certification, Python, Public Speaking"
-                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
-                        />
-                      </div>
-
-                      <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-                        <label className="block text-sm font-bold mb-2 text-blue-800">
-                          🎓 How I Will Learn
-                        </label>
-                        <p className="text-xs text-gray-600 mb-2">Course, book, mentorship, practice, etc.</p>
-                        <input
-                          type="text"
-                          value={item.method}
-                          onChange={(e) => updateArrayItem('learningPlan', idx, 'method', e.target.value)}
-                          placeholder="e.g., Take online course, join study group, practice daily"
-                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                        />
-                      </div>
-
-                      <div className="bg-green-50 p-4 rounded-lg border border-green-200">
-                        <label className="block text-sm font-bold mb-2 text-green-800">
-                          📅 When I'll Check My Progress
-                        </label>
-                        <input
-                          type="date"
-                          value={item.checkDate}
-                          onChange={(e) => updateArrayItem('learningPlan', idx, 'checkDate', e.target.value)}
-                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </Section>
-
-            {/* Success Metrics */}
-            <Section title="Success Metrics" sectionKey="success" icon={CheckCircle2}>
-              <p className="text-sm text-gray-600 bg-green-50 p-3 rounded mb-4">
-                Define 2 things you will measure to track your success. Be specific about what you'll measure and how you'll know you've succeeded.
-              </p>
-
-              <div className="space-y-4">
-                {data.successMetrics && data.successMetrics.map((metric, idx) => (
-                  <div key={idx} className="bg-gradient-to-r from-green-50 to-blue-50 p-5 rounded-lg border-2 border-green-300 shadow-md">
-                    <div className="flex items-center gap-2 mb-3">
-                      <CheckCircle2 className="w-6 h-6 text-green-600" />
-                      <h4 className="font-bold text-lg text-gray-800">Success Metric {idx + 1}</h4>
-                    </div>
-                    
-                    <div className="bg-white p-4 rounded-lg border border-gray-300">
-                      <label className="block text-sm font-semibold mb-2 text-gray-700">
-                        What will you measure and how will you track it?
-                      </label>
-                      <p className="text-xs text-gray-600 mb-3">
-                        Examples: "Complete 3 AWS certifications by December", "Conduct 5 informational interviews", "Build and deploy 2 portfolio projects"
-                      </p>
-                      <textarea
-                        value={metric}
-                        onChange={(e) => {
-                          const newMetrics = [...data.successMetrics];
-                          newMetrics[idx] = e.target.value;
-                          updateField('successMetrics', newMetrics);
-                        }}
-                        placeholder={`Describe success metric ${idx + 1} with specific, measurable outcomes...`}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 h-32 resize-none"
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Celebration Section */}
-              <div className="mt-6 p-6 bg-gradient-to-r from-purple-100 via-pink-100 to-blue-100 rounded-lg border-2 border-purple-300">
-                <div className="text-center">
-                  <div className="flex justify-center mb-3">
-                    <Award className="w-12 h-12 text-purple-600" />
-                  </div>
-                  <h4 className="font-bold text-xl text-gray-800 mb-2">🎉 Congratulations! 🎉</h4>
-                  <p className="text-gray-700 mb-3">
-                    You've completed all Month 3 assignments! You're ready to apply what you've learned, grow your network, and thrive in your tech journey.
-                  </p>
-                  <p className="text-sm text-gray-600 italic">
-                    "The future belongs to those who believe in the beauty of their dreams." - Eleanor Roosevelt
-                  </p>
-                </div>
-              </div>
-            </Section>
-          </div>
-        )}
-
-        {/* Footer */}
-        <div className="mt-8 text-center text-sm text-gray-600 bg-white rounded-lg p-4 shadow">
-          <p>💜 AWS She Builds Mentorship Program | Sep - Nov 2025</p>
-          <p className="mt-1">All assignments are optional. Complete what serves your journey best!</p>
+            </div>
+            <div id="saveStatus" class="text-sm hidden"></div>
         </div>
-      </div>
-    </div>
-  );
-};
 
-export default MentorshipTracker;
+        <!-- Month Navigation -->
+        <div class="grid grid-cols-3 gap-3 mb-6">
+            <button onclick="window.location.href='month1.html'" class="p-4 rounded-lg shadow-md bg-purple-100 text-purple-600 hover:bg-purple-200 hover:scale-105 transition-all">
+                <svg class="w-6 h-6 mb-2 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                </svg>
+                <h3 class="text-sm font-bold">Month 1</h3>
+                <p class="text-xs opacity-75">Foundation</p>
+            </button>
+            
+            <button onclick="window.location.href='month2.html'" class="p-4 rounded-lg shadow-md bg-blue-100 text-blue-600 hover:bg-blue-200 hover:scale-105 transition-all">
+                <svg class="w-6 h-6 mb-2 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                </svg>
+                <h3 class="text-sm font-bold">Month 2</h3>
+                <p class="text-xs opacity-75">Exploration</p>
+            </button>
+            
+            <button class="p-4 rounded-lg shadow-md bg-green-600 text-white scale-105">
+                <svg class="w-6 h-6 mb-2 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+                </svg>
+                <h3 class="text-sm font-bold">Month 3</h3>
+                <p class="text-xs opacity-75">Apply & Thrive</p>
+            </button>
+        </div>
+
+        <!-- Content Sections -->
+        <div id="sectionsContainer"></div>
+
+        <!-- Footer -->
+        <div class="mt-8 text-center text-sm text-gray-600 bg-white rounded-lg p-4 shadow">
+            <p>💜 AWS She Builds Mentorship Program | Sep - Nov 2025</p>
+            <p class="mt-1">Month 3: Apply, Grow & Thrive - Congratulations on completing the program! 🎉</p>
+        </div>
+    </div>
+
+    <script>
+        let appData = {
+            actionPlan90: {
+                goals: ['', '', ''],
+                weeklyMilestones: ['', '', '', ''],
+                accountability: ''
+            },
+            portfolio: {
+                projects: [
+                    { name: '', description: '', link: '', completed: false },
+                    { name: '', description: '', link: '', completed: false },
+                    { name: '', description: '', link: '', completed: false }
+                ],
+                resume: '',
+                githubUrl: '',
+                portfolioUrl: ''
+            },
+            extendedNetworking: {
+                mentors: ['', ''],
+                peers: ['', '', ''],
+                communityInvolvement: ''
+            },
+            successMetrics: {
+                goalsAchieved: '',
+                skillsGained: '',
+                connections: '',
+                nextSteps: ''
+            },
+            reflection: {
+                highlights: '',
+                challenges: '',
+                learnings: '',
+                gratitude: ''
+            },
+            meetingLogs: []
+        };
+
+        const expandedSections = {};
+
+        function loadData() {
+            const saved = localStorage.getItem('mentee-month3-data');
+            if (saved) {
+                appData = JSON.parse(saved);
+            }
+        }
+
+        function saveData() {
+            localStorage.setItem('mentee-month3-data', JSON.stringify(appData));
+            const status = document.getElementById('saveStatus');
+            status.className = 'text-sm text-green-600';
+            status.textContent = '✓ Progress saved!';
+            status.classList.remove('hidden');
+            setTimeout(() => status.classList.add('hidden'), 2000);
+        }
+
+        function toggleSection(key) {
+            expandedSections[key] = !expandedSections[key];
+            renderSections();
+        }
+
+        function updateNested(path, value) {
+            const keys = path.split('.');
+            let obj = appData;
+            for (let i = 0; i < keys.length - 1; i++) {
+                obj = obj[keys[i]];
+            }
+            obj[keys[keys.length - 1]] = value;
+        }
+
+        function updateArray(field, index, value) {
+            const parts = field.split('.');
+            let obj = appData;
+            for (let i = 0; i < parts.length - 1; i++) {
+                obj = obj[parts[i]];
+            }
+            obj[parts[parts.length - 1]][index] = value;
+        }
+
+        function addMeeting() {
+            appData.meetingLogs.push({
+                id: Date.now(),
+                date: new Date().toISOString().split('T')[0],
+                week: '',
+                topics: '',
+                nextSteps: '',
+                mentorAdvice: ''
+            });
+            renderSections();
+        }
+
+        function deleteMeeting(id) {
+            appData.meetingLogs = appData.meetingLogs.filter(m => m.id !== id);
+            renderSections();
+        }
+
+        function updateMeeting(id, field, value) {
+            const meeting = appData.meetingLogs.find(m => m.id === id);
+            if (meeting) meeting[field] = value;
+        }
+
+        function renderSections() {
+            const container = document.getElementById('sectionsContainer');
+            container.innerHTML = `
+                ${renderMeetingLogs()}
+                ${renderActionPlan()}
+                ${renderPortfolio()}
+                ${renderNetworking()}
+                ${renderMetrics()}
+                ${renderReflection()}
+            `;
+        }
+
+        function renderMeetingLogs() {
+            const isExpanded = expandedSections['meetings'];
+            return `
+                <div class="bg-white rounded-lg shadow-md mb-4 overflow-hidden border border-gray-200">
+                    <button onclick="toggleSection('meetings')" class="w-full p-4 flex items-center justify-between hover:bg-green-50 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                            <h3 class="text-lg font-semibold text-gray-800">Meeting Logs</h3>
+                        </div>
+                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${isExpanded ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7'}"/>
+                        </svg>
+                    </button>
+                    ${isExpanded ? `
+                    <div class="p-6 border-t border-gray-200 bg-gray-50">
+                        <button onclick="addMeeting()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 mb-4">
+                            Add New Meeting
+                        </button>
+                        <div class="space-y-4">
+                            ${appData.meetingLogs.map(log => `
+                                <div class="bg-white p-4 rounded-lg border shadow-sm">
+                                    <div class="grid md:grid-cols-2 gap-3 mb-3">
+                                        <input type="date" value="${log.date}" onchange="updateMeeting(${log.id}, 'date', this.value)" 
+                                               class="p-2 border rounded focus:ring-2 focus:ring-green-500">
+                                        <input type="text" value="${log.week}" onchange="updateMeeting(${log.id}, 'week', this.value)" 
+                                               placeholder="Week #" class="p-2 border rounded focus:ring-2 focus:ring-green-500">
+                                    </div>
+                                    <textarea onchange="updateMeeting(${log.id}, 'topics', this.value)" 
+                                              placeholder="Topics discussed..." class="w-full p-2 border rounded mb-2 h-20">${log.topics}</textarea>
+                                    <textarea onchange="updateMeeting(${log.id}, 'nextSteps', this.value)" 
+                                              placeholder="Next steps..." class="w-full p-2 border rounded mb-2 h-20">${log.nextSteps}</textarea>
+                                    <textarea onchange="updateMeeting(${log.id}, 'mentorAdvice', this.value)" 
+                                              placeholder="Mentor's advice..." class="w-full p-2 border rounded mb-2 h-20">${log.mentorAdvice}</textarea>
+                                    <button onclick="deleteMeeting(${log.id})" class="text-red-600 text-sm hover:text-red-800">Delete</button>
+                                </div>
+                            `).join('')}
+                            ${appData.meetingLogs.length === 0 ? '<p class="text-gray-500 text-center py-8">No meetings yet</p>' : ''}
+                        </div>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        function renderActionPlan() {
+            const isExpanded = expandedSections['action'];
+            return `
+                <div class="bg-white rounded-lg shadow-md mb-4 overflow-hidden border border-gray-200">
+                    <button onclick="toggleSection('action')" class="w-full p-4 flex items-center justify-between hover:bg-green-50 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+                            </svg>
+                            <h3 class="text-lg font-semibold text-gray-800">90-Day Action Plan</h3>
+                        </div>
+                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${isExpanded ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7'}"/>
+                        </svg>
+                    </button>
+                    ${isExpanded ? `
+                    <div class="p-6 border-t border-gray-200 bg-gray-50">
+                        <div class="bg-green-50 p-3 rounded mb-4">
+                            <p class="text-sm text-gray-700">🎯 Create your action plan for the next 90 days post-program</p>
+                        </div>
+                        
+                        <h4 class="font-bold mb-3">Top 3 Goals for Next 90 Days</h4>
+                        ${appData.actionPlan90.goals.map((goal, idx) => `
+                            <input type="text" value="${goal}" 
+                                   onchange="updateArray('actionPlan90.goals', ${idx}, this.value)"
+                                   placeholder="Goal ${idx + 1}" 
+                                   class="w-full p-3 border rounded-lg mb-2 focus:ring-2 focus:ring-green-500">
+                        `).join('')}
+                        
+                        <h4 class="font-bold mb-3 mt-6">Weekly Milestones</h4>
+                        ${appData.actionPlan90.weeklyMilestones.map((milestone, idx) => `
+                            <input type="text" value="${milestone}" 
+                                   onchange="updateArray('actionPlan90.weeklyMilestones', ${idx}, this.value)"
+                                   placeholder="Week ${idx + 1} milestone" 
+                                   class="w-full p-3 border rounded-lg mb-2 focus:ring-2 focus:ring-green-500">
+                        `).join('')}
+                        
+                        <h4 class="font-bold mb-3 mt-6">Accountability Plan</h4>
+                        <textarea onchange="updateNested('actionPlan90.accountability', this.value)" 
+                                  placeholder="How will you stay accountable? Who will support you?" 
+                                  class="w-full p-4 border rounded-lg h-32 focus:ring-2 focus:ring-green-500">${appData.actionPlan90.accountability}</textarea>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        function renderPortfolio() {
+            const isExpanded = expandedSections['portfolio'];
+            return `
+                <div class="bg-white rounded-lg shadow-md mb-4 overflow-hidden border border-gray-200">
+                    <button onclick="toggleSection('portfolio')" class="w-full p-4 flex items-center justify-between hover:bg-green-50 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                            </svg>
+                            <h3 class="text-lg font-semibold text-gray-800">Professional Portfolio</h3>
+                        </div>
+                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${isExpanded ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7'}"/>
+                        </svg>
+                    </button>
+                    ${isExpanded ? `
+                    <div class="p-6 border-t border-gray-200 bg-gray-50">
+                        <div class="bg-blue-50 p-3 rounded mb-4">
+                            <p class="text-sm text-gray-700">💼 Showcase your work and achievements</p>
+                        </div>
+                        
+                        <h4 class="font-bold mb-3">Key Projects</h4>
+                        ${appData.portfolio.projects.map((project, idx) => `
+                            <div class="bg-white p-4 rounded-lg border mb-3">
+                                <input type="text" value="${project.name}" 
+                                       onchange="updateNested('portfolio.projects.${idx}.name', this.value)"
+                                       placeholder="Project name" 
+                                       class="w-full p-2 border rounded mb-2 focus:ring-2 focus:ring-green-500">
+                                <textarea onchange="updateNested('portfolio.projects.${idx}.description', this.value)" 
+                                          placeholder="Project description" 
+                                          class="w-full p-2 border rounded mb-2 h-20 focus:ring-2 focus:ring-green-500">${project.description}</textarea>
+                                <input type="url" value="${project.link}" 
+                                       onchange="updateNested('portfolio.projects.${idx}.link', this.value)"
+                                       placeholder="Project link" 
+                                       class="w-full p-2 border rounded mb-2 focus:ring-2 focus:ring-green-500">
+                                <label class="flex items-center gap-2">
+                                    <input type="checkbox" ${project.completed ? 'checked' : ''} 
+                                           onchange="updateNested('portfolio.projects.${idx}.completed', this.checked)">
+                                    <span class="text-sm">Completed</span>
+                                </label>
+                            </div>
+                        `).join('')}
+                        
+                        <h4 class="font-bold mb-3 mt-6">Professional Links</h4>
+                        <div class="space-y-3">
+                            <div>
+                                <label class="text-sm font-semibold">GitHub Profile</label>
+                                <input type="url" value="${appData.portfolio.githubUrl}" 
+                                       onchange="updateNested('portfolio.githubUrl', this.value)"
+                                       placeholder="https://github.com/yourusername" 
+                                       class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-green-500">
+                            </div>
+                            <div>
+                                <label class="text-sm font-semibold">Portfolio Website</label>
+                                <input type="url" value="${appData.portfolio.portfolioUrl}" 
+                                       onchange="updateNested('portfolio.portfolioUrl', this.value)"
+                                       placeholder="https://yourportfolio.com" 
+                                       class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-green-500">
+                            </div>
+                        </div>
+                        
+                        <h4 class="font-bold mb-3 mt-6">Resume Summary</h4>
+                        <textarea onchange="updateNested('portfolio.resume', this.value)" 
+                                  placeholder="Key achievements and updates to add to your resume..." 
+                                  class="w-full p-4 border rounded-lg h-32 focus:ring-2 focus:ring-green-500">${appData.portfolio.resume}</textarea>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        function renderNetworking() {
+            const isExpanded = expandedSections['networking'];
+            return `
+                <div class="bg-white rounded-lg shadow-md mb-4 overflow-hidden border border-gray-200">
+                    <button onclick="toggleSection('networking')" class="w-full p-4 flex items-center justify-between hover:bg-green-50 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                            </svg>
+                            <h3 class="text-lg font-semibold text-gray-800">Extended Networking</h3>
+                        </div>
+                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${isExpanded ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7'}"/>
+                        </svg>
+                    </button>
+                    ${isExpanded ? `
+                    <div class="p-6 border-t border-gray-200 bg-gray-50">
+                        <div class="bg-purple-50 p-3 rounded mb-4">
+                            <p class="text-sm text-gray-700">🤝 Build your extended network beyond the program</p>
+                        </div>
+                        
+                        <h4 class="font-bold mb-3">Additional Mentors/Advisors</h4>
+                        ${appData.extendedNetworking.mentors.map((mentor, idx) => `
+                            <input type="text" value="${mentor}" 
+                                   onchange="updateArray('extendedNetworking.mentors', ${idx}, this.value)"
+                                   placeholder="Mentor/Advisor ${idx + 1}" 
+                                   class="w-full p-3 border rounded-lg mb-2 focus:ring-2 focus:ring-green-500">
+                        `).join('')}
+                        
+                        <h4 class="font-bold mb-3 mt-6">Peer Network</h4>
+                        ${appData.extendedNetworking.peers.map((peer, idx) => `
+                            <input type="text" value="${peer}" 
+                                   onchange="updateArray('extendedNetworking.peers', ${idx}, this.value)"
+                                   placeholder="Peer ${idx + 1}" 
+                                   class="w-full p-3 border rounded-lg mb-2 focus:ring-2 focus:ring-green-500">
+                        `).join('')}
+                        
+                        <h4 class="font-bold mb-3 mt-6">Community Involvement</h4>
+                        <textarea onchange="updateNested('extendedNetworking.communityInvolvement', this.value)" 
+                                  placeholder="Groups, communities, or organizations you'll stay involved with..." 
+                                  class="w-full p-4 border rounded-lg h-32 focus:ring-2 focus:ring-green-500">${appData.extendedNetworking.communityInvolvement}</textarea>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        function renderMetrics() {
+            const isExpanded = expandedSections['metrics'];
+            return `
+                <div class="bg-white rounded-lg shadow-md mb-4 overflow-hidden border border-gray-200">
+                    <button onclick="toggleSection('metrics')" class="w-full p-4 flex items-center justify-between hover:bg-green-50 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                            </svg>
+                            <h3 class="text-lg font-semibold text-gray-800">Success Metrics</h3>
+                        </div>
+                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${isExpanded ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7'}"/>
+                        </svg>
+                    </button>
+                    ${isExpanded ? `
+                    <div class="p-6 border-t border-gray-200 bg-gray-50">
+                        <div class="bg-yellow-50 p-3 rounded mb-4">
+                            <p class="text-sm text-gray-700">📊 Measure your program success and growth</p>
+                        </div>
+                        
+                        <h4 class="font-bold mb-3">Goals Achieved</h4>
+                        <textarea onchange="updateNested('successMetrics.goalsAchieved', this.value)" 
+                                  placeholder="What goals from Month 1 did you achieve?" 
+                                  class="w-full p-4 border rounded-lg h-32 mb-4 focus:ring-2 focus:ring-green-500">${appData.successMetrics.goalsAchieved}</textarea>
+                        
+                        <h4 class="font-bold mb-3">Skills Gained</h4>
+                        <textarea onchange="updateNested('successMetrics.skillsGained', this.value)" 
+                                  placeholder="What new skills did you develop?" 
+                                  class="w-full p-4 border rounded-lg h-32 mb-4 focus:ring-2 focus:ring-green-500">${appData.successMetrics.skillsGained}</textarea>
+                        
+                        <h4 class="font-bold mb-3">Connections Made</h4>
+                        <textarea onchange="updateNested('successMetrics.connections', this.value)" 
+                                  placeholder="How many meaningful connections did you make?" 
+                                  class="w-full p-4 border rounded-lg h-32 mb-4 focus:ring-2 focus:ring-green-500">${appData.successMetrics.connections}</textarea>
+                        
+                        <h4 class="font-bold mb-3">Next Steps</h4>
+                        <textarea onchange="updateNested('successMetrics.nextSteps', this.value)" 
+                                  placeholder="What are your immediate next steps?" 
+                                  class="w-full p-4 border rounded-lg h-32 focus:ring-2 focus:ring-green-500">${appData.successMetrics.nextSteps}</textarea>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        function renderReflection() {
+            const isExpanded = expandedSections['reflection'];
+            return `
+                <div class="bg-white rounded-lg shadow-md mb-4 overflow-hidden border border-gray-200">
+                    <button onclick="toggleSection('reflection')" class="w-full p-4 flex items-center justify-between hover:bg-green-50 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                            </svg>
+                            <h3 class="text-lg font-semibold text-gray-800">Final Reflection</h3>
+                        </div>
+                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${isExpanded ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7'}"/>
+                        </svg>
+                    </button>
+                    ${isExpanded ? `
+                    <div class="p-6 border-t border-gray-200 bg-gray-50">
+                        <div class="bg-pink-50 p-3 rounded mb-4">
+                            <p class="text-sm text-gray-700">💭 Reflect on your journey through the program</p>
+                        </div>
+                        
+                        <h4 class="font-bold mb-3">Program Highlights</h4>
+                        <textarea onchange="updateNested('reflection.highlights', this.value)" 
+                                  placeholder="What were the best moments or experiences?" 
+                                  class="w-full p-4 border rounded-lg h-32 mb-4 focus:ring-2 focus:ring-green-500">${appData.reflection.highlights}</textarea>
+                        
+                        <h4 class="font-bold mb-3">Challenges Overcome</h4>
+                        <textarea onchange="updateNested('reflection.challenges', this.value)" 
+                                  placeholder="What challenges did you face and how did you overcome them?" 
+                                  class="w-full p-4 border rounded-lg h-32 mb-4 focus:ring-2 focus:ring-green-500">${appData.reflection.challenges}</textarea>
+                        
+                        <h4 class="font-bold mb-3">Key Learnings</h4>
+                        <textarea onchange="updateNested('reflection.learnings', this.value)" 
+                                  placeholder="What are the most important things you learned?" 
+                                  class="w-full p-4 border rounded-lg h-32 mb-4 focus:ring-2 focus:ring-green-500">${appData.reflection.learnings}</textarea>
+                        
+                        <h4 class="font-bold mb-3">Gratitude</h4>
+                        <textarea onchange="updateNested('reflection.gratitude', this.value)" 
+                                  placeholder="Who would you like to thank? What are you grateful for?" 
+                                  class="w-full p-4 border rounded-lg h-32 focus:ring-2 focus:ring-green-500">${appData.reflection.gratitude}</textarea>
+                        
+                        <div class="mt-6 bg-gradient-to-r from-purple-100 to-pink-100 p-6 rounded-lg text-center">
+                            <h3 class="text-2xl font-bold text-gray-800 mb-2">🎉 Congratulations! 🎉</h3>
+                            <p class="text-gray-700">You've completed the AWS She Builds Mentorship Program!</p>
+                            <p class="text-gray-600 text-sm mt-2">Keep building, keep growing, keep thriving! 💜</p>
+                        </div>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        loadData();
+        renderSections();
+    </script>
+</body>
+</html>

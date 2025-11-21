@@ -1,893 +1,445 @@
-import React, { useState, useEffect } from 'react';
-import { Calendar, Target, CheckCircle2, Award, ChevronDown, ChevronUp, Save, BookOpen, Star, TrendingUp, Users } from 'lucide-react';
-
-const MentorshipTracker = () => {
-  const [activeMonth, setActiveMonth] = useState(1);
-  const [expandedSections, setExpandedSections] = useState({});
-  const [saveStatus, setSaveStatus] = useState('');
-  
-  const [data, setData] = useState({
-    personalMission: '',
-    strengths: ['', '', '', '', ''],
-    developmentAreas: ['', '', ''],
-    learningPreferences: '',
-    smartGoals: {
-      shortTerm: [
-        { goal: '', metric: '', completed: false },
-        { goal: '', metric: '', completed: false },
-        { goal: '', metric: '', completed: false }
-      ],
-      longTerm: [
-        { goal: '', metric: '', completed: false },
-        { goal: '', metric: '', completed: false }
-      ]
-    },
-    meetingLogs: [],
-    // Month 2 Data
-    industryResearch: [
-      { company: '', summary: '', skills: '', trends: '' },
-      { company: '', summary: '', skills: '', trends: '' },
-      { company: '', summary: '', skills: '', trends: '' }
-    ],
-    industryTrends: '',
-    networkingPlan: {
-      professionals: [
-        { name: '', notes: '' },
-        { name: '', notes: '' },
-        { name: '', notes: '' },
-        { name: '', notes: '' },
-        { name: '', notes: '' }
-      ],
-      events: [
-        { name: '', notes: '' },
-        { name: '', notes: '' }
-      ],
-      goals: ['', '', '']
-    },
-    skillRoadmap: {
-      technical: [
-        { skill: '', method: '', timeline: '' },
-        { skill: '', method: '', timeline: '' },
-        { skill: '', method: '', timeline: '' }
-      ],
-      soft: [
-        { skill: '', method: '', timeline: '' },
-        { skill: '', method: '', timeline: '' },
-        { skill: '', method: '', timeline: '' }
-      ]
-    },
-    linkedinChecklist: {
-      photo: false,
-      headline: false,
-      summary: false,
-      experience: false,
-      skills: false
-    },
-    elevatorPitch: {
-      thirty: '',
-      sixty: '',
-      ninety: ''
-    },
-    portfolioIdeas: ['', '', ''],
-    // Month 3 Data
-    actionPlan90: {
-      actions: ['', '', ''],
-      weeklyGoals: Array(12).fill(''),
-      resources: ['', '', '', '', '']
-    }
-  });
-
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        const result = await window.storage.get('mentee-data-simple');
-        if (result && result.value) {
-          setData(JSON.parse(result.value));
-        }
-      } catch (error) {
-        console.log('Starting fresh');
-      }
-    };
-    loadData();
-  }, []);
-
-  const saveData = async () => {
-    try {
-      await window.storage.set('mentee-data-simple', JSON.stringify(data));
-      setSaveStatus('saved');
-      setTimeout(() => setSaveStatus(''), 2000);
-    } catch (error) {
-      setSaveStatus('error');
-    }
-  };
-
-  const toggleSection = (section) => {
-    setExpandedSections(prev => ({ ...prev, [section]: !prev[section] }));
-  };
-
-  const updateField = (path, value) => {
-    setData(prev => {
-      const newData = { ...prev };
-      const keys = path.split('.');
-      let current = newData;
-      for (let i = 0; i < keys.length - 1; i++) {
-        current = current[keys[i]];
-      }
-      current[keys[keys.length - 1]] = value;
-      return newData;
-    });
-  };
-
-  const updateArray = (path, index, value) => {
-    setData(prev => {
-      const newData = { ...prev };
-      const keys = path.split('.');
-      let current = newData;
-      for (let i = 0; i < keys.length - 1; i++) {
-        current = current[keys[i]];
-      }
-      current[keys[keys.length - 1]][index] = value;
-      return newData;
-    });
-  };
-
-  const updateArrayItem = (path, index, field, value) => {
-    setData(prev => {
-      const newData = { ...prev };
-      const keys = path.split('.');
-      let current = newData;
-      
-      // Navigate to the parent object
-      for (let i = 0; i < keys.length - 1; i++) {
-        if (!current[keys[i]]) {
-          current[keys[i]] = {};
-        }
-        current = current[keys[i]];
-      }
-      
-      // Get the array
-      const arrayKey = keys[keys.length - 1];
-      if (!current[arrayKey]) {
-        current[arrayKey] = [];
-      }
-      
-      // Update the specific item
-      if (!current[arrayKey][index]) {
-        current[arrayKey][index] = {};
-      }
-      current[arrayKey][index][field] = value;
-      
-      return newData;
-    });
-  };
-
-  const updateGoal = (type, index, field, value) => {
-    setData(prev => ({
-      ...prev,
-      smartGoals: {
-        ...prev.smartGoals,
-        [type]: prev.smartGoals[type].map((goal, i) => 
-          i === index ? { ...goal, [field]: value } : goal
-        )
-      }
-    }));
-  };
-
-  const addMeeting = () => {
-    const newLog = {
-      id: Date.now(),
-      date: new Date().toISOString().split('T')[0],
-      week: '',
-      topics: '',
-      nextSteps: '',
-      mentorAdvice: ''
-    };
-    setData(prev => ({
-      ...prev,
-      meetingLogs: [...prev.meetingLogs, newLog]
-    }));
-  };
-
-  const updateMeeting = (id, field, value) => {
-    setData(prev => ({
-      ...prev,
-      meetingLogs: prev.meetingLogs.map(log =>
-        log.id === id ? { ...log, [field]: value } : log
-      )
-    }));
-  };
-
-  const deleteMeeting = (id) => {
-    setData(prev => ({
-      ...prev,
-      meetingLogs: prev.meetingLogs.filter(log => log.id !== id)
-    }));
-  };
-
-  const Section = ({ title, children, sectionKey, icon: Icon }) => (
-    <div className="bg-white rounded-lg shadow-md mb-4 overflow-hidden border border-gray-200">
-      <button
-        onClick={() => toggleSection(sectionKey)}
-        className="w-full p-4 flex items-center justify-between hover:bg-purple-50 transition-colors"
-      >
-        <div className="flex items-center gap-3">
-          {Icon && <Icon className="w-5 h-5 text-purple-600" />}
-          <h3 className="text-lg font-semibold text-gray-800">{title}</h3>
-        </div>
-        {expandedSections[sectionKey] ? 
-          <ChevronUp className="w-5 h-5 text-gray-600" /> : 
-          <ChevronDown className="w-5 h-5 text-gray-600" />
-        }
-      </button>
-      {expandedSections[sectionKey] && (
-        <div className="p-6 border-t border-gray-200 bg-gray-50">
-          {children}
-        </div>
-      )}
-    </div>
-  );
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 p-4 md:p-8">
-      <div className="max-w-5xl mx-auto">
-        {/* Header */}
-        <div className="bg-white rounded-xl shadow-lg p-6 mb-6 border-t-4 border-purple-600">
-          <div className="flex items-start justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <div className="bg-purple-100 p-3 rounded-lg">
-                <Award className="w-8 h-8 text-purple-600" />
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Mentee Dashboard</h1>
-                  <span className="bg-purple-100 text-purple-700 text-xs font-semibold px-2 py-1 rounded">MENTEE</span>
-                </div>
-                <p className="text-gray-600 text-sm">AWS She Builds Mentorship Program 2025</p>
-              </div>
-            </div>
-            <button
-              onClick={saveData}
-              className="flex items-center gap-2 bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors shadow-md"
-            >
-              <Save className="w-4 h-4" />
-              <span className="hidden md:inline">Save</span>
-            </button>
-          </div>
-          
-          {saveStatus && (
-            <div className={`text-sm ${saveStatus === 'saved' ? 'text-green-600' : 'text-red-600'}`}>
-              {saveStatus === 'saved' ? '✓ Progress saved!' : '✗ Error saving'}
-            </div>
-          )}
-        </div>
-
-        {/* Month Navigation */}
-        <div className="grid grid-cols-3 gap-3 mb-6">
-          {[
-            { id: 1, title: 'Month 1', subtitle: 'Foundation', icon: BookOpen },
-            { id: 2, title: 'Month 2', subtitle: 'Exploration', icon: TrendingUp },
-            { id: 3, title: 'Month 3', subtitle: 'Growth', icon: Star, locked: true }
-          ].map(month => {
-            const Icon = month.icon;
-            const isActive = activeMonth === month.id;
-            const bgColor = isActive ? (month.id === 1 ? 'bg-purple-600' : month.id === 2 ? 'bg-blue-600' : 'bg-green-600') : month.locked ? 'bg-gray-200' : 'bg-white';
-            const textColor = isActive ? 'text-white' : month.locked ? 'text-gray-400' : 'text-gray-800';
-            const iconColor = isActive ? 'text-white' : month.locked ? 'text-gray-400' : (month.id === 1 ? 'text-purple-600' : month.id === 2 ? 'text-blue-600' : 'text-green-600');
-            
-            return (
-              <button
-                key={month.id}
-                onClick={() => !month.locked && setActiveMonth(month.id)}
-                disabled={month.locked}
-                className={`p-4 rounded-lg shadow-md transition-all ${bgColor} ${textColor} ${
-                  isActive ? 'scale-105' : month.locked ? 'cursor-not-allowed' : 'hover:shadow-lg'
-                }`}
-              >
-                <Icon className={`w-6 h-6 mb-2 mx-auto ${iconColor}`} />
-                <h3 className="text-sm font-bold">{month.title}</h3>
-                <p className="text-xs opacity-75">{month.subtitle}</p>
-                {month.locked && <p className="text-xs mt-1">Coming Soon</p>}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Month 1 Content */}
-        {activeMonth === 1 && (
-          <div className="space-y-4">
-            {/* Meeting Logs */}
-            <Section title="Meeting Logs" sectionKey="meetings" icon={Calendar}>
-              <div className="mb-4">
-                <button
-                  onClick={addMeeting}
-                  className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors flex items-center gap-2"
-                >
-                  <Calendar className="w-4 h-4" />
-                  Add New Meeting
-                </button>
-              </div>
-              
-              <div className="space-y-4">
-                {data.meetingLogs.map(log => (
-                  <div key={log.id} className="bg-white p-4 rounded-lg border border-purple-200 shadow-sm">
-                    <div className="grid md:grid-cols-2 gap-3 mb-3">
-                      <input
-                        type="date"
-                        value={log.date}
-                        onChange={(e) => updateMeeting(log.id, 'date', e.target.value)}
-                        className="p-2 border border-gray-300 rounded focus:ring-2 focus:ring-purple-500"
-                      />
-                      <input
-                        type="text"
-                        value={log.week}
-                        onChange={(e) => updateMeeting(log.id, 'week', e.target.value)}
-                        placeholder="Week #"
-                        className="p-2 border border-gray-300 rounded focus:ring-2 focus:ring-purple-500"
-                      />
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Month 2 - Mentee Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 p-4">
+    <div class="max-w-5xl mx-auto">
+        <!-- Header -->
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-6 border-t-4 border-blue-600">
+            <div class="flex items-start justify-between mb-4">
+                <div class="flex items-center gap-3">
+                    <div class="bg-blue-100 p-3 rounded-lg">
+                        <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                        </svg>
                     </div>
-                    <textarea
-                      value={log.topics}
-                      onChange={(e) => updateMeeting(log.id, 'topics', e.target.value)}
-                      placeholder="What we talked about..."
-                      className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-purple-500 mb-2 h-20"
-                    />
-                    <textarea
-                      value={log.nextSteps}
-                      onChange={(e) => updateMeeting(log.id, 'nextSteps', e.target.value)}
-                      placeholder="What I will do next..."
-                      className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-purple-500 mb-2 h-20"
-                    />
-                    <textarea
-                      value={log.mentorAdvice}
-                      onChange={(e) => updateMeeting(log.id, 'mentorAdvice', e.target.value)}
-                      placeholder="Mentor's advice..."
-                      className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-purple-500 mb-2 h-20"
-                    />
-                    <button
-                      onClick={() => deleteMeeting(log.id)}
-                      className="text-red-600 text-sm hover:text-red-800"
-                    >
-                      Delete
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h1 class="text-2xl font-bold text-gray-800">Mentee Dashboard</h1>
+                            <span class="bg-purple-100 text-purple-700 text-xs font-semibold px-2 py-1 rounded">MENTEE</span>
+                        </div>
+                        <p class="text-gray-600 text-sm">AWS She Builds Mentorship Program 2025</p>
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <a href="../index.html" class="flex items-center gap-1 text-sm text-gray-600 hover:text-purple-600 px-3 py-2 rounded-lg hover:bg-purple-50">
+                        ← Home
+                    </a>
+                    <button onclick="saveData()" class="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors shadow-md">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/>
+                        </svg>
+                        <span>Save</span>
                     </button>
-                  </div>
-                ))}
-                {data.meetingLogs.length === 0 && (
-                  <p className="text-gray-500 text-center py-8">No meetings yet. Click "Add New Meeting" to start!</p>
-                )}
-              </div>
-            </Section>
-
-            {/* Personal Mission */}
-            <Section title="Personal Mission Statement" sectionKey="mission" icon={Target}>
-              <p className="text-sm text-gray-600 bg-purple-50 p-3 rounded mb-3">
-                Write a short statement (max 150 words) about what's most important to you and what you want to achieve.
-              </p>
-              <textarea
-                value={data.personalMission}
-                onChange={(e) => updateField('personalMission', e.target.value)}
-                placeholder="My personal mission is to..."
-                className="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 h-40"
-                maxLength={750}
-              />
-              <p className="text-sm text-gray-500 mt-2">{data.personalMission.length}/750 characters</p>
-            </Section>
-
-            {/* SMART Goals */}
-            <Section title="SMART Goals" sectionKey="smart" icon={Target}>
-              <p className="text-sm text-gray-600 bg-purple-50 p-3 rounded mb-4">
-                SMART = Specific, Measurable, Attainable, Relevant, Time-bound
-              </p>
-              
-              <div className="mb-6">
-                <h4 className="font-bold text-lg mb-3">📅 Short-Term Goals (3-month)</h4>
-                {data.smartGoals.shortTerm.map((item, idx) => (
-                  <div key={idx} className="bg-white p-4 rounded-lg border mb-3">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="bg-purple-100 text-purple-700 px-2 py-1 rounded text-sm font-semibold">
-                        Goal {idx + 1}
-                      </span>
-                      <input
-                        type="checkbox"
-                        checked={item.completed}
-                        onChange={(e) => updateGoal('shortTerm', idx, 'completed', e.target.checked)}
-                        className="w-5 h-5"
-                      />
-                    </div>
-                    <input
-                      type="text"
-                      value={item.goal}
-                      onChange={(e) => updateGoal('shortTerm', idx, 'goal', e.target.value)}
-                      placeholder="What do you want to achieve?"
-                      className="w-full p-3 border rounded-lg mb-2 focus:ring-2 focus:ring-purple-500"
-                    />
-                    <input
-                      type="text"
-                      value={item.metric}
-                      onChange={(e) => updateGoal('shortTerm', idx, 'metric', e.target.value)}
-                      placeholder="How will you measure success?"
-                      className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-purple-500"
-                    />
-                  </div>
-                ))}
-              </div>
-
-              <div>
-                <h4 className="font-bold text-lg mb-3">🎯 Long-Term Goals (1-year)</h4>
-                {data.smartGoals.longTerm.map((item, idx) => (
-                  <div key={idx} className="bg-white p-4 rounded-lg border mb-3">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded text-sm font-semibold">
-                        Goal {idx + 1}
-                      </span>
-                      <input
-                        type="checkbox"
-                        checked={item.completed}
-                        onChange={(e) => updateGoal('longTerm', idx, 'completed', e.target.checked)}
-                        className="w-5 h-5"
-                      />
-                    </div>
-                    <input
-                      type="text"
-                      value={item.goal}
-                      onChange={(e) => updateGoal('longTerm', idx, 'goal', e.target.value)}
-                      placeholder="What do you want to achieve?"
-                      className="w-full p-3 border rounded-lg mb-2 focus:ring-2 focus:ring-blue-500"
-                    />
-                    <input
-                      type="text"
-                      value={item.metric}
-                      onChange={(e) => updateGoal('longTerm', idx, 'metric', e.target.value)}
-                      placeholder="How will you measure success?"
-                      className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-                ))}
-              </div>
-            </Section>
-
-            {/* Skills */}
-            <Section title="Skill Assessment" sectionKey="skills" icon={TrendingUp}>
-              <div className="mb-6">
-                <h4 className="font-bold mb-3 text-green-700">💪 Top 5 Strengths</h4>
-                {data.strengths.map((strength, idx) => (
-                  <input
-                    key={idx}
-                    type="text"
-                    value={strength}
-                    onChange={(e) => updateArray('strengths', idx, e.target.value)}
-                    placeholder={`Strength ${idx + 1}`}
-                    className="w-full p-3 border rounded-lg mb-2 focus:ring-2 focus:ring-green-500"
-                  />
-                ))}
-              </div>
-
-              <div className="mb-6">
-                <h4 className="font-bold mb-3 text-orange-700">🎯 Top 3 Development Areas</h4>
-                {data.developmentAreas.map((area, idx) => (
-                  <input
-                    key={idx}
-                    type="text"
-                    value={area}
-                    onChange={(e) => updateArray('developmentAreas', idx, e.target.value)}
-                    placeholder={`Development Area ${idx + 1}`}
-                    className="w-full p-3 border rounded-lg mb-2 focus:ring-2 focus:ring-orange-500"
-                  />
-                ))}
-              </div>
-
-              <div>
-                <h4 className="font-bold mb-3 text-blue-700">📚 Learning Preferences</h4>
-                <textarea
-                  value={data.learningPreferences}
-                  onChange={(e) => updateField('learningPreferences', e.target.value)}
-                  placeholder="How do you learn best? (e.g., hands-on, videos, reading)"
-                  className="w-full p-4 border rounded-lg focus:ring-2 focus:ring-blue-500 h-32"
-                />
-              </div>
-            </Section>
-          </div>
-        )}
-
-        {/* Month 2 Content */}
-        {activeMonth === 2 && (
-          <div className="space-y-4">
-            {/* Industry Research */}
-            <Section title="Industry Research (3 Companies/Roles)" sectionKey="research" icon={BookOpen}>
-              <p className="text-sm text-gray-600 bg-blue-50 p-3 rounded mb-4">
-                Research 3 companies or job roles that interest you. For each, write a short summary (max 150 words) covering what they do, required skills, and industry trends.
-              </p>
-              
-              {data.industryResearch.map((item, idx) => (
-                <div key={idx} className="mb-6 p-4 bg-white rounded-lg border border-blue-200 shadow-sm">
-                  <h4 className="font-bold text-lg mb-3 text-blue-700">Company/Role {idx + 1}</h4>
-                  
-                  <div className="space-y-3">
-                    <div>
-                      <label className="block text-sm font-semibold mb-2">Company or Job Role Name</label>
-                      <input
-                        type="text"
-                        value={item.company}
-                        onChange={(e) => updateArrayItem('industryResearch', idx, 'company', e.target.value)}
-                        placeholder="e.g., Amazon Web Services, Cloud Architect"
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-semibold mb-2">Summary (max 150 words)</label>
-                      <p className="text-xs text-gray-500 mb-1">What does the company do or what does the job role involve?</p>
-                      <textarea
-                        value={item.summary}
-                        onChange={(e) => updateArrayItem('industryResearch', idx, 'summary', e.target.value)}
-                        placeholder="Describe what the company does or what the job role involves..."
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 h-24 resize-none"
-                        maxLength={750}
-                      />
-                      <p className="text-xs text-gray-500 mt-1">{item.summary.length}/750 characters (~150 words)</p>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-semibold mb-2">Required Skills or Qualifications</label>
-                      <textarea
-                        value={item.skills}
-                        onChange={(e) => updateArrayItem('industryResearch', idx, 'skills', e.target.value)}
-                        placeholder="What skills or qualifications are needed?"
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 h-20 resize-none"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-semibold mb-2">Industry Trends or Changes</label>
-                      <textarea
-                        value={item.trends}
-                        onChange={(e) => updateArrayItem('industryResearch', idx, 'trends', e.target.value)}
-                        placeholder="Any interesting trends or changes in the industry?"
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 h-20 resize-none"
-                      />
-                    </div>
-                  </div>
                 </div>
-              ))}
-
-              <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-                <label className="block text-sm font-semibold mb-2 text-blue-900">
-                  📊 What I've Learned About Where the Industry is Heading (max 50 words)
-                </label>
-                <textarea
-                  value={data.industryTrends}
-                  onChange={(e) => updateField('industryTrends', e.target.value)}
-                  placeholder="Summary of overall industry trends based on your research..."
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 h-24 resize-none"
-                  maxLength={250}
-                />
-                <p className="text-xs text-gray-500 mt-1">{data.industryTrends.length}/250 characters</p>
-              </div>
-            </Section>
-
-            {/* Networking Action Plan */}
-            <Section title="Networking Action Plan" sectionKey="networking" icon={Users}>
-              <p className="text-sm text-gray-600 bg-blue-50 p-3 rounded mb-4">
-                Build your professional network by identifying people to connect with, events to attend, and setting clear networking goals.
-              </p>
-
-              {/* 5 Professionals to Connect With */}
-              <div className="mb-6">
-                <h4 className="font-bold text-lg mb-3 text-blue-700">👥 5 Professionals to Connect With</h4>
-                <p className="text-sm text-gray-600 mb-3">People in your field, alumni, or speakers from events</p>
-                
-                <div className="space-y-3">
-                  {data.networkingPlan && data.networkingPlan.professionals && data.networkingPlan.professionals.map((prof, idx) => (
-                    <div key={idx} className="bg-white p-3 rounded-lg border border-gray-300 shadow-sm">
-                      <div className="grid md:grid-cols-2 gap-3">
-                        <div>
-                          <label className="block text-xs font-semibold mb-1 text-gray-700">Name</label>
-                          <input
-                            type="text"
-                            value={prof.name}
-                            onChange={(e) => updateArrayItem('networkingPlan.professionals', idx, 'name', e.target.value)}
-                            placeholder={`Professional ${idx + 1} name`}
-                            className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-xs font-semibold mb-1 text-gray-700">Notes</label>
-                          <input
-                            type="text"
-                            value={prof.notes}
-                            onChange={(e) => updateArrayItem('networkingPlan.professionals', idx, 'notes', e.target.value)}
-                            placeholder="Role, company, why connect"
-                            className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* 2 Networking Events/Groups */}
-              <div className="mb-6">
-                <h4 className="font-bold text-lg mb-3 text-blue-700">📅 2 Networking Events or Groups to Join</h4>
-                <p className="text-sm text-gray-600 mb-3">LinkedIn groups, local meetups, or online webinars</p>
-                
-                <div className="space-y-3">
-                  {data.networkingPlan && data.networkingPlan.events && data.networkingPlan.events.map((event, idx) => (
-                    <div key={idx} className="bg-white p-3 rounded-lg border border-gray-300 shadow-sm">
-                      <div className="grid md:grid-cols-2 gap-3">
-                        <div>
-                          <label className="block text-xs font-semibold mb-1 text-gray-700">Event or Group Name</label>
-                          <input
-                            type="text"
-                            value={event.name}
-                            onChange={(e) => updateArrayItem('networkingPlan.events', idx, 'name', e.target.value)}
-                            placeholder={`Event/Group ${idx + 1}`}
-                            className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-xs font-semibold mb-1 text-gray-700">Notes</label>
-                          <input
-                            type="text"
-                            value={event.notes}
-                            onChange={(e) => updateArrayItem('networkingPlan.events', idx, 'notes', e.target.value)}
-                            placeholder="Date, link, focus area"
-                            className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* 2-3 Networking Goals */}
-              <div>
-                <h4 className="font-bold text-lg mb-3 text-blue-700">🎯 2-3 Networking Goals for Next Month</h4>
-                <p className="text-sm text-gray-600 mb-3">Example: Connect with 3 new people each week</p>
-                
-                <div className="space-y-2">
-                  {data.networkingPlan && data.networkingPlan.goals && data.networkingPlan.goals.map((goal, idx) => (
-                    <div key={idx} className="bg-white p-3 rounded-lg border border-gray-300 shadow-sm">
-                      <label className="block text-xs font-semibold mb-1 text-gray-700">Goal {idx + 1}</label>
-                      <input
-                        type="text"
-                        value={goal}
-                        onChange={(e) => {
-                          const newGoals = [...data.networkingPlan.goals];
-                          newGoals[idx] = e.target.value;
-                          updateField('networkingPlan.goals', newGoals);
-                        }}
-                        placeholder={`Networking goal ${idx + 1}`}
-                        className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </Section>
-
-            {/* Skill Development Roadmap */}
-            <Section title="Skill Development Roadmap" sectionKey="skillroadmap" icon={TrendingUp}>
-              <p className="text-sm text-gray-600 bg-blue-50 p-3 rounded mb-4">
-                Identify the top 3 technical and 3 soft skills you want to improve. For each skill, note how you'll learn it and when you plan to practice.
-              </p>
-
-              {/* Technical Skills */}
-              <div className="mb-6">
-                <h4 className="font-bold text-lg mb-3 text-purple-700">💻 Technical Skills</h4>
-                <p className="text-sm text-gray-600 mb-3">Coding, cloud tools, data analysis, etc.</p>
-                
-                <div className="space-y-3">
-                  {data.skillRoadmap && data.skillRoadmap.technical && data.skillRoadmap.technical.map((skill, idx) => (
-                    <div key={idx} className="bg-purple-50 p-4 rounded-lg border border-purple-200">
-                      <h5 className="font-semibold text-sm mb-3 text-purple-800">Technical Skill {idx + 1}</h5>
-                      <div className="space-y-2">
-                        <div>
-                          <label className="block text-xs font-semibold mb-1 text-gray-700">Skill to Improve</label>
-                          <input
-                            type="text"
-                            value={skill.skill}
-                            onChange={(e) => updateArrayItem('skillRoadmap.technical', idx, 'skill', e.target.value)}
-                            placeholder="e.g., Python, AWS Cloud, SQL"
-                            className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-purple-500"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-xs font-semibold mb-1 text-gray-700">How I Will Learn It</label>
-                          <input
-                            type="text"
-                            value={skill.method}
-                            onChange={(e) => updateArrayItem('skillRoadmap.technical', idx, 'method', e.target.value)}
-                            placeholder="e.g., Take online course, build practice project"
-                            className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-purple-500"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-xs font-semibold mb-1 text-gray-700">When I Plan to Do It</label>
-                          <input
-                            type="text"
-                            value={skill.timeline}
-                            onChange={(e) => updateArrayItem('skillRoadmap.technical', idx, 'timeline', e.target.value)}
-                            placeholder="e.g., Next week, by end of month"
-                            className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-purple-500"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Soft Skills */}
-              <div>
-                <h4 className="font-bold text-lg mb-3 text-green-700">🤝 Soft Skills</h4>
-                <p className="text-sm text-gray-600 mb-3">Teamwork, communication, leadership, etc.</p>
-                
-                <div className="space-y-3">
-                  {data.skillRoadmap && data.skillRoadmap.soft && data.skillRoadmap.soft.map((skill, idx) => (
-                    <div key={idx} className="bg-green-50 p-4 rounded-lg border border-green-200">
-                      <h5 className="font-semibold text-sm mb-3 text-green-800">Soft Skill {idx + 1}</h5>
-                      <div className="space-y-2">
-                        <div>
-                          <label className="block text-xs font-semibold mb-1 text-gray-700">Skill to Improve</label>
-                          <input
-                            type="text"
-                            value={skill.skill}
-                            onChange={(e) => updateArrayItem('skillRoadmap.soft', idx, 'skill', e.target.value)}
-                            placeholder="e.g., Public speaking, teamwork, time management"
-                            className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-green-500"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-xs font-semibold mb-1 text-gray-700">How I Will Learn It</label>
-                          <input
-                            type="text"
-                            value={skill.method}
-                            onChange={(e) => updateArrayItem('skillRoadmap.soft', idx, 'method', e.target.value)}
-                            placeholder="e.g., Ask for feedback at work, join Toastmasters"
-                            className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-green-500"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-xs font-semibold mb-1 text-gray-700">When I Plan to Do It</label>
-                          <input
-                            type="text"
-                            value={skill.timeline}
-                            onChange={(e) => updateArrayItem('skillRoadmap.soft', idx, 'timeline', e.target.value)}
-                            placeholder="e.g., Next week, by end of month"
-                            className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-green-500"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </Section>
-
-            {/* Professional Brand Audit */}
-            <Section title="Professional Brand Audit" sectionKey="brand" icon={Star}>
-              <p className="text-sm text-gray-600 bg-blue-50 p-3 rounded mb-4">
-                Review your online presence and create compelling elevator pitches to introduce yourself professionally.
-              </p>
-
-              {/* LinkedIn Profile Checklist */}
-              <div className="mb-6">
-                <h4 className="font-bold text-lg mb-3 text-blue-700">✅ LinkedIn Profile Checklist</h4>
-                <p className="text-sm text-gray-600 mb-3">Check off items that are up to date and clearly show your career interests</p>
-                
-                <div className="space-y-2">
-                  {[
-                    { key: 'photo', label: '📷 Professional Photo' },
-                    { key: 'headline', label: '📝 Headline (your current role/expertise)' },
-                    { key: 'summary', label: '📄 Summary (your story and goals)' },
-                    { key: 'experience', label: '💼 Work Experience' },
-                    { key: 'skills', label: '⚡ Skills Section' }
-                  ].map(item => (
-                    <label 
-                      key={item.key} 
-                      className="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-300 hover:border-blue-400 cursor-pointer transition-colors"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={data.linkedinChecklist && data.linkedinChecklist[item.key]}
-                        onChange={(e) => updateField(`linkedinChecklist.${item.key}`, e.target.checked)}
-                        className="w-5 h-5 text-blue-600 cursor-pointer rounded"
-                      />
-                      <span className={`${data.linkedinChecklist && data.linkedinChecklist[item.key] ? 'text-gray-800 font-medium' : 'text-gray-600'}`}>
-                        {item.label}
-                      </span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              {/* Elevator Pitches */}
-              <div className="mb-6">
-                <h4 className="font-bold text-lg mb-3 text-purple-700">🎤 Elevator Pitches</h4>
-                <p className="text-sm text-gray-600 mb-3">Prepare 3 versions of your introduction for different situations</p>
-                
-                <div className="space-y-4">
-                  {/* 30 Second Pitch */}
-                  <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
-                    <label className="block text-sm font-bold mb-2 text-purple-800">⚡ 30 Seconds (Quick Intro)</label>
-                    <p className="text-xs text-gray-600 mb-2">
-                      Template: "Hi, I'm [Name]. I'm a [Role] with [X] years in [Area]. I enjoy [Passion] and am looking to [Goal]."
-                    </p>
-                    <textarea
-                      value={data.elevatorPitch && data.elevatorPitch.thirty}
-                      onChange={(e) => updateField('elevatorPitch.thirty', e.target.value)}
-                      placeholder="Example: Hi, I'm Sarah. I'm a software engineer with 2 years in cloud computing. I love building user-friendly apps and am looking to connect with other women in tech."
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 h-24 resize-none"
-                    />
-                  </div>
-
-                  {/* 60 Second Pitch */}
-                  <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-                    <label className="block text-sm font-bold mb-2 text-blue-800">💬 60 Seconds (More Detail)</label>
-                    <p className="text-xs text-gray-600 mb-2">
-                      Add: Notable projects, what you enjoy about your work, and current goal.
-                    </p>
-                    <textarea
-                      value={data.elevatorPitch && data.elevatorPitch.sixty}
-                      onChange={(e) => updateField('elevatorPitch.sixty', e.target.value)}
-                      placeholder="Expand on your intro with specific achievements and what you enjoy about your work..."
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 h-32 resize-none"
-                    />
-                  </div>
-
-                  {/* 90 Second Pitch */}
-                  <div className="bg-green-50 p-4 rounded-lg border border-green-200">
-                    <label className="block text-sm font-bold mb-2 text-green-800">📖 90 Seconds (Full Story)</label>
-                    <p className="text-xs text-gray-600 mb-2">
-                      Add: Your journey, proud achievement, current interests, growth goals, and what you'd like from the listener.
-                    </p>
-                    <textarea
-                      value={data.elevatorPitch && data.elevatorPitch.ninety}
-                      onChange={(e) => updateField('elevatorPitch.ninety', e.target.value)}
-                      placeholder="Tell your complete professional story - how you started, your proudest achievement, what excites you, and where you're heading..."
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 h-40 resize-none"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Portfolio Ideas */}
-              <div>
-                <h4 className="font-bold text-lg mb-3 text-green-700">💡 Portfolio or Project Ideas to Showcase</h4>
-                <p className="text-sm text-gray-600 mb-3">GitHub link, blog, presentation, or project you could showcase</p>
-                
-                <div className="space-y-2">
-                  {data.portfolioIdeas && data.portfolioIdeas.map((idea, idx) => (
-                    <div key={idx} className="bg-white p-3 rounded-lg border border-gray-300 shadow-sm">
-                      <label className="block text-xs font-semibold mb-1 text-gray-700">Idea {idx + 1}</label>
-                      <input
-                        type="text"
-                        value={idea}
-                        onChange={(e) => {
-                          const newIdeas = [...data.portfolioIdeas];
-                          newIdeas[idx] = e.target.value;
-                          updateField('portfolioIdeas', newIdeas);
-                        }}
-                        placeholder={`Portfolio idea ${idx + 1} (e.g., GitHub repo, blog post, presentation)`}
-                        className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-green-500"
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </Section>
-          </div>
-        )}
-
-        {/* Footer */}
-        <div className="mt-8 text-center text-sm text-gray-600 bg-white rounded-lg p-4 shadow">
-          <p>💜 AWS She Builds Mentorship Program | Sep - Nov 2025</p>
-          <p className="mt-1">All assignments are optional. Complete what serves your journey best!</p>
+            </div>
+            <div id="saveStatus" class="text-sm hidden"></div>
         </div>
-      </div>
-    </div>
-  );
-};
 
-export default MentorshipTracker;
+        <!-- Month Navigation -->
+        <div class="grid grid-cols-3 gap-3 mb-6">
+            <button onclick="window.location.href='month1.html'" class="p-4 rounded-lg shadow-md bg-purple-100 text-purple-600 hover:bg-purple-200 hover:scale-105 transition-all">
+                <svg class="w-6 h-6 mb-2 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                </svg>
+                <h3 class="text-sm font-bold">Month 1</h3>
+                <p class="text-xs opacity-75">Foundation</p>
+            </button>
+            
+            <button class="p-4 rounded-lg shadow-md bg-blue-600 text-white scale-105">
+                <svg class="w-6 h-6 mb-2 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                </svg>
+                <h3 class="text-sm font-bold">Month 2</h3>
+                <p class="text-xs opacity-75">Exploration</p>
+            </button>
+            
+            <button onclick="window.location.href='month3.html'" class="p-4 rounded-lg shadow-md bg-green-100 text-green-600 hover:bg-green-200 hover:scale-105 transition-all">
+                <svg class="w-6 h-6 mb-2 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+                </svg>
+                <h3 class="text-sm font-bold">Month 3</h3>
+                <p class="text-xs opacity-75">Apply & Thrive</p>
+            </button>
+        </div>
+
+        <!-- Content Sections -->
+        <div id="sectionsContainer"></div>
+
+        <!-- Footer -->
+        <div class="mt-8 text-center text-sm text-gray-600 bg-white rounded-lg p-4 shadow">
+            <p>💜 AWS She Builds Mentorship Program | Sep - Nov 2025</p>
+            <p class="mt-1">Month 2: Exploration & Skill Development</p>
+        </div>
+    </div>
+
+    <script>
+        let appData = {
+            industryResearch: {
+                companies: ['', '', ''],
+                trends: '',
+                opportunities: '',
+                threatsOrChallenges: ''
+            },
+            networkingPlan: {
+                contacts: [
+                    { name: '', role: '', company: '', linkedinUrl: '', contacted: false, notes: '' },
+                    { name: '', role: '', company: '', linkedinUrl: '', contacted: false, notes: '' },
+                    { name: '', role: '', company: '', linkedinUrl: '', contacted: false, notes: '' }
+                ],
+                events: ['', '', ''],
+                elevatorPitch: ''
+            },
+            skillRoadmap: {
+                technical: [
+                    { skill: '', method: '', timeline: '' },
+                    { skill: '', method: '', timeline: '' },
+                    { skill: '', method: '', timeline: '' }
+                ],
+                soft: [
+                    { skill: '', method: '', timeline: '' },
+                    { skill: '', method: '', timeline: '' }
+                ],
+                linkedinChecklist: {
+                    photo: false,
+                    headline: false,
+                    summary: false,
+                    experience: false,
+                    skills: false
+                }
+            },
+            meetingLogs: []
+        };
+
+        const expandedSections = {};
+
+        function loadData() {
+            const saved = localStorage.getItem('mentee-month2-data');
+            if (saved) {
+                appData = JSON.parse(saved);
+            }
+        }
+
+        function saveData() {
+            localStorage.setItem('mentee-month2-data', JSON.stringify(appData));
+            const status = document.getElementById('saveStatus');
+            status.className = 'text-sm text-green-600';
+            status.textContent = '✓ Progress saved!';
+            status.classList.remove('hidden');
+            setTimeout(() => status.classList.add('hidden'), 2000);
+        }
+
+        function toggleSection(key) {
+            expandedSections[key] = !expandedSections[key];
+            renderSections();
+        }
+
+        function updateNested(path, value) {
+            const keys = path.split('.');
+            let obj = appData;
+            for (let i = 0; i < keys.length - 1; i++) {
+                obj = obj[keys[i]];
+            }
+            obj[keys[keys.length - 1]] = value;
+        }
+
+        function updateArray(field, index, value) {
+            appData[field][index] = value;
+        }
+
+        function addMeeting() {
+            appData.meetingLogs.push({
+                id: Date.now(),
+                date: new Date().toISOString().split('T')[0],
+                week: '',
+                topics: '',
+                nextSteps: '',
+                mentorAdvice: ''
+            });
+            renderSections();
+        }
+
+        function deleteMeeting(id) {
+            appData.meetingLogs = appData.meetingLogs.filter(m => m.id !== id);
+            renderSections();
+        }
+
+        function updateMeeting(id, field, value) {
+            const meeting = appData.meetingLogs.find(m => m.id === id);
+            if (meeting) meeting[field] = value;
+        }
+
+        function renderSections() {
+            const container = document.getElementById('sectionsContainer');
+            container.innerHTML = `
+                ${renderMeetingLogs()}
+                ${renderIndustryResearch()}
+                ${renderNetworkingPlan()}
+                ${renderSkillRoadmap()}
+            `;
+        }
+
+        function renderMeetingLogs() {
+            const isExpanded = expandedSections['meetings'];
+            return `
+                <div class="bg-white rounded-lg shadow-md mb-4 overflow-hidden border border-gray-200">
+                    <button onclick="toggleSection('meetings')" class="w-full p-4 flex items-center justify-between hover:bg-blue-50 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                            <h3 class="text-lg font-semibold text-gray-800">Meeting Logs</h3>
+                        </div>
+                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${isExpanded ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7'}"/>
+                        </svg>
+                    </button>
+                    ${isExpanded ? `
+                    <div class="p-6 border-t border-gray-200 bg-gray-50">
+                        <button onclick="addMeeting()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 mb-4">
+                            Add New Meeting
+                        </button>
+                        <div class="space-y-4">
+                            ${appData.meetingLogs.map(log => `
+                                <div class="bg-white p-4 rounded-lg border shadow-sm">
+                                    <div class="grid md:grid-cols-2 gap-3 mb-3">
+                                        <input type="date" value="${log.date}" onchange="updateMeeting(${log.id}, 'date', this.value)" 
+                                               class="p-2 border rounded focus:ring-2 focus:ring-blue-500">
+                                        <input type="text" value="${log.week}" onchange="updateMeeting(${log.id}, 'week', this.value)" 
+                                               placeholder="Week #" class="p-2 border rounded focus:ring-2 focus:ring-blue-500">
+                                    </div>
+                                    <textarea onchange="updateMeeting(${log.id}, 'topics', this.value)" 
+                                              placeholder="Topics discussed..." class="w-full p-2 border rounded mb-2 h-20">${log.topics}</textarea>
+                                    <textarea onchange="updateMeeting(${log.id}, 'nextSteps', this.value)" 
+                                              placeholder="Next steps..." class="w-full p-2 border rounded mb-2 h-20">${log.nextSteps}</textarea>
+                                    <textarea onchange="updateMeeting(${log.id}, 'mentorAdvice', this.value)" 
+                                              placeholder="Mentor's advice..." class="w-full p-2 border rounded mb-2 h-20">${log.mentorAdvice}</textarea>
+                                    <button onclick="deleteMeeting(${log.id})" class="text-red-600 text-sm hover:text-red-800">Delete</button>
+                                </div>
+                            `).join('')}
+                            ${appData.meetingLogs.length === 0 ? '<p class="text-gray-500 text-center py-8">No meetings yet</p>' : ''}
+                        </div>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        function renderIndustryResearch() {
+            const isExpanded = expandedSections['industry'];
+            return `
+                <div class="bg-white rounded-lg shadow-md mb-4 overflow-hidden border border-gray-200">
+                    <button onclick="toggleSection('industry')" class="w-full p-4 flex items-center justify-between hover:bg-blue-50 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                            <h3 class="text-lg font-semibold text-gray-800">Industry Research</h3>
+                        </div>
+                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${isExpanded ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7'}"/>
+                        </svg>
+                    </button>
+                    ${isExpanded ? `
+                    <div class="p-6 border-t border-gray-200 bg-gray-50">
+                        <div class="bg-blue-50 p-3 rounded mb-4">
+                            <p class="text-sm text-gray-700">🔍 Research companies and industry trends in your target field</p>
+                        </div>
+                        
+                        <h4 class="font-bold mb-3">Target Companies</h4>
+                        ${appData.industryResearch.companies.map((company, idx) => `
+                            <input type="text" value="${company}" 
+                                   onchange="updateArray('industryResearch.companies', ${idx}, this.value)"
+                                   placeholder="Company ${idx + 1}" 
+                                   class="w-full p-3 border rounded-lg mb-2 focus:ring-2 focus:ring-blue-500">
+                        `).join('')}
+                        
+                        <h4 class="font-bold mb-3 mt-6">Industry Trends</h4>
+                        <textarea onchange="updateNested('industryResearch.trends', this.value)" 
+                                  placeholder="What trends are shaping your target industry?" 
+                                  class="w-full p-4 border rounded-lg h-32 mb-4">${appData.industryResearch.trends}</textarea>
+                        
+                        <h4 class="font-bold mb-3">Opportunities</h4>
+                        <textarea onchange="updateNested('industryResearch.opportunities', this.value)" 
+                                  placeholder="What opportunities do you see?" 
+                                  class="w-full p-4 border rounded-lg h-32 mb-4">${appData.industryResearch.opportunities}</textarea>
+                        
+                        <h4 class="font-bold mb-3">Challenges</h4>
+                        <textarea onchange="updateNested('industryResearch.threatsOrChallenges', this.value)" 
+                                  placeholder="What challenges might you face?" 
+                                  class="w-full p-4 border rounded-lg h-32">${appData.industryResearch.threatsOrChallenges}</textarea>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        function renderNetworkingPlan() {
+            const isExpanded = expandedSections['networking'];
+            return `
+                <div class="bg-white rounded-lg shadow-md mb-4 overflow-hidden border border-gray-200">
+                    <button onclick="toggleSection('networking')" class="w-full p-4 flex items-center justify-between hover:bg-blue-50 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                            </svg>
+                            <h3 class="text-lg font-semibold text-gray-800">Networking Action Plan</h3>
+                        </div>
+                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${isExpanded ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7'}"/>
+                        </svg>
+                    </button>
+                    ${isExpanded ? `
+                    <div class="p-6 border-t border-gray-200 bg-gray-50">
+                        <div class="bg-green-50 p-3 rounded mb-4">
+                            <p class="text-sm text-gray-700">🤝 Build your professional network strategically</p>
+                        </div>
+                        
+                        <h4 class="font-bold mb-3">Key Contacts to Reach</h4>
+                        ${appData.networkingPlan.contacts.map((contact, idx) => `
+                            <div class="bg-white p-4 rounded-lg border mb-3">
+                                <div class="grid md:grid-cols-2 gap-3 mb-2">
+                                    <input type="text" value="${contact.name}" 
+                                           onchange="updateNested('networkingPlan.contacts.${idx}.name', this.value)"
+                                           placeholder="Name" 
+                                           class="p-2 border rounded">
+                                    <input type="text" value="${contact.role}" 
+                                           onchange="updateNested('networkingPlan.contacts.${idx}.role', this.value)"
+                                           placeholder="Role" 
+                                           class="p-2 border rounded">
+                                </div>
+                                <div class="grid md:grid-cols-2 gap-3 mb-2">
+                                    <input type="text" value="${contact.company}" 
+                                           onchange="updateNested('networkingPlan.contacts.${idx}.company', this.value)"
+                                           placeholder="Company" 
+                                           class="p-2 border rounded">
+                                    <input type="url" value="${contact.linkedinUrl}" 
+                                           onchange="updateNested('networkingPlan.contacts.${idx}.linkedinUrl', this.value)"
+                                           placeholder="LinkedIn URL" 
+                                           class="p-2 border rounded">
+                                </div>
+                                <textarea onchange="updateNested('networkingPlan.contacts.${idx}.notes', this.value)" 
+                                          placeholder="Notes..." 
+                                          class="w-full p-2 border rounded h-20">${contact.notes}</textarea>
+                                <label class="flex items-center gap-2 mt-2">
+                                    <input type="checkbox" ${contact.contacted ? 'checked' : ''} 
+                                           onchange="updateNested('networkingPlan.contacts.${idx}.contacted', this.checked)">
+                                    <span class="text-sm">Contacted</span>
+                                </label>
+                            </div>
+                        `).join('')}
+                        
+                        <h4 class="font-bold mb-3 mt-6">Networking Events</h4>
+                        ${appData.networkingPlan.events.map((event, idx) => `
+                            <input type="text" value="${event}" 
+                                   onchange="updateArray('networkingPlan.events', ${idx}, this.value)"
+                                   placeholder="Event ${idx + 1}" 
+                                   class="w-full p-3 border rounded-lg mb-2">
+                        `).join('')}
+                        
+                        <h4 class="font-bold mb-3 mt-6">Elevator Pitch</h4>
+                        <textarea onchange="updateNested('networkingPlan.elevatorPitch', this.value)" 
+                                  placeholder="Write your 30-second elevator pitch..." 
+                                  class="w-full p-4 border rounded-lg h-32">${appData.networkingPlan.elevatorPitch}</textarea>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        function renderSkillRoadmap() {
+            const isExpanded = expandedSections['skills'];
+            return `
+                <div class="bg-white rounded-lg shadow-md mb-4 overflow-hidden border border-gray-200">
+                    <button onclick="toggleSection('skills')" class="w-full p-4 flex items-center justify-between hover:bg-blue-50 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                            </svg>
+                            <h3 class="text-lg font-semibold text-gray-800">Skill Development Roadmap</h3>
+                        </div>
+                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${isExpanded ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7'}"/>
+                        </svg>
+                    </button>
+                    ${isExpanded ? `
+                    <div class="p-6 border-t border-gray-200 bg-gray-50">
+                        <h4 class="font-bold mb-3">Technical Skills</h4>
+                        ${appData.skillRoadmap.technical.map((skill, idx) => `
+                            <div class="bg-white p-4 rounded-lg border mb-3">
+                                <input type="text" value="${skill.skill}" 
+                                       onchange="updateNested('skillRoadmap.technical.${idx}.skill', this.value)"
+                                       placeholder="Skill" 
+                                       class="w-full p-2 border rounded mb-2">
+                                <input type="text" value="${skill.method}" 
+                                       onchange="updateNested('skillRoadmap.technical.${idx}.method', this.value)"
+                                       placeholder="How will you learn it?" 
+                                       class="w-full p-2 border rounded mb-2">
+                                <input type="text" value="${skill.timeline}" 
+                                       onchange="updateNested('skillRoadmap.technical.${idx}.timeline', this.value)"
+                                       placeholder="Timeline" 
+                                       class="w-full p-2 border rounded">
+                            </div>
+                        `).join('')}
+                        
+                        <h4 class="font-bold mb-3 mt-6">Soft Skills</h4>
+                        ${appData.skillRoadmap.soft.map((skill, idx) => `
+                            <div class="bg-white p-4 rounded-lg border mb-3">
+                                <input type="text" value="${skill.skill}" 
+                                       onchange="updateNested('skillRoadmap.soft.${idx}.skill', this.value)"
+                                       placeholder="Skill" 
+                                       class="w-full p-2 border rounded mb-2">
+                                <input type="text" value="${skill.method}" 
+                                       onchange="updateNested('skillRoadmap.soft.${idx}.method', this.value)"
+                                       placeholder="How will you develop it?" 
+                                       class="w-full p-2 border rounded mb-2">
+                                <input type="text" value="${skill.timeline}" 
+                                       onchange="updateNested('skillRoadmap.soft.${idx}.timeline', this.value)"
+                                       placeholder="Timeline" 
+                                       class="w-full p-2 border rounded">
+                            </div>
+                        `).join('')}
+                        
+                        <h4 class="font-bold mb-3 mt-6">LinkedIn Profile Checklist</h4>
+                        <div class="bg-white p-4 rounded-lg border">
+                            <label class="flex items-center gap-2 mb-2">
+                                <input type="checkbox" ${appData.skillRoadmap.linkedinChecklist.experience ? 'checked' : ''} 
+                                       onchange="updateNested('skillRoadmap.linkedinChecklist.experience', this.checked)">
+                                <span>Detailed experience section</span>
+                            </label>
+                            <label class="flex items-center gap-2">
+                                <input type="checkbox" ${appData.skillRoadmap.linkedinChecklist.skills ? 'checked' : ''} 
+                                       onchange="updateNested('skillRoadmap.linkedinChecklist.skills', this.checked)">
+                                <span>Relevant skills added</span>
+                            </label>
+                        </div>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        loadData();
+        renderSections();
+    </script>
+</body>
+</html>.photo ? 'checked' : ''} 
+                                       onchange="updateNested('skillRoadmap.linkedinChecklist.photo', this.checked)">
+                                <span>Professional profile photo</span>
+                            </label>
+                            <label class="flex items-center gap-2 mb-2">
+                                <input type="checkbox" ${appData.skillRoadmap.linkedinChecklist.headline ? 'checked' : ''} 
+                                       onchange="updateNested('skillRoadmap.linkedinChecklist.headline', this.checked)">
+                                <span>Compelling headline</span>
+                            </label>
+                            <label class="flex items-center gap-2 mb-2">
+                                <input type="checkbox" ${appData.skillRoadmap.linkedinChecklist.summary ? 'checked' : ''} 
+                                       onchange="updateNested('skillRoadmap.linkedinChecklist.summary', this.checked)">
+                                <span>Strong summary</span>
+                            </label>
+                            <label class="flex items-center gap-2 mb-2">
+                                <input type="checkbox" ${appData.skillRoadmap.linkedinChecklist

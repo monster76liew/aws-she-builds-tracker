@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AWS She Builds Mentorship Tracker</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="assets/css/main.css">
 </head>
 <body class="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50">
     <div class="container mx-auto px-4 py-8">
@@ -44,13 +43,40 @@
                 mentorship experience across three transformative months.
             </p>
             
-            <!-- CTA Button -->
+            <!-- Role Selection -->
             <div class="text-center">
-                <a href="onboarding.html" 
-                   class="inline-block bg-purple-600 text-white px-8 py-4 rounded-lg text-lg font-semibold 
-                          hover:bg-purple-700 transition-all shadow-md hover:shadow-lg transform hover:scale-105">
-                    Get Started →
-                </a>
+                <p class="text-gray-800 font-bold text-xl mb-4">Choose Your Role to Get Started:</p>
+                <div class="flex gap-4 justify-center flex-wrap">
+                    <a href="mentee/month1.html" 
+                       class="inline-flex flex-col items-center bg-purple-600 text-white px-8 py-6 rounded-lg text-lg font-semibold 
+                              hover:bg-purple-700 transition-all shadow-md hover:shadow-lg transform hover:scale-105">
+                        <svg class="w-12 h-12 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
+                        </svg>
+                        <span>I'm a Mentee</span>
+                        <span class="text-xs opacity-75 mt-1">Program participant</span>
+                    </a>
+                    
+                    <a href="mentor/month1.html" 
+                       class="inline-flex flex-col items-center bg-blue-600 text-white px-8 py-6 rounded-lg text-lg font-semibold 
+                              hover:bg-blue-700 transition-all shadow-md hover:shadow-lg transform hover:scale-105">
+                        <svg class="w-12 h-12 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                        </svg>
+                        <span>I'm a Mentor</span>
+                        <span class="text-xs opacity-75 mt-1">Program guide</span>
+                    </a>
+                    
+                    <a href="coordinator/month1.html" 
+                       class="inline-flex flex-col items-center bg-green-600 text-white px-8 py-6 rounded-lg text-lg font-semibold 
+                              hover:bg-green-700 transition-all shadow-md hover:shadow-lg transform hover:scale-105">
+                        <svg class="w-12 h-12 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+                        </svg>
+                        <span>I'm a Coordinator</span>
+                        <span class="text-xs opacity-75 mt-1">Program organizer</span>
+                    </a>
+                </div>
             </div>
         </section>
 
