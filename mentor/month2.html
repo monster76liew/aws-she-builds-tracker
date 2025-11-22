@@ -31,7 +31,7 @@
                         <p class="text-gray-600 text-xs sm:text-sm">Month 2 - Exploration & Skill Development</p>
                     </div>
                 </div>
-                <button onclick="saveData()" class="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors shadow-md text-sm w-full sm:w-auto justify-center">
+                <button onclick="saveData()" class="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors shadow-md w-full sm:w-auto justify-center">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/>
                     </svg>
@@ -40,7 +40,6 @@
             </div>
             <div id="saveStatus" class="text-sm hidden"></div>
         </div>
-
  
         <!-- Month Navigation -->
         <div class="grid grid-cols-3 gap-2 sm:gap-3 mb-4 sm:mb-6">
@@ -215,12 +214,20 @@
                             </div>
                         </div>
                     ` : ''}
-                </div>
-            `;
-        }
+</div>
 
-        loadData();
-        renderSections();
-    </script>
+<script>
+    function goBack() {
+        if (window.history.length > 1 && document.referrer) {
+            window.history.back();
+        } else {
+            window.location.href = '../index.html';
+        }
+    }
+
+    loadData();
+    renderSections();
+    updateStats();
+</script>
 </body>
 </html>
