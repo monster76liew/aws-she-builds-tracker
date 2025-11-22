@@ -6,56 +6,79 @@
     <title>Month 3 - Coordinator Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 p-4">
+<body class="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 p-2 sm:p-4">
     <div class="max-w-6xl mx-auto">
-        <!-- Header -->
-        <div class="bg-white rounded-xl shadow-lg p-6 mb-6 border-t-4 border-green-600">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <div class="bg-green-100 p-3 rounded-lg">
-                        <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <!-- Header with Back Button -->
+        <div class="bg-white rounded-xl shadow-lg p-4 sm:p-6 mb-4 sm:mb-6 border-t-4 border-green-600">
+            <div class="flex flex-col sm:flex-row items-start justify-between gap-4 mb-4">
+                <div class="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
+                    <!-- Back Button -->
+                    <button onclick="goBack()" class="p-2 hover:bg-green-50 rounded-lg transition-colors flex-shrink-0" title="Go Back">
+                        <svg class="w-5 h-5 sm:w-6 sm:h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                        </svg>
+                    </button>
+                    <div class="bg-green-100 p-2 sm:p-3 rounded-lg flex-shrink-0">
+                        <svg class="w-6 h-6 sm:w-8 sm:h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
                     </div>
-                    <div>
-                        <h1 class="text-2xl font-bold text-gray-800">Coordinator Dashboard - Month 3</h1>
-                        <p class="text-gray-600 text-sm">Apply, Grow & Thrive</p>
+                    <div class="min-w-0">
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <h1 class="text-xl sm:text-2xl font-bold text-gray-800">Coordinator Dashboard</h1>
+                            <span class="bg-green-100 text-green-700 text-xs font-semibold px-2 py-1 rounded">COORDINATOR</span>
+                        </div>
+                        <p class="text-gray-600 text-xs sm:text-sm">Month 3 - Apply, Grow & Thrive</p>
                     </div>
                 </div>
-                <button onclick="saveData()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">Save</button>
+                <button onclick="saveData()" class="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors shadow-md text-sm w-full sm:w-auto justify-center">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/>
+                    </svg>
+                    <span>Save</span>
+                </button>
             </div>
-            <div id="saveStatus" class="text-sm hidden mt-2"></div>
+            <div id="saveStatus" class="text-sm hidden"></div>
 
             <!-- Stats -->
-            <div class="grid grid-cols-3 gap-4 mt-4">
-                <div class="bg-green-50 p-4 rounded-lg">
-                    <span class="text-sm font-semibold">Completed Pairs</span>
-                    <p class="text-3xl font-bold text-green-600" id="completedPairs">0</p>
+            <div class="grid grid-cols-3 gap-3 sm:gap-4 mt-4">
+                <div class="bg-green-50 p-3 sm:p-4 rounded-lg">
+                    <span class="text-xs sm:text-sm font-semibold">Completed Pairs</span>
+                    <p class="text-2xl sm:text-3xl font-bold text-green-600" id="completedPairs">0</p>
                 </div>
-                <div class="bg-blue-50 p-4 rounded-lg">
-                    <span class="text-sm font-semibold">Success Rate</span>
-                    <p class="text-3xl font-bold text-blue-600" id="successRate">0%</p>
+                <div class="bg-blue-50 p-3 sm:p-4 rounded-lg">
+                    <span class="text-xs sm:text-sm font-semibold">Success Rate</span>
+                    <p class="text-2xl sm:text-3xl font-bold text-blue-600" id="successRate">0%</p>
                 </div>
-                <div class="bg-purple-50 p-4 rounded-lg">
-                    <span class="text-sm font-semibold">Graduation Event</span>
-                    <p class="text-xl font-bold text-purple-600" id="graduationStatus">Pending</p>
+                <div class="bg-purple-50 p-3 sm:p-4 rounded-lg">
+                    <span class="text-xs sm:text-sm font-semibold">Graduation Event</span>
+                    <p class="text-lg sm:text-xl font-bold text-purple-600" id="graduationStatus">Pending</p>
                 </div>
             </div>
         </div>
 
         <!-- Month Navigation -->
-        <div class="grid grid-cols-3 gap-3 mb-6">
-            <a href="month1.html" class="p-4 rounded-lg shadow-md bg-white text-gray-800 hover:shadow-lg text-center">
-                <h3 class="font-bold">Month 1</h3>
-                <p class="text-xs text-gray-600">Foundation</p>
+        <div class="grid grid-cols-3 gap-2 sm:gap-3 mb-4 sm:mb-6">
+            <a href="month1.html" class="p-3 sm:p-4 rounded-lg shadow-md bg-white text-gray-800 hover:shadow-lg text-center">
+                <svg class="w-5 h-5 sm:w-6 sm:h-6 mb-1 sm:mb-2 mx-auto text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                </svg>
+                <h3 class="text-xs sm:text-sm font-bold">Month 1</h3>
+                <p class="text-xs text-gray-600 hidden sm:block">Foundation</p>
             </a>
-            <a href="month2.html" class="p-4 rounded-lg shadow-md bg-white text-gray-800 hover:shadow-lg text-center">
-                <h3 class="font-bold">Month 2</h3>
-                <p class="text-xs text-gray-600">Exploration</p>
+            <a href="month2.html" class="p-3 sm:p-4 rounded-lg shadow-md bg-white text-gray-800 hover:shadow-lg text-center">
+                <svg class="w-5 h-5 sm:w-6 sm:h-6 mb-1 sm:mb-2 mx-auto text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                </svg>
+                <h3 class="text-xs sm:text-sm font-bold">Month 2</h3>
+                <p class="text-xs text-gray-600 hidden sm:block">Exploration</p>
             </a>
-            <button class="p-4 rounded-lg shadow-md bg-green-600 text-white scale-105">
-                <h3 class="font-bold">Month 3</h3>
-                <p class="text-xs opacity-75">Growth</p>
+            <button class="p-3 sm:p-4 rounded-lg shadow-md bg-green-600 text-white scale-105">
+                <svg class="w-5 h-5 sm:w-6 sm:h-6 mb-1 sm:mb-2 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+                </svg>
+                <h3 class="text-xs sm:text-sm font-bold">Month 3</h3>
+                <p class="text-xs opacity-75 hidden sm:block">Growth</p>
             </button>
         </div>
 
@@ -63,7 +86,7 @@
         <div id="sectionsContainer"></div>
 
         <!-- Footer -->
-        <div class="mt-8 text-center text-sm text-gray-600 bg-white rounded-lg p-4 shadow">
+        <div class="mt-6 sm:mt-8 text-center text-xs sm:text-sm text-gray-600 bg-white rounded-lg p-3 sm:p-4 shadow">
             <p>💚 AWS She Builds Mentorship Program 2025</p>
             <p class="mt-1">🎉 Program Completion & Celebration!</p>
         </div>
@@ -85,6 +108,15 @@
         };
 
         const expandedSections = {};
+
+        // Back button function
+        function goBack() {
+            if (window.history.length > 1 && document.referrer) {
+                window.history.back();
+            } else {
+                window.location.href = '../index.html';
+            }
+        }
 
         function loadData() {
             const saved = localStorage.getItem('coordinator-month3-data');
@@ -157,43 +189,48 @@
             document.getElementById('sectionsContainer').innerHTML = `
                 ${renderPairCompletions()}
                 ${renderGraduation()}
-                ${renderSection('Program Reflection', 'programReflection', 'Overall program reflections', 'reflection')}
-                ${renderSection('Success Stories', 'successStories', 'Highlight success stories', 'success')}
-                ${renderSection('Lessons Learned', 'lessonsLearned', 'What worked and what to improve', 'lessons')}
-                ${renderSection('Next Cohort Planning', 'nextCohortPlanning', 'Ideas for the next cohort', 'nextcohort')}
+                ${renderSection('Program Reflection', 'programReflection', 'Overall program reflections', 'reflection', `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>`)}
+                ${renderSection('Success Stories', 'successStories', 'Highlight success stories', 'success', `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>`)}
+                ${renderSection('Lessons Learned', 'lessonsLearned', 'What worked and what to improve', 'lessons', `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>`)}
+                ${renderSection('Next Cohort Planning', 'nextCohortPlanning', 'Ideas for the next cohort', 'nextcohort', `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>`)}
             `;
         }
 
         function renderPairCompletions() {
             const isExpanded = expandedSections['pairs'];
             return `
-                <div class="bg-white rounded-lg shadow-md mb-4 border">
-                    <button onclick="toggleSection('pairs')" class="w-full p-4 flex items-center justify-between hover:bg-green-50">
-                        <h3 class="font-semibold">Pair Completions</h3>
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="bg-white rounded-lg shadow-md mb-3 sm:mb-4 border border-gray-200">
+                    <button onclick="toggleSection('pairs')" class="w-full p-3 sm:p-4 flex items-center justify-between hover:bg-green-50">
+                        <div class="flex items-center gap-2 sm:gap-3">
+                            <svg class="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                            </svg>
+                            <h3 class="font-semibold text-sm sm:text-base">Pair Completions</h3>
+                        </div>
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${isExpanded ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7'}"/>
                         </svg>
                     </button>
                     ${isExpanded ? `
-                        <div class="p-6 border-t bg-gray-50">
-                            <button onclick="addPairCompletion()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 mb-4">Add Pair</button>
+                        <div class="p-4 sm:p-6 border-t bg-gray-50">
+                            <button onclick="addPairCompletion()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 mb-4 w-full sm:w-auto text-sm sm:text-base">Add Pair</button>
                             ${appData.pairCompletions.map(pair => `
-                                <div class="bg-white p-4 rounded-lg border mb-3">
+                                <div class="bg-white p-3 sm:p-4 rounded-lg border mb-3">
                                     <div class="flex items-center gap-3 mb-2">
                                         <input type="checkbox" ${pair.completed ? 'checked' : ''} 
                                                onchange="updatePairCompletion(${pair.id}, 'completed', this.checked)" 
-                                               class="w-5 h-5 cursor-pointer">
+                                               class="w-4 h-4 sm:w-5 sm:h-5 cursor-pointer">
                                         <input type="text" value="${pair.pair}" 
                                                onchange="updatePairCompletion(${pair.id}, 'pair', this.value)" 
-                                               placeholder="Mentor-Mentee pair" class="flex-1 p-2 border rounded">
+                                               placeholder="Mentor-Mentee pair" class="flex-1 p-2 border rounded text-sm sm:text-base">
                                     </div>
                                     <textarea onchange="updatePairCompletion(${pair.id}, 'feedback', this.value)" 
                                               placeholder="Completion feedback..." 
-                                              class="w-full p-2 border rounded h-20">${pair.feedback}</textarea>
-                                    <button onclick="deletePairCompletion(${pair.id})" class="text-red-600 text-sm mt-2">Delete</button>
+                                              class="w-full p-2 border rounded h-20 text-sm sm:text-base">${pair.feedback}</textarea>
+                                    <button onclick="deletePairCompletion(${pair.id})" class="text-red-600 text-xs sm:text-sm mt-2">Delete</button>
                                 </div>
                             `).join('')}
-                            ${appData.pairCompletions.length === 0 ? '<p class="text-gray-500 text-center py-4">No pairs added yet</p>' : ''}
+                            ${appData.pairCompletions.length === 0 ? '<p class="text-gray-500 text-center py-6 sm:py-8 text-sm sm:text-base">No pairs added yet</p>' : ''}
                         </div>
                     ` : ''}
                 </div>
@@ -203,39 +240,44 @@
         function renderGraduation() {
             const isExpanded = expandedSections['graduation'];
             return `
-                <div class="bg-white rounded-lg shadow-md mb-4 border">
-                    <button onclick="toggleSection('graduation')" class="w-full p-4 flex items-center justify-between hover:bg-green-50">
-                        <h3 class="font-semibold">Graduation Event</h3>
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="bg-white rounded-lg shadow-md mb-3 sm:mb-4 border border-gray-200">
+                    <button onclick="toggleSection('graduation')" class="w-full p-3 sm:p-4 flex items-center justify-between hover:bg-green-50">
+                        <div class="flex items-center gap-2 sm:gap-3">
+                            <svg class="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/>
+                            </svg>
+                            <h3 class="font-semibold text-sm sm:text-base">Graduation Event</h3>
+                        </div>
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${isExpanded ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7'}"/>
                         </svg>
                     </button>
                     ${isExpanded ? `
-                        <div class="p-6 border-t bg-gray-50">
-                            <div class="space-y-4">
+                        <div class="p-4 sm:p-6 border-t bg-gray-50">
+                            <div class="space-y-3 sm:space-y-4">
                                 <div class="flex items-center gap-3">
                                     <input type="checkbox" ${appData.graduationEvent.completed ? 'checked' : ''} 
                                            onchange="updateField('graduationEvent.completed', this.checked)" 
-                                           class="w-5 h-5 cursor-pointer">
-                                    <label class="font-semibold">Event Completed</label>
+                                           class="w-4 h-4 sm:w-5 sm:h-5 cursor-pointer">
+                                    <label class="font-semibold text-sm sm:text-base">Event Completed</label>
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-medium mb-1">Event Date</label>
+                                    <label class="block text-xs sm:text-sm font-medium mb-1">Event Date</label>
                                     <input type="date" value="${appData.graduationEvent.date}" 
                                            onchange="updateField('graduationEvent.date', this.value)" 
-                                           class="w-full p-2 border rounded">
+                                           class="w-full p-2 border rounded text-sm sm:text-base">
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-medium mb-1">Attendees</label>
+                                    <label class="block text-xs sm:text-sm font-medium mb-1">Attendees</label>
                                     <textarea onchange="updateField('graduationEvent.attendees', this.value)" 
                                               placeholder="Number and names of attendees..." 
-                                              class="w-full p-3 border rounded h-20">${appData.graduationEvent.attendees}</textarea>
+                                              class="w-full p-2 sm:p-3 border rounded h-20 text-sm sm:text-base">${appData.graduationEvent.attendees}</textarea>
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-medium mb-1">Event Highlights</label>
+                                    <label class="block text-xs sm:text-sm font-medium mb-1">Event Highlights</label>
                                     <textarea onchange="updateField('graduationEvent.highlights', this.value)" 
                                               placeholder="Key moments and highlights..." 
-                                              class="w-full p-3 border rounded h-32">${appData.graduationEvent.highlights}</textarea>
+                                              class="w-full p-2 sm:p-3 border rounded h-32 text-sm sm:text-base">${appData.graduationEvent.highlights}</textarea>
                                 </div>
                             </div>
                         </div>
@@ -244,21 +286,26 @@
             `;
         }
 
-        function renderSection(title, field, placeholder, key) {
+        function renderSection(title, field, placeholder, key, iconPath) {
             const isExpanded = expandedSections[key];
             return `
-                <div class="bg-white rounded-lg shadow-md mb-4 border">
-                    <button onclick="toggleSection('${key}')" class="w-full p-4 flex items-center justify-between hover:bg-green-50">
-                        <h3 class="font-semibold">${title}</h3>
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="bg-white rounded-lg shadow-md mb-3 sm:mb-4 border border-gray-200">
+                    <button onclick="toggleSection('${key}')" class="w-full p-3 sm:p-4 flex items-center justify-between hover:bg-green-50">
+                        <div class="flex items-center gap-2 sm:gap-3">
+                            <svg class="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                ${iconPath}
+                            </svg>
+                            <h3 class="font-semibold text-sm sm:text-base text-left">${title}</h3>
+                        </div>
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${isExpanded ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7'}"/>
                         </svg>
                     </button>
                     ${isExpanded ? `
-                        <div class="p-6 border-t bg-gray-50">
+                        <div class="p-4 sm:p-6 border-t bg-gray-50">
                             <textarea onchange="updateField('${field}', this.value)" 
                                       placeholder="${placeholder}" 
-                                      class="w-full p-4 border rounded-lg h-40">${appData[field]}</textarea>
+                                      class="w-full p-3 sm:p-4 border rounded-lg h-32 sm:h-40 text-sm sm:text-base">${appData[field]}</textarea>
                         </div>
                     ` : ''}
                 </div>
