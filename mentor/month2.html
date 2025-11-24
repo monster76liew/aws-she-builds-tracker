@@ -5,33 +5,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Month 2 - Mentor Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .section-collapsed { display: none; }
+        .section-expanded { display: block; }
+    </style>
 </head>
-<body class="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-2 sm:p-4">
+<body class="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-4">
     <div class="max-w-5xl mx-auto">
-        <!-- Header with Back Button -->
-        <div class="bg-white rounded-xl shadow-lg p-4 sm:p-6 mb-4 sm:mb-6 border-t-4 border-blue-600">
-            <div class="flex flex-col sm:flex-row items-start justify-between gap-4 mb-4">
-                <div class="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
-                    <!-- Back Button -->
-                    <button onclick="goBack()" class="p-2 hover:bg-blue-50 rounded-lg transition-colors flex-shrink-0" title="Go Back">
-                        <svg class="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-                        </svg>
-                    </button>
-                    <div class="bg-blue-100 p-2 sm:p-3 rounded-lg flex-shrink-0">
-                        <svg class="w-6 h-6 sm:w-8 sm:h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        
+        <!-- Back Button -->
+        <a href="javascript:history.back()" class="p-2 hover:bg-gray-100 rounded-lg transition-colors inline-block" title="Go Back">
+            <svg class="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+            </svg>
+        </a>
+
+        <!-- Header -->
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-6 border-t-4 border-indigo-600">
+            <div class="flex items-start justify-between mb-4">
+                <div class="flex items-center gap-3">
+                    <div class="bg-indigo-100 p-3 rounded-lg">
+                        <svg class="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
                         </svg>
                     </div>
-                    <div class="min-w-0">
-                        <div class="flex items-center gap-2 flex-wrap">
-                            <h1 class="text-xl sm:text-2xl font-bold text-gray-800">Mentor Dashboard</h1>
-                            <span class="bg-blue-100 text-blue-700 text-xs font-semibold px-2 py-1 rounded">MENTOR</span>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h1 class="text-2xl font-bold text-gray-800">Mentor Dashboard</h1>
+                            <span class="bg-indigo-100 text-indigo-700 text-xs font-semibold px-2 py-1 rounded">MENTOR</span>
                         </div>
-                        <p class="text-gray-600 text-xs sm:text-sm">Month 2 - Exploration & Skill Development</p>
+                        <p class="text-gray-600 text-sm">AWS She Builds Mentorship Program 2025</p>
                     </div>
                 </div>
-                <button onclick="saveData()" class="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors shadow-md w-full sm:w-auto justify-center">
+                <button onclick="saveData()" class="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors shadow-md">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/>
                     </svg>
@@ -39,66 +45,121 @@
                 </button>
             </div>
             <div id="saveStatus" class="text-sm hidden"></div>
-        </div>
- 
-        <!-- Month Navigation -->
-        <div class="grid grid-cols-3 gap-2 sm:gap-3 mb-4 sm:mb-6">
-            <a href="month1.html" class="p-3 sm:p-4 rounded-lg shadow-md bg-white text-gray-800 hover:shadow-lg transition-all text-center hover:bg-blue-50">
-                <svg class="w-5 h-5 sm:w-6 sm:h-6 mb-1 sm:mb-2 mx-auto text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
-                </svg>
-                <h3 class="text-xs sm:text-sm font-bold">Month 1</h3>
-                <p class="text-xs text-gray-600 hidden sm:block">Foundation</p>
-            </a>
-            <button class="p-3 sm:p-4 rounded-lg shadow-md bg-blue-600 text-white scale-105">
-                <svg class="w-5 h-5 sm:w-6 sm:h-6 mb-1 sm:mb-2 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
-                </svg>
-                <h3 class="text-xs sm:text-sm font-bold">Month 2</h3>
-                <p class="text-xs opacity-75 hidden sm:block">Exploration</p>
-            </button>
-            <a href="month3.html" class="p-3 sm:p-4 rounded-lg shadow-md bg-blue-100 text-blue-700 hover:bg-blue-200 transition-all text-center cursor-pointer">
-                <svg class="w-5 h-5 sm:w-6 sm:h-6 mb-1 sm:mb-2 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
-                </svg>
-                <h3 class="text-xs sm:text-sm font-bold">Month 3</h3>
-                <p class="text-xs hidden sm:block">Growth</p>
-            </a>
+            
+            <!-- Progress Bar -->
+            <div class="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg p-4 mt-4">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm font-medium text-gray-700">Month 2 Progress</span>
+                    <span class="text-sm font-bold text-indigo-600" id="progressText">0%</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-3 mb-2">
+                    <div id="progressBar" class="bg-gradient-to-r from-indigo-600 to-purple-600 h-3 rounded-full transition-all duration-500" style="width: 0%"></div>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span class="text-xs text-gray-600" id="progressStatus">🔍 Exploring</span>
+                    <span class="text-xs text-gray-600" id="milestoneCount">0 of 5 milestones completed</span>
+                </div>
+            </div>
         </div>
 
-        <!-- Content -->
+        <!-- Month Navigation -->
+        <div class="grid grid-cols-3 gap-3 mb-6">
+            <button onclick="window.location.href='month1.html'" class="p-4 rounded-lg shadow-md bg-blue-100 text-blue-600 hover:bg-blue-200 hover:scale-105 transition-all">
+                <svg class="w-6 h-6 mb-2 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                </svg>
+                <h3 class="text-sm font-bold">Month 1</h3>
+                <p class="text-xs opacity-75">Foundation</p>
+            </button>
+            
+            <button class="p-4 rounded-lg shadow-md bg-indigo-600 text-white scale-105">
+                <svg class="w-6 h-6 mb-2 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                </svg>
+                <h3 class="text-sm font-bold">Month 2</h3>
+                <p class="text-xs opacity-75">Exploration</p>
+            </button>
+            
+            <button onclick="window.location.href='month3.html'" class="p-4 rounded-lg shadow-md bg-green-100 text-green-600 hover:bg-green-200 hover:scale-105 transition-all">
+                <svg class="w-6 h-6 mb-2 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+                </svg>
+                <h3 class="text-sm font-bold">Month 3</h3>
+                <p class="text-xs opacity-75">Apply & Thrive</p>
+            </button>
+        </div>
+
+        <!-- Content Sections -->
         <div id="sectionsContainer"></div>
 
         <!-- Footer -->
-        <div class="mt-6 sm:mt-8 text-center text-xs sm:text-sm text-gray-600 bg-white rounded-lg p-3 sm:p-4 shadow">
+        <div class="mt-8 text-center text-sm text-gray-600 bg-white rounded-lg p-4 shadow">
             <p>💙 AWS She Builds Mentorship Program | Sep - Nov 2025</p>
+            <p class="mt-1">Month 2: Exploration & Skill Development</p>
         </div>
     </div>
 
     <script>
+        // Progress Tracking Configuration
+        const progressConfig = {
+            milestones: [
+                {
+                    id: "meeting-logs",
+                    name: "Complete Meeting Logs",
+                    sectionId: "meeting-logs-section",
+                    checkFunction: () => appData.meetingLogs.length > 0
+                },
+                {
+                    id: "industry-research",
+                    name: "Review Industry Research",
+                    sectionId: "industry-research-section",
+                    checkFunction: () => appData.industryResearchFeedback.trim().length > 30
+                },
+                {
+                    id: "networking",
+                    name: "Networking Guidance Provided",
+                    sectionId: "networking-section",
+                    checkFunction: () => appData.networkingGuidance.trim().length > 30
+                },
+                {
+                    id: "skills",
+                    name: "Skills Development Reviewed",
+                    sectionId: "skills-section",
+                    checkFunction: () => appData.skillsReview.trim().length > 30
+                },
+                {
+                    id: "linkedin",
+                    name: "LinkedIn Profile Reviewed",
+                    sectionId: "linkedin-section",
+                    checkFunction: () => appData.linkedinReview.trim().length > 30
+                }
+            ],
+            progressLevels: {
+                0: {emoji: "🔍", text: "Exploring"},
+                20: {emoji: "🌿", text: "Growing"},
+                40: {emoji: "📈", text: "Building Momentum"},
+                60: {emoji: "💼", text: "Taking Shape"},
+                80: {emoji: "🎯", text: "Nearly There"},
+                100: {emoji: "🌟", text: "Exploration Complete!"}
+            }
+        };
+
         let appData = {
-            industryInsights: '',
+            industryResearchFeedback: '',
             networkingGuidance: '',
-            skillDevelopmentAdvice: '',
-            brandingFeedback: '',
-            meetingLogs: [],
-            monthlyObservations: ''
+            skillsReview: '',
+            linkedinReview: '',
+            monthlyNotes: '',
+            meetingLogs: []
         };
 
         const expandedSections = {};
 
-        // Back button function
-        function goBack() {
-            if (window.history.length > 1 && document.referrer) {
-                window.history.back();
-            } else {
-                window.location.href = '../index.html';
-            }
-        }
-
         function loadData() {
             const saved = localStorage.getItem('mentor-month2-data');
-            if (saved) appData = JSON.parse(saved);
+            if (saved) {
+                appData = JSON.parse(saved);
+            }
         }
 
         function saveData() {
@@ -108,6 +169,41 @@
             status.textContent = '✓ Progress saved!';
             status.classList.remove('hidden');
             setTimeout(() => status.classList.add('hidden'), 2000);
+            updateProgress();
+        }
+
+        function updateProgress() {
+            let completedCount = 0;
+            
+            progressConfig.milestones.forEach(milestone => {
+                if (milestone.checkFunction()) {
+                    completedCount++;
+                }
+            });
+            
+            const totalMilestones = progressConfig.milestones.length;
+            const percentage = Math.round((completedCount / totalMilestones) * 100);
+            
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
+            const progressStatus = document.getElementById('progressStatus');
+            const milestoneCount = document.getElementById('milestoneCount');
+            
+            if (progressBar) progressBar.style.width = percentage + '%';
+            if (progressText) progressText.textContent = percentage + '%';
+            if (milestoneCount) milestoneCount.textContent = `${completedCount} of ${totalMilestones} milestones completed`;
+            
+            let statusLevel = 0;
+            if (percentage >= 100) statusLevel = 100;
+            else if (percentage >= 80) statusLevel = 80;
+            else if (percentage >= 60) statusLevel = 60;
+            else if (percentage >= 40) statusLevel = 40;
+            else if (percentage >= 20) statusLevel = 20;
+            
+            const status = progressConfig.progressLevels[statusLevel];
+            if (progressStatus && status) {
+                progressStatus.textContent = `${status.emoji} ${status.text}`;
+            }
         }
 
         function toggleSection(key) {
@@ -123,7 +219,9 @@
             appData.meetingLogs.push({
                 id: Date.now(),
                 date: new Date().toISOString().split('T')[0],
+                week: '',
                 topics: '',
+                menteeProgress: '',
                 guidance: ''
             });
             renderSections();
@@ -140,94 +238,249 @@
         }
 
         function renderSections() {
-            document.getElementById('sectionsContainer').innerHTML = `
-                ${renderSection('Industry Research Guidance', 'industryInsights', 'Guide your mentee on industry research', 'industry', `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>`)}
-                ${renderSection('Networking Guidance', 'networkingGuidance', 'Help your mentee expand their network', 'networking', `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>`)}
-                ${renderSection('Skill Development Advice', 'skillDevelopmentAdvice', 'Advise on technical and soft skills', 'skills', `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>`)}
-                ${renderSection('Professional Branding Feedback', 'brandingFeedback', 'Review LinkedIn and elevator pitches', 'branding', `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>`)}
-                ${renderMeetings()}
-                ${renderSection('Monthly Observations', 'monthlyObservations', 'Overall Month 2 observations', 'observations', `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>`)}
+            const container = document.getElementById('sectionsContainer');
+            container.innerHTML = `
+                ${renderMeetingLogs()}
+                ${renderIndustryResearch()}
+                ${renderNetworking()}
+                ${renderSkills()}
+                ${renderLinkedIn()}
+                ${renderNotes()}
             `;
         }
 
-        function renderSection(title, field, placeholder, key, iconPath) {
-            const isExpanded = expandedSections[key];
+        function renderMeetingLogs() {
+            const isExpanded = expandedSections['meetings'];
             return `
-                <div class="bg-white rounded-lg shadow-md mb-3 sm:mb-4 border border-gray-200">
-                    <button onclick="toggleSection('${key}')" class="w-full p-3 sm:p-4 flex items-center justify-between hover:bg-blue-50 transition-colors">
-                        <div class="flex items-center gap-2 sm:gap-3">
-                            <svg class="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                ${iconPath}
+                <div id="meeting-logs-section" class="bg-white rounded-lg shadow-md mb-4 border border-gray-200">
+                    <button onclick="toggleSection('meetings')" class="w-full p-4 flex items-center justify-between hover:bg-indigo-50 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                             </svg>
-                            <h3 class="font-semibold text-gray-800 text-sm sm:text-base text-left">${title}</h3>
+                            <h3 class="text-lg font-semibold text-gray-800">Meeting Logs</h3>
                         </div>
-                        <svg class="w-4 h-4 sm:w-5 sm:h-5 text-gray-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${isExpanded ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7'}"/>
                         </svg>
                     </button>
                     ${isExpanded ? `
-                        <div class="p-4 sm:p-6 border-t border-gray-200 bg-gray-50">
-                            <textarea onchange="updateField('${field}', this.value)" 
-                                      placeholder="${placeholder}" 
-                                      class="w-full p-3 sm:p-4 border rounded-lg focus:ring-2 focus:ring-blue-500 h-32 sm:h-40 text-sm sm:text-base">${appData[field]}</textarea>
+                    <div class="p-6 border-t bg-gray-50">
+                        <button onclick="addMeeting()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 mb-4">
+                            Add New Meeting
+                        </button>
+                        <div class="space-y-4">
+                            ${appData.meetingLogs.map(log => `
+                                <div class="bg-white p-4 rounded-lg border-2 border-indigo-100 shadow-sm">
+                                    <div class="grid md:grid-cols-2 gap-3 mb-3">
+                                        <div>
+                                            <label class="text-xs text-gray-600 font-semibold">Date</label>
+                                            <input type="date" value="${log.date}" 
+                                                   onchange="updateMeeting(${log.id}, 'date', this.value)" 
+                                                   class="w-full p-2 border rounded focus:ring-2 focus:ring-indigo-500">
+                                        </div>
+                                        <div>
+                                            <label class="text-xs text-gray-600 font-semibold">Week</label>
+                                            <input type="text" value="${log.week}" 
+                                                   onchange="updateMeeting(${log.id}, 'week', this.value)" 
+                                                   placeholder="Week #" 
+                                                   class="w-full p-2 border rounded focus:ring-2 focus:ring-indigo-500">
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="text-xs text-gray-600 font-semibold">Topics Discussed</label>
+                                        <textarea onchange="updateMeeting(${log.id}, 'topics', this.value)" 
+                                                  placeholder="What did you discuss?" 
+                                                  class="w-full p-2 border rounded h-20 focus:ring-2 focus:ring-indigo-500">${log.topics}</textarea>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="text-xs text-gray-600 font-semibold">Mentee Progress Observations</label>
+                                        <textarea onchange="updateMeeting(${log.id}, 'menteeProgress', this.value)" 
+                                                  placeholder="How is your mentee progressing?" 
+                                                  class="w-full p-2 border rounded h-20 focus:ring-2 focus:ring-indigo-500">${log.menteeProgress}</textarea>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="text-xs text-gray-600 font-semibold">Your Guidance</label>
+                                        <textarea onchange="updateMeeting(${log.id}, 'guidance', this.value)" 
+                                                  placeholder="What guidance did you provide?" 
+                                                  class="w-full p-2 border rounded h-20 focus:ring-2 focus:ring-indigo-500">${log.guidance}</textarea>
+                                    </div>
+                                    <button onclick="deleteMeeting(${log.id})" 
+                                            class="text-red-600 text-sm hover:text-red-800 font-semibold">
+                                        Delete Meeting
+                                    </button>
+                                </div>
+                            `).join('')}
+                            ${appData.meetingLogs.length === 0 ? '<p class="text-gray-500 text-center py-8">No meetings logged yet.</p>' : ''}
                         </div>
+                    </div>
                     ` : ''}
                 </div>
             `;
         }
 
-        function renderMeetings() {
-            const isExpanded = expandedSections['meetings'];
+        function renderIndustryResearch() {
+            const isExpanded = expandedSections['industry'];
             return `
-                <div class="bg-white rounded-lg shadow-md mb-3 sm:mb-4 border border-gray-200">
-                    <button onclick="toggleSection('meetings')" class="w-full p-3 sm:p-4 flex items-center justify-between hover:bg-blue-50 transition-colors">
-                        <div class="flex items-center gap-2 sm:gap-3">
-                            <svg class="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                <div id="industry-research-section" class="bg-white rounded-lg shadow-md mb-4 border border-gray-200">
+                    <button onclick="toggleSection('industry')" class="w-full p-4 flex items-center justify-between hover:bg-indigo-50 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                             </svg>
-                            <h3 class="font-semibold text-gray-800 text-sm sm:text-base">Meeting Logs</h3>
+                            <h3 class="text-lg font-semibold text-gray-800">Industry Research Feedback</h3>
                         </div>
-                        <svg class="w-4 h-4 sm:w-5 sm:h-5 text-gray-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${isExpanded ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7'}"/>
                         </svg>
                     </button>
                     ${isExpanded ? `
-                        <div class="p-4 sm:p-6 border-t border-gray-200 bg-gray-50">
-                            <button onclick="addMeeting()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 mb-4 w-full sm:w-auto text-sm sm:text-base">
-                                Add Meeting
-                            </button>
-                            <div class="space-y-3 sm:space-y-4">
-                                ${appData.meetingLogs.map(log => `
-                                    <div class="bg-white p-3 sm:p-4 rounded-lg border shadow-sm">
-                                        <input type="date" value="${log.date}" onchange="updateMeeting(${log.id}, 'date', this.value)" 
-                                               class="w-full p-2 border rounded mb-2 focus:ring-2 focus:ring-blue-500 text-sm sm:text-base">
-                                        <textarea onchange="updateMeeting(${log.id}, 'topics', this.value)" 
-                                                  placeholder="Topics discussed..." 
-                                                  class="w-full p-2 border rounded mb-2 h-20 focus:ring-2 focus:ring-blue-500 text-sm sm:text-base">${log.topics}</textarea>
-                                        <textarea onchange="updateMeeting(${log.id}, 'guidance', this.value)" 
-                                                  placeholder="Your guidance and advice..." 
-                                                  class="w-full p-2 border rounded h-20 focus:ring-2 focus:ring-blue-500 text-sm sm:text-base">${log.guidance}</textarea>
-                                        <button onclick="deleteMeeting(${log.id})" class="text-red-600 text-xs sm:text-sm mt-2 hover:text-red-800">Delete</button>
-                                    </div>
-                                `).join('')}
-                                ${appData.meetingLogs.length === 0 ? '<p class="text-gray-500 text-center py-6 sm:py-8 text-sm sm:text-base">No meetings yet</p>' : ''}
-                            </div>
-                        </div>
+                    <div class="p-6 border-t bg-gray-50">
+                        <p class="text-sm text-gray-600 bg-blue-50 p-3 rounded mb-4">
+                            🔍 <strong>Review your mentee's industry research.</strong> Provide insights on their target companies, trends analysis, and opportunities.
+                        </p>
+                        <textarea onchange="updateField('industryResearchFeedback', this.value)" 
+                                  placeholder="Comment on their company research, industry trends analysis, and provide additional insights or corrections..." 
+                                  class="w-full p-4 border rounded-lg h-40 focus:ring-2 focus:ring-indigo-500">${appData.industryResearchFeedback}</textarea>
+                    </div>
                     ` : ''}
-</div>
-
-<script>
-    function goBack() {
-        if (window.history.length > 1 && document.referrer) {
-            window.history.back();
-        } else {
-            window.location.href = '../index.html';
+                </div>
+            `;
         }
-    }
 
-    loadData();
-    renderSections();
-    updateStats();
-</script>
+        function renderNetworking() {
+            const isExpanded = expandedSections['networking'];
+            return `
+                <div id="networking-section" class="bg-white rounded-lg shadow-md mb-4 border border-gray-200">
+                    <button onclick="toggleSection('networking')" class="w-full p-4 flex items-center justify-between hover:bg-indigo-50 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                            </svg>
+                            <h3 class="text-lg font-semibold text-gray-800">Networking Guidance</h3>
+                        </div>
+                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${isExpanded ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7'}"/>
+                        </svg>
+                    </button>
+                    ${isExpanded ? `
+                    <div class="p-6 border-t bg-gray-50">
+                        <p class="text-sm text-gray-600 bg-green-50 p-3 rounded mb-4">
+                            🤝 <strong>Guide your mentee's networking strategy.</strong> Review their contacts, elevator pitch, and provide networking tips.
+                        </p>
+                        <textarea onchange="updateField('networkingGuidance', this.value)" 
+                                  placeholder="Provide feedback on their networking plan, elevator pitch, and suggest additional contacts or events..." 
+                                  class="w-full p-4 border rounded-lg h-40 focus:ring-2 focus:ring-indigo-500">${appData.networkingGuidance}</textarea>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        function renderSkills() {
+            const isExpanded = expandedSections['skills'];
+            return `
+                <div id="skills-section" class="bg-white rounded-lg shadow-md mb-4 border border-gray-200">
+                    <button onclick="toggleSection('skills')" class="w-full p-4 flex items-center justify-between hover:bg-indigo-50 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                            </svg>
+                            <h3 class="text-lg font-semibold text-gray-800">Skills Development Review</h3>
+                        </div>
+                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${isExpanded ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7'}"/>
+                        </svg>
+                    </button>
+                    ${isExpanded ? `
+                    <div class="p-6 border-t bg-gray-50">
+                        <p class="text-sm text-gray-600 bg-purple-50 p-3 rounded mb-4">
+                            📊 <strong>Review your mentee's skill development roadmap.</strong> Are their learning methods effective? Suggest resources or alternative approaches.
+                        </p>
+                        <textarea onchange="updateField('skillsReview', this.value)" 
+                                  placeholder="Comment on their technical and soft skills development plan. Suggest resources, courses, or alternative learning methods..." 
+                                  class="w-full p-4 border rounded-lg h-40 focus:ring-2 focus:ring-indigo-500">${appData.skillsReview}</textarea>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        function renderLinkedIn() {
+            const isExpanded = expandedSections['linkedin'];
+            return `
+                <div id="linkedin-section" class="bg-white rounded-lg shadow-md mb-4 border border-gray-200">
+                    <button onclick="toggleSection('linkedin')" class="w-full p-4 flex items-center justify-between hover:bg-indigo-50 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                            </svg>
+                            <h3 class="text-lg font-semibold text-gray-800">LinkedIn Profile Review</h3>
+                        </div>
+                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${isExpanded ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7'}"/>
+                        </svg>
+                    </button>
+                    ${isExpanded ? `
+                    <div class="p-6 border-t bg-gray-50">
+                        <p class="text-sm text-gray-600 bg-yellow-50 p-3 rounded mb-4">
+                            💼 <strong>Help optimize your mentee's LinkedIn profile.</strong> Review their headline, summary, and experience sections for maximum impact.
+                        </p>
+                        <textarea onchange="updateField('linkedinReview', this.value)" 
+                                  placeholder="Provide specific feedback on their LinkedIn profile. Suggest improvements to headline, summary, experience descriptions..." 
+                                  class="w-full p-4 border rounded-lg h-40 focus:ring-2 focus:ring-indigo-500">${appData.linkedinReview}</textarea>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        function renderNotes() {
+            const isExpanded = expandedSections['notes'];
+            return `
+                <div class="bg-white rounded-lg shadow-md mb-4 border border-gray-200">
+                    <button onclick="toggleSection('notes')" class="w-full p-4 flex items-center justify-between hover:bg-indigo-50 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                            </svg>
+                            <h3 class="text-lg font-semibold text-gray-800">Private Notes</h3>
+                        </div>
+                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${isExpanded ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7'}"/>
+                        </svg>
+                    </button>
+                    ${isExpanded ? `
+                    <div class="p-6 border-t bg-gray-50">
+                        <p class="text-sm text-gray-600 bg-pink-50 p-3 rounded mb-4">
+                            🔒 <strong>Private notes for Month 2.</strong> Record your observations, concerns, or strategies for supporting your mentee.
+                        </p>
+                        <textarea onchange="updateField('monthlyNotes', this.value)" 
+                                  placeholder="Your private notes for Month 2..." 
+                                  class="w-full p-4 border rounded-lg h-40 focus:ring-2 focus:ring-indigo-500">${appData.monthlyNotes}</textarea>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        // Initialize
+        loadData();
+        renderSections();
+        
+        // Initial progress check after a short delay
+        setTimeout(updateProgress, 100);
+        
+        // Listen for all input changes to update progress
+        document.addEventListener('input', () => {
+            setTimeout(updateProgress, 100);
+        });
+        document.addEventListener('change', () => {
+            setTimeout(updateProgress, 100);
+        });
+    </script>
+</body>
+</html>
+    </script>
 </body>
 </html>

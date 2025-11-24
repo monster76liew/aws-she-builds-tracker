@@ -5,33 +5,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Month 3 - Mentor Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .section-collapsed { display: none; }
+        .section-expanded { display: block; }
+    </style>
 </head>
-<body class="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-2 sm:p-4">
+<body class="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-4">
     <div class="max-w-5xl mx-auto">
-        <!-- Header with Back Button -->
-        <div class="bg-white rounded-xl shadow-lg p-4 sm:p-6 mb-4 sm:mb-6 border-t-4 border-blue-600">
-            <div class="flex flex-col sm:flex-row items-start justify-between gap-4 mb-4">
-                <div class="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
-                    <!-- Back Button -->
-                    <button onclick="goBack()" class="p-2 hover:bg-blue-50 rounded-lg transition-colors flex-shrink-0" title="Go Back">
-                        <svg class="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-                        </svg>
-                    </button>
-                    <div class="bg-blue-100 p-2 sm:p-3 rounded-lg flex-shrink-0">
-                        <svg class="w-6 h-6 sm:w-8 sm:h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        
+        <!-- Back Button -->
+        <a href="javascript:history.back()" class="p-2 hover:bg-gray-100 rounded-lg transition-colors inline-block" title="Go Back">
+            <svg class="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+            </svg>
+        </a>
+
+
+        <!-- Header -->
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-6 border-t-4 border-green-600">
+            <div class="flex items-start justify-between mb-4">
+                <div class="flex items-center gap-3">
+                    <div class="bg-green-100 p-3 rounded-lg">
+                        <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
                         </svg>
                     </div>
-                    <div class="min-w-0">
-                        <div class="flex items-center gap-2 flex-wrap">
-                            <h1 class="text-xl sm:text-2xl font-bold text-gray-800">Mentor Dashboard</h1>
-                            <span class="bg-blue-100 text-blue-700 text-xs font-semibold px-2 py-1 rounded">MENTOR</span>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h1 class="text-2xl font-bold text-gray-800">Mentor Dashboard</h1>
+                            <span class="bg-green-100 text-green-700 text-xs font-semibold px-2 py-1 rounded">MENTOR</span>
                         </div>
-                        <p class="text-gray-600 text-xs sm:text-sm">Month 3 - Apply, Grow & Thrive</p>
+                        <p class="text-gray-600 text-sm">AWS She Builds Mentorship Program 2025</p>
                     </div>
                 </div>
-                <button onclick="saveData()" class="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors shadow-md w-full sm:w-auto justify-center">
+                <button onclick="saveData()" class="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors shadow-md">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/>
                     </svg>
@@ -39,45 +46,112 @@
                 </button>
             </div>
             <div id="saveStatus" class="text-sm hidden"></div>
+            
+            <!-- Progress Bar -->
+            <div class="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-4 mt-4">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm font-medium text-gray-700">Month 3 Progress</span>
+                    <span class="text-sm font-bold text-green-600" id="progressText">0%</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-3 mb-2">
+                    <div id="progressBar" class="bg-gradient-to-r from-green-600 to-blue-600 h-3 rounded-full transition-all duration-500" style="width: 0%"></div>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span class="text-xs text-gray-600" id="progressStatus">🎯 Final Push</span>
+                    <span class="text-xs text-gray-600" id="milestoneCount">0 of 6 milestones completed</span>
+                </div>
+            </div>
         </div>
 
- 
         <!-- Month Navigation -->
-        <div class="grid grid-cols-3 gap-2 sm:gap-3 mb-4 sm:mb-6">
-            <a href="month1.html" class="p-3 sm:p-4 rounded-lg shadow-md bg-white text-gray-800 hover:shadow-lg transition-all text-center hover:bg-blue-50">
-                <svg class="w-5 h-5 sm:w-6 sm:h-6 mb-1 sm:mb-2 mx-auto text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="grid grid-cols-3 gap-3 mb-6">
+            <button onclick="window.location.href='month1.html'" class="p-4 rounded-lg shadow-md bg-blue-100 text-blue-600 hover:bg-blue-200 hover:scale-105 transition-all">
+                <svg class="w-6 h-6 mb-2 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
                 </svg>
-                <h3 class="text-xs sm:text-sm font-bold">Month 1</h3>
-                <p class="text-xs text-gray-600 hidden sm:block">Foundation</p>
-            </a>
-            <a href="month2.html" class="p-3 sm:p-4 rounded-lg shadow-md bg-white text-gray-800 hover:shadow-lg transition-all text-center hover:bg-blue-50">
-                <svg class="w-5 h-5 sm:w-6 sm:h-6 mb-1 sm:mb-2 mx-auto text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <h3 class="text-sm font-bold">Month 1</h3>
+                <p class="text-xs opacity-75">Foundation</p>
+            </button>
+            
+            <button onclick="window.location.href='month2.html'" class="p-4 rounded-lg shadow-md bg-indigo-100 text-indigo-600 hover:bg-indigo-200 hover:scale-105 transition-all">
+                <svg class="w-6 h-6 mb-2 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
                 </svg>
-                <h3 class="text-xs sm:text-sm font-bold">Month 2</h3>
-                <p class="text-xs text-gray-600 hidden sm:block">Exploration</p>
-            </a>
-            <button class="p-3 sm:p-4 rounded-lg shadow-md bg-blue-600 text-white scale-105">
-                <svg class="w-5 h-5 sm:w-6 sm:h-6 mb-1 sm:mb-2 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <h3 class="text-sm font-bold">Month 2</h3>
+                <p class="text-xs opacity-75">Exploration</p>
+            </button>
+            
+            <button class="p-4 rounded-lg shadow-md bg-green-600 text-white scale-105">
+                <svg class="w-6 h-6 mb-2 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
                 </svg>
-                <h3 class="text-xs sm:text-sm font-bold">Month 3</h3>
-                <p class="text-xs opacity-75 hidden sm:block">Growth</p>
+                <h3 class="text-sm font-bold">Month 3</h3>
+                <p class="text-xs opacity-75">Apply & Thrive</p>
             </button>
         </div>
 
-        <!-- Content -->
+        <!-- Content Sections -->
         <div id="sectionsContainer"></div>
 
         <!-- Footer -->
-        <div class="mt-6 sm:mt-8 text-center text-xs sm:text-sm text-gray-600 bg-white rounded-lg p-3 sm:p-4 shadow">
+        <div class="mt-8 text-center text-sm text-gray-600 bg-white rounded-lg p-4 shadow">
             <p>💙 AWS She Builds Mentorship Program | Sep - Nov 2025</p>
-            <p class="mt-1">Program Completion & Next Steps</p>
+            <p class="mt-1">Program Completion & Next Steps - Congratulations! 🎉</p>
         </div>
     </div>
 
     <script>
+        // Progress Tracking Configuration
+        const progressConfig = {
+            milestones: [
+                {
+                    id: "meeting-logs",
+                    name: "Complete Meeting Logs",
+                    sectionId: "meeting-logs-section",
+                    checkFunction: () => appData.meetingLogs.length > 0
+                },
+                {
+                    id: "action-plan",
+                    name: "90-Day Action Plan Reviewed",
+                    sectionId: "action-plan-section",
+                    checkFunction: () => appData.actionPlanReview.trim().length > 30
+                },
+                {
+                    id: "portfolio",
+                    name: "Portfolio Feedback Provided",
+                    sectionId: "portfolio-section",
+                    checkFunction: () => appData.portfolioFeedback.trim().length > 30
+                },
+                {
+                    id: "networking",
+                    name: "Networking Strategy Advised",
+                    sectionId: "networking-section",
+                    checkFunction: () => appData.networkingAdvice.trim().length > 30
+                },
+                {
+                    id: "career",
+                    name: "Career Guidance Provided",
+                    sectionId: "career-section",
+                    checkFunction: () => appData.careerGuidance.trim().length > 30
+                },
+                {
+                    id: "reflection",
+                    name: "Program Reflection Completed",
+                    sectionId: "reflection-section",
+                    checkFunction: () => appData.programReflection.trim().length > 30
+                }
+            ],
+            progressLevels: {
+                0: {emoji: "🎯", text: "Final Push"},
+                17: {emoji: "📊", text: "Documenting"},
+                33: {emoji: "💎", text: "Polishing"},
+                50: {emoji: "🏆", text: "Halfway to Success"},
+                67: {emoji: "🚀", text: "Launch Ready"},
+                83: {emoji: "🌠", text: "Almost Done"},
+                100: {emoji: "🎓", text: "Program Complete!"}
+            }
+        };
+
         let appData = {
             actionPlanReview: '',
             portfolioFeedback: '',
@@ -90,18 +164,11 @@
 
         const expandedSections = {};
 
-        // Back button function
-        function goBack() {
-            if (window.history.length > 1 && document.referrer) {
-                window.history.back();
-            } else {
-                window.location.href = '../index.html';
-            }
-        }
-
         function loadData() {
             const saved = localStorage.getItem('mentor-month3-data');
-            if (saved) appData = JSON.parse(saved);
+            if (saved) {
+                appData = JSON.parse(saved);
+            }
         }
 
         function saveData() {
@@ -111,6 +178,42 @@
             status.textContent = '✓ Progress saved!';
             status.classList.remove('hidden');
             setTimeout(() => status.classList.add('hidden'), 2000);
+            updateProgress();
+        }
+
+        function updateProgress() {
+            let completedCount = 0;
+            
+            progressConfig.milestones.forEach(milestone => {
+                if (milestone.checkFunction()) {
+                    completedCount++;
+                }
+            });
+            
+            const totalMilestones = progressConfig.milestones.length;
+            const percentage = Math.round((completedCount / totalMilestones) * 100);
+            
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
+            const progressStatus = document.getElementById('progressStatus');
+            const milestoneCount = document.getElementById('milestoneCount');
+            
+            if (progressBar) progressBar.style.width = percentage + '%';
+            if (progressText) progressText.textContent = percentage + '%';
+            if (milestoneCount) milestoneCount.textContent = `${completedCount} of ${totalMilestones} milestones completed`;
+            
+            let statusLevel = 0;
+            if (percentage >= 100) statusLevel = 100;
+            else if (percentage >= 83) statusLevel = 83;
+            else if (percentage >= 67) statusLevel = 67;
+            else if (percentage >= 50) statusLevel = 50;
+            else if (percentage >= 33) statusLevel = 33;
+            else if (percentage >= 17) statusLevel = 17;
+            
+            const status = progressConfig.progressLevels[statusLevel];
+            if (progressStatus && status) {
+                progressStatus.textContent = `${status.emoji} ${status.text}`;
+            }
         }
 
         function toggleSection(key) {
@@ -143,95 +246,254 @@
         }
 
         function renderSections() {
-            document.getElementById('sectionsContainer').innerHTML = `
-                ${renderSection('90-Day Action Plan Review', 'actionPlanReview', 'Review mentee action plan progress', 'actionplan', `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>`)}
-                ${renderSection('Portfolio & Projects Feedback', 'portfolioFeedback', 'Provide feedback on STAR format projects', 'portfolio', `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>`)}
-                ${renderSection('Networking Strategy Advice', 'networkingAdvice', 'Guide on maintaining relationships', 'networking', `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>`)}
-                ${renderSection('Career Guidance & Next Steps', 'careerGuidance', 'Help plan post-program career moves', 'career', `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>`)}
-                ${renderMeetings()}
-                ${renderSection('Program Reflection', 'programReflection', 'Reflect on the 12-week journey', 'reflection', `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>`)}
-                ${renderSection('Recommendations for Next Steps', 'nextStepsRecommendations', 'Suggest continued development', 'nextsteps', `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>`)}
+            const container = document.getElementById('sectionsContainer');
+            container.innerHTML = `
+                ${renderMeetingLogs()}
+                ${renderActionPlan()}
+                ${renderPortfolio()}
+                ${renderNetworking()}
+                ${renderCareer()}
+                ${renderReflection()}
+                ${renderNextSteps()}
             `;
         }
 
-        function renderSection(title, field, placeholder, key, iconPath) {
-            const isExpanded = expandedSections[key];
+        function renderMeetingLogs() {
+            const isExpanded = expandedSections['meetings'];
             return `
-                <div class="bg-white rounded-lg shadow-md mb-3 sm:mb-4 border border-gray-200">
-                    <button onclick="toggleSection('${key}')" class="w-full p-3 sm:p-4 flex items-center justify-between hover:bg-blue-50 transition-colors">
-                        <div class="flex items-center gap-2 sm:gap-3">
-                            <svg class="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                ${iconPath}
+                <div id="meeting-logs-section" class="bg-white rounded-lg shadow-md mb-4 border border-gray-200">
+                    <button onclick="toggleSection('meetings')" class="w-full p-4 flex items-center justify-between hover:bg-green-50 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                             </svg>
-                            <h3 class="font-semibold text-gray-800 text-sm sm:text-base text-left">${title}</h3>
+                            <h3 class="text-lg font-semibold text-gray-800">Meeting Logs</h3>
                         </div>
-                        <svg class="w-4 h-4 sm:w-5 sm:h-5 text-gray-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${isExpanded ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7'}"/>
                         </svg>
                     </button>
                     ${isExpanded ? `
-                        <div class="p-4 sm:p-6 border-t border-gray-200 bg-gray-50">
-                            <textarea onchange="updateField('${field}', this.value)" 
-                                      placeholder="${placeholder}" 
-                                      class="w-full p-3 sm:p-4 border rounded-lg focus:ring-2 focus:ring-blue-500 h-32 sm:h-40 text-sm sm:text-base">${appData[field]}</textarea>
+                    <div class="p-6 border-t bg-gray-50">
+                        <button onclick="addMeeting()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 mb-4">
+                            Add New Meeting
+                        </button>
+                        <div class="space-y-4">
+                            ${appData.meetingLogs.map(log => `
+                                <div class="bg-white p-4 rounded-lg border-2 border-green-100 shadow-sm">
+                                    <input type="date" value="${log.date}" onchange="updateMeeting(${log.id}, 'date', this.value)" 
+                                           class="w-full p-2 border rounded mb-2 focus:ring-2 focus:ring-green-500">
+                                    <textarea onchange="updateMeeting(${log.id}, 'topics', this.value)" 
+                                              placeholder="Topics discussed..." 
+                                              class="w-full p-2 border rounded mb-2 h-20 focus:ring-2 focus:ring-green-500">${log.topics}</textarea>
+                                    <textarea onchange="updateMeeting(${log.id}, 'guidance', this.value)" 
+                                              placeholder="Your guidance and advice..." 
+                                              class="w-full p-2 border rounded h-20 focus:ring-2 focus:ring-green-500">${log.guidance}</textarea>
+                                    <button onclick="deleteMeeting(${log.id})" class="text-red-600 text-sm mt-2 hover:text-red-800">Delete</button>
+                                </div>
+                            `).join('')}
+                            ${appData.meetingLogs.length === 0 ? '<p class="text-gray-500 text-center py-8">No meetings yet</p>' : ''}
                         </div>
+                    </div>
                     ` : ''}
                 </div>
             `;
         }
 
-        function renderMeetings() {
-            const isExpanded = expandedSections['meetings'];
+        function renderActionPlan() {
+            const isExpanded = expandedSections['actionplan'];
             return `
-                <div class="bg-white rounded-lg shadow-md mb-3 sm:mb-4 border border-gray-200">
-                    <button onclick="toggleSection('meetings')" class="w-full p-3 sm:p-4 flex items-center justify-between hover:bg-blue-50 transition-colors">
-                        <div class="flex items-center gap-2 sm:gap-3">
-                            <svg class="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                <div id="action-plan-section" class="bg-white rounded-lg shadow-md mb-4 border border-gray-200">
+                    <button onclick="toggleSection('actionplan')" class="w-full p-4 flex items-center justify-between hover:bg-green-50 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
                             </svg>
-                            <h3 class="font-semibold text-gray-800 text-sm sm:text-base">Meeting Logs</h3>
+                            <h3 class="text-lg font-semibold text-gray-800">90-Day Action Plan Review</h3>
                         </div>
-                        <svg class="w-4 h-4 sm:w-5 sm:h-5 text-gray-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${isExpanded ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7'}"/>
                         </svg>
                     </button>
                     ${isExpanded ? `
-                        <div class="p-4 sm:p-6 border-t border-gray-200 bg-gray-50">
-                            <button onclick="addMeeting()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 mb-4 w-full sm:w-auto text-sm sm:text-base">
-                                Add Meeting
-                            </button>
-                            <div class="space-y-3 sm:space-y-4">
-                                ${appData.meetingLogs.map(log => `
-                                    <div class="bg-white p-3 sm:p-4 rounded-lg border shadow-sm">
-                                        <input type="date" value="${log.date}" onchange="updateMeeting(${log.id}, 'date', this.value)" 
-                                               class="w-full p-2 border rounded mb-2 focus:ring-2 focus:ring-blue-500 text-sm sm:text-base">
-                                        <textarea onchange="updateMeeting(${log.id}, 'topics', this.value)" 
-                                                  placeholder="Topics discussed..." 
-                                                  class="w-full p-2 border rounded mb-2 h-20 focus:ring-2 focus:ring-blue-500 text-sm sm:text-base">${log.topics}</textarea>
-                                        <textarea onchange="updateMeeting(${log.id}, 'guidance', this.value)" 
-                                                  placeholder="Your guidance and advice..." 
-                                                  class="w-full p-2 border rounded h-20 focus:ring-2 focus:ring-blue-500 text-sm sm:text-base">${log.guidance}</textarea>
-                                        <button onclick="deleteMeeting(${log.id})" class="text-red-600 text-xs sm:text-sm mt-2 hover:text-red-800">Delete</button>
-                                    </div>
-                                `).join('')}
-                                ${appData.meetingLogs.length === 0 ? '<p class="text-gray-500 text-center py-6 sm:py-8 text-sm sm:text-base">No meetings yet</p>' : ''}
-                            </div>
-                        </div>
+                    <div class="p-6 border-t bg-gray-50">
+                        <p class="text-sm text-gray-600 bg-blue-50 p-3 rounded mb-4">
+                            🎯 <strong>Review your mentee's 90-day action plan.</strong> Are their goals realistic? Provide guidance on priorities and accountability.
+                        </p>
+                        <textarea onchange="updateField('actionPlanReview', this.value)" 
+                                  placeholder="Review their goals, milestones, and accountability plan. Suggest adjustments or additional resources..." 
+                                  class="w-full p-4 border rounded-lg h-40 focus:ring-2 focus:ring-green-500">${appData.actionPlanReview}</textarea>
+                    </div>
                     ` : ''}
-</div>
-
-<script>
-    function goBack() {
-        if (window.history.length > 1 && document.referrer) {
-            window.history.back();
-        } else {
-            window.location.href = '../index.html';
+                </div>
+            `;
         }
-    }
 
-    loadData();
-    renderSections();
-    updateStats();
-</script>
+        function renderPortfolio() {
+            const isExpanded = expandedSections['portfolio'];
+            return `
+                <div id="portfolio-section" class="bg-white rounded-lg shadow-md mb-4 border border-gray-200">
+                    <button onclick="toggleSection('portfolio')" class="w-full p-4 flex items-center justify-between hover:bg-green-50 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                            </svg>
+                            <h3 class="text-lg font-semibold text-gray-800">Portfolio & Projects Feedback</h3>
+                        </div>
+                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${isExpanded ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7'}"/>
+                        </svg>
+                    </button>
+                    ${isExpanded ? `
+                    <div class="p-6 border-t bg-gray-50">
+                        <p class="text-sm text-gray-600 bg-purple-50 p-3 rounded mb-4">
+                            💼 <strong>Provide feedback on portfolio projects.</strong> Review their STAR format descriptions and suggest improvements.
+                        </p>
+                        <textarea onchange="updateField('portfolioFeedback', this.value)" 
+                                  placeholder="Comment on project descriptions, GitHub links, portfolio presentation. Are they showcasing their best work effectively?" 
+                                  class="w-full p-4 border rounded-lg h-40 focus:ring-2 focus:ring-green-500">${appData.portfolioFeedback}</textarea>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        function renderNetworking() {
+            const isExpanded = expandedSections['networking'];
+            return `
+                <div id="networking-section" class="bg-white rounded-lg shadow-md mb-4 border border-gray-200">
+                    <button onclick="toggleSection('networking')" class="w-full p-4 flex items-center justify-between hover:bg-green-50 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                            </svg>
+                            <h3 class="text-lg font-semibold text-gray-800">Networking Strategy Advice</h3>
+                        </div>
+                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${isExpanded ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7'}"/>
+                        </svg>
+                    </button>
+                    ${isExpanded ? `
+                    <div class="p-6 border-t bg-gray-50">
+                        <p class="text-sm text-gray-600 bg-green-50 p-3 rounded mb-4">
+                            🤝 <strong>Guide on maintaining professional relationships.</strong> How can they stay connected with mentors, peers, and community post-program?
+                        </p>
+                        <textarea onchange="updateField('networkingAdvice', this.value)" 
+                                  placeholder="Provide advice on maintaining relationships, following up with contacts, staying active in communities..." 
+                                  class="w-full p-4 border rounded-lg h-40 focus:ring-2 focus:ring-green-500">${appData.networkingAdvice}</textarea>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        function renderCareer() {
+            const isExpanded = expandedSections['career'];
+            return `
+                <div id="career-section" class="bg-white rounded-lg shadow-md mb-4 border border-gray-200">
+                    <button onclick="toggleSection('career')" class="w-full p-4 flex items-center justify-between hover:bg-green-50 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                            </svg>
+                            <h3 class="text-lg font-semibold text-gray-800">Career Guidance & Next Steps</h3>
+                        </div>
+                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${isExpanded ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7'}"/>
+                        </svg>
+                    </button>
+                    ${isExpanded ? `
+                    <div class="p-6 border-t bg-gray-50">
+                        <p class="text-sm text-gray-600 bg-yellow-50 p-3 rounded mb-4">
+                            💡 <strong>Help plan post-program career moves.</strong> What should they focus on immediately after the program ends?
+                        </p>
+                        <textarea onchange="updateField('careerGuidance', this.value)" 
+                                  placeholder="Provide specific career guidance, job search strategies, skill development recommendations..." 
+                                  class="w-full p-4 border rounded-lg h-40 focus:ring-2 focus:ring-green-500">${appData.careerGuidance}</textarea>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        function renderReflection() {
+            const isExpanded = expandedSections['reflection'];
+            return `
+                <div id="reflection-section" class="bg-white rounded-lg shadow-md mb-4 border border-gray-200">
+                    <button onclick="toggleSection('reflection')" class="w-full p-4 flex items-center justify-between hover:bg-green-50 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                            </svg>
+                            <h3 class="text-lg font-semibold text-gray-800">Program Reflection</h3>
+                        </div>
+                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${isExpanded ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7'}"/>
+                        </svg>
+                    </button>
+                    ${isExpanded ? `
+                    <div class="p-6 border-t bg-gray-50">
+                        <p class="text-sm text-gray-600 bg-pink-50 p-3 rounded mb-4">
+                            💭 <strong>Reflect on your mentorship journey.</strong> What did you learn? What would you do differently? How did your mentee grow?
+                        </p>
+                        <textarea onchange="updateField('programReflection', this.value)" 
+                                  placeholder="Reflect on the 3-month journey, your mentee's growth, lessons learned, memorable moments..." 
+                                  class="w-full p-4 border rounded-lg h-40 focus:ring-2 focus:ring-green-500">${appData.programReflection}</textarea>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        function renderNextSteps() {
+            const isExpanded = expandedSections['nextsteps'];
+            return `
+                <div class="bg-white rounded-lg shadow-md mb-4 border border-gray-200">
+                    <button onclick="toggleSection('nextsteps')" class="w-full p-4 flex items-center justify-between hover:bg-green-50 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            <h3 class="text-lg font-semibold text-gray-800">Recommendations for Next Steps</h3>
+                        </div>
+                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${isExpanded ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7'}"/>
+                        </svg>
+                    </button>
+                    ${isExpanded ? `
+                    <div class="p-6 border-t bg-gray-50">
+                        <p class="text-sm text-gray-600 bg-indigo-50 p-3 rounded mb-4">
+                            🎯 <strong>Suggest continued development path.</strong> What should your mentee focus on in the next 6-12 months?
+                        </p>
+                        <textarea onchange="updateField('nextStepsRecommendations', this.value)" 
+                                  placeholder="Recommend resources, courses, communities, or experiences for continued growth..." 
+                                  class="w-full p-4 border rounded-lg h-40 focus:ring-2 focus:ring-green-500">${appData.nextStepsRecommendations}</textarea>
+                        
+                        <div class="mt-6 bg-gradient-to-r from-green-100 to-blue-100 p-6 rounded-lg text-center">
+                            <h3 class="text-2xl font-bold text-gray-800 mb-2">🎉 Congratulations, Mentor! 🎉</h3>
+                            <p class="text-gray-700">Thank you for dedicating your time and expertise to support your mentee's growth.</p>
+                            <p class="text-gray-600 text-sm mt-2">Your guidance has made a lasting impact! 💙</p>
+                        </div>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        // Initialize
+        loadData();
+        renderSections();
+        
+        // Initial progress check after a short delay
+        setTimeout(updateProgress, 100);
+        
+        // Listen for all input changes to update progress
+        document.addEventListener('input', () => {
+            setTimeout(updateProgress, 100);
+        });
+        document.addEventListener('change', () => {
+            setTimeout(updateProgress, 100);
+        });
+    </script>
 </body>
 </html>
