@@ -1,0 +1,35 @@
+async function submitReflection(reflectionId) {
+  const reflection = await db.collection('reflections').doc(reflectionId).get();
+  const reflectionData = reflection.data();
+  
+  // Update reflection status
+  await db.collection('reflections').doc(reflectionId).update({
+    status: 'submitted',
+    submittedAt: firebase.firestore.FieldValue.serverTimestamp()
+  });
+  
+  // Get mentor from pairing
+  const pairing = await db.collection('pairings').doc(reflectionData.pairingId).get();
+  const mentorId = pairing.data().mentorId;
+  
+  // Create notification for mentor
+  await createNotification(
+    mentorId,
+    'submission',
+    'New Reflection Submitted',
+    `A mentee has submitted their Month ${reflectionData.month} reflection`,
+    reflectionId
+  );
+  
+  // Log activity
+  await db.collection('activity_log').add({
+    userId: auth.currentUser.uid,
+    action: 'reflection_submitted',
+    entityType: 'reflection',
+    entityId: reflectionId,
+    metadata: { month: reflectionData.month },
+    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+  });
+  
+  alert('Reflection submitted successfully! Your mentor has been notified.');
+}
