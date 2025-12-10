@@ -1,0 +1,471 @@
+┌─────────────────────────────────────────────────────────────┐
+│                     MONTH 1 WORKFLOW                        │
+└─────────────────────────────────────────────────────────────┘
+
+1. MENTEE fills Month 1 → Clicks "Submit" ✅ (We built this)
+   └─> Status: draft → submitted
+   └─> Notification created for MENTOR
+
+2. MENTOR receives notification ⚠️ (Partially built)
+   └─> Clicks notification → Goes to review page
+   └─> MENTOR READS mentee's Month 1 content ❌ (MISSING!)
+   └─> MENTOR writes feedback
+   └─> MENTOR clicks "Submit Feedback" ⚠️ (Code exists, not integrated)
+   └─> Status: submitted → reviewed
+   └─> Notification created for MENTEE
+
+3. MENTEE receives notification ⚠️ (Partially built)
+   └─> MENTEE sees feedback section appear ❌ (MISSING!)
+   └─> MENTEE READS mentor's feedback (read-only)
+
+   # 🎯 Complete Implementation Checklist
+
+## 📂 Files Organization
+
+```
+Your Project Structure:
+├── auth.html                          ← ✅ DONE
+├── coordinator/
+│   ├── dashboard.html                 ← ⚠️ Needs Firebase + Nav
+│   ├── month1.html                    ← ⚠️ Needs enhancement
+│   ├── month2.html                    ← ⚠️ Needs enhancement  
+│   ├── month3.html                    ← ⚠️ Needs enhancement
+│   ├── analytics.html                 ← ❌ CREATE NEW
+│   └── pairings.html                  ← ❌ CREATE NEW
+├── mentee/
+│   ├── dashboard.html                 ← ⚠️ Needs Firebase + Nav
+│   ├── month1.html                    ← ⚠️ Needs enhancement + feedback display
+│   ├── month2.html                    ← ⚠️ Needs enhancement + feedback display
+│   └── month3.html                    ← ⚠️ Needs enhancement + feedback display
+├── mentor/
+│   ├── dashboard.html                 ← ⚠️ Needs Firebase + Nav
+│   ├── month1.html                    ← ⚠️ Needs enhancement
+│   ├── month2.html                    ← ⚠️ Needs enhancement
+│   ├── month3.html                    ← ⚠️ Needs enhancement
+│   ├── review.html                    ← ❌ CREATE NEW (to read mentee submissions)
+│   └── feedback-list.html             ← ❌ CREATE NEW (list all pending reviews)
+└── assets/
+    └── js/
+        ├── firebase-config.js         ← ✅ DONE
+        ├── auth.js                    ← ✅ DONE
+        └── auto-save.js               ← ✅ DONE
+```
+
+---
+
+## ✅ Phase 1: What We've Built (DONE)
+
+### Core Infrastructure
+- [x] Firebase setup
+- [x] Authentication (login/signup)
+- [x] Auto-save functionality
+- [x] Submit workflow
+- [x] Database schema
+- [x] Security rules
+
+### Files Created
+- [x] `auth.html` - Login/signup page
+- [x] `assets/js/firebase-config.js` - Firebase initialization
+- [x] `assets/js/auth.js` - Auth logic
+- [x] `assets/js/auto-save.js` - Auto-save class
+
+---
+
+## ⚠️ Phase 2: Enhance Existing Month Pages (IN PROGRESS)
+
+### What to Add to ALL Month Pages (Mentee, Mentor, Coordinator)
+
+#### For: `mentee/month1.html`, `month2.html`, `month3.html`
+- [ ] Add Firebase SDK scripts in `<head>`
+- [ ] Add save status indicator: `<div id="saveStatus"></div>`
+- [ ] Add submit button: `<button id="submitReflection">`
+- [ ] Add Firebase initialization code
+- [ ] Add auto-save trigger on all inputs
+- [ ] Add submit handler function
+- [ ] **ADD: Mentor feedback display section** ← New!
+- [ ] **ADD: Load feedback function** ← New!
+
+#### For: `mentor/month1.html`, `month2.html`, `month3.html`
+- [ ] Add Firebase SDK scripts in `<head>`
+- [ ] Add save status indicator: `<div id="saveStatus"></div>`
+- [ ] Add submit button for mentor's own observations
+- [ ] Add Firebase initialization code
+- [ ] Add auto-save trigger on all inputs
+- [ ] Add submit handler function
+
+#### For: `coordinator/month1.html`, `month2.html`, `month3.html`
+- [ ] Add Firebase SDK scripts in `<head>`
+- [ ] Add save status indicator: `<div id="saveStatus"></div>`
+- [ ] Add submit button for program notes
+- [ ] Add Firebase initialization code
+- [ ] Add auto-save trigger on all inputs
+- [ ] Add submit handler function
+
+---
+
+## ❌ Phase 3: Build Missing Critical Pages (TODO)
+
+### Priority 1: Mentor Review System (CRITICAL!)
+
+#### File: `mentor/review.html` ← **CREATE THIS**
+**Purpose:** Let mentors READ what mentees submitted
+
+**What it needs:**
+```html
+┌──────────────────────────────────────────────┐
+│ Navigation Bar                                │
+├──────────────────────────────────────────────┤
+│ [← Back to Dashboard]                        │
+│                                              │
+│ 👤 Mentee: Sarah Chen                       │
+│ 📅 Month 1: Foundation & Goal Setting       │
+│ 🕒 Submitted: 2 days ago                    │
+├──────────────────────────────────────────────┤
+│ 📋 MENTEE'S SUBMISSION (Read-Only)          │
+│                                              │
+│ ┌─────────────────────────────────────────┐ │
+│ │ Personal Mission:                        │ │
+│ │ "My mission is to become a cloud..."    │ │
+│ │                                          │ │
+│ │ SMART Goals:                             │ │
+│ │ • Short-term Goal 1: ...                │ │
+│ │ • Short-term Goal 2: ...                │ │
+│ │                                          │ │
+│ │ Strengths:                               │ │
+│ │ • Problem solving                        │ │
+│ │ • Communication                          │ │
+│ │                                          │ │
+│ │ [... ALL mentee's form data ...]        │ │
+│ └─────────────────────────────────────────┘ │
+├──────────────────────────────────────────────┤
+│ ✍️ YOUR FEEDBACK                            │
+│ ┌─────────────────────────────────────────┐ │
+│ │ [Text area - auto-save enabled]         │ │
+│ │                                          │ │
+│ │                                          │ │
+│ └─────────────────────────────────────────┘ │
+│ [💾 Save Draft] [✅ Submit Feedback]        │
+└──────────────────────────────────────────────┘
+```
+
+**How it works:**
+1. URL: `review.html?id=reflection_xyz123`
+2. Load reflection from Firestore
+3. Display ALL mentee's form data (read-only)
+4. Show text area for mentor feedback
+5. Auto-save feedback as draft
+6. Submit button creates feedback + notifies mentee
+
+**Files needed:**
+- [ ] `mentor/review.html` (HTML structure)
+- [ ] JavaScript inline (or separate `review.js`)
+
+---
+
+#### File: `mentor/feedback-list.html` ← **CREATE THIS**
+**Purpose:** Show mentor all pending reviews
+
+**What it needs:**
+```html
+┌──────────────────────────────────────────────┐
+│ Pending Reviews                              │
+├──────────────────────────────────────────────┤
+│ ┌──────────────────────────────────────────┐ │
+│ │ 🟠 Sarah Chen - Month 1                  │ │
+│ │ Submitted: 2 days ago                    │ │
+│ │ [Review Now →]                           │ │
+│ └──────────────────────────────────────────┘ │
+│                                              │
+│ ┌──────────────────────────────────────────┐ │
+│ │ 🟠 Emma Rodriguez - Month 2              │ │
+│ │ Submitted: 5 hours ago                   │ │
+│ │ [Review Now →]                           │ │
+│ └──────────────────────────────────────────┘ │
+├──────────────────────────────────────────────┤
+│ Completed Reviews                            │
+├──────────────────────────────────────────────┤
+│ ┌──────────────────────────────────────────┐ │
+│ │ ✅ Sarah Chen - Month 1 (Week 1)        │ │
+│ │ Reviewed: 1 week ago                     │ │
+│ │ [View Feedback]                          │ │
+│ └──────────────────────────────────────────┘ │
+└──────────────────────────────────────────────┘
+```
+
+**How it works:**
+1. Query reflections where:
+   - `status = 'submitted'` (pending)
+   - `pairingId` matches mentor's assigned mentees
+2. Show list with "Review Now" button
+3. Click → Navigate to `review.html?id=reflection_xyz`
+
+---
+
+### Priority 2: Feedback Display on Mentee Pages
+
+#### Add to: `mentee/month1.html`, `month2.html`, `month3.html`
+
+**What to add:** (After submit button, before footer)
+
+```html
+<!-- Mentor Feedback Section -->
+<div id="mentorFeedbackSection" class="hidden">
+  <h3>📝 Mentor Feedback</h3>
+  <div id="feedbackContent">
+    <!-- Loads dynamically -->
+  </div>
+</div>
+```
+
+**JavaScript to add:**
+```javascript
+async function loadMentorFeedback() {
+  // Query feedback for this reflection
+  // If exists, show section and display content
+}
+```
+
+---
+
+### Priority 3: Coordinator Analytics Dashboard
+
+#### File: `coordinator/analytics.html` ← **CREATE THIS**
+
+**What it needs:**
+```
+┌─────────────────────────────────────────────┐
+│ Cohort: [Q1 2025 ▼]                        │
+├─────────────────────────────────────────────┤
+│ ┌─────┐ ┌─────┐ ┌─────┐ ┌─────┐          │
+│ │  24 │ │ 87% │ │  22 │ │  3  │          │
+│ │Pairs│ │Comp.│ │Actv.│ │Pend.│          │
+│ └─────┘ └─────┘ └─────┘ └─────┘          │
+├─────────────────────────────────────────────┤
+│ 📊 Submission Timeline                      │
+│ [Line chart: submissions over time]        │
+├─────────────────────────────────────────────┤
+│ All Pairings                                │
+├──────────┬──────────┬────────┬────────────┤
+│ Mentee   │ Mentor   │ Status │ Last Action│
+├──────────┼──────────┼────────┼────────────┤
+│ Sarah    │ Dr. Lisa │ Month 2│ 2 days ago │
+│ Maya     │ Jennifer │ Month 2│ 1 day ago  │
+│ Emma     │ Dr. Lisa │ Month 1│ 5 days ago │
+└──────────┴──────────┴────────┴────────────┘
+```
+
+---
+
+## 📝 Detailed Task Breakdown
+
+### Task 1: Enhance Mentee Month Pages (3 pages × similar work)
+**Estimated time:** 2-3 hours per page = **6-9 hours total**
+
+For each of `mentee/month1.html`, `month2.html`, `month3.html`:
+
+1. **Add Firebase SDK** (5 min)
+   ```html
+   <script src="firebase-app-compat.js"></script>
+   <script src="firebase-auth-compat.js"></script>
+   <script src="firebase-firestore-compat.js"></script>
+   ```
+
+2. **Add save status indicator** (2 min)
+   ```html
+   <div id="saveStatus"></div>
+   ```
+
+3. **Add submit button** (5 min)
+   ```html
+   <button id="submitReflection" onclick="handleSubmit()">
+   ```
+
+4. **Add Firebase initialization** (30 min)
+   - Copy from enhanced month1.html I provided
+   - Adjust for month number (1, 2, or 3)
+
+5. **Add mentor feedback section** (20 min)
+   ```html
+   <div id="mentorFeedbackSection" class="hidden">
+     <!-- Feedback display -->
+   </div>
+   ```
+
+6. **Add load feedback function** (30 min)
+   ```javascript
+   async function loadMentorFeedback() {
+     // Query and display
+   }
+   ```
+
+7. **Test thoroughly** (30 min per page)
+
+---
+
+### Task 2: Enhance Mentor Month Pages (3 pages)
+**Estimated time:** 1-2 hours per page = **3-6 hours total**
+
+Same as Task 1, but WITHOUT feedback display section.
+
+---
+
+### Task 3: Build Mentor Review Page
+**Estimated time:** 4-6 hours**
+
+**Sub-tasks:**
+1. Create `mentor/review.html` structure (1 hour)
+2. Add JavaScript to load mentee submission (1 hour)
+3. Display all form data in read-only format (1.5 hours)
+4. Add feedback text area with auto-save (30 min)
+5. Add submit feedback workflow (1 hour)
+6. Test end-to-end (1 hour)
+
+---
+
+### Task 4: Build Feedback List Page
+**Estimated time:** 2-3 hours**
+
+**Sub-tasks:**
+1. Create `mentor/feedback-list.html` (30 min)
+2. Query pending reviews from Firestore (1 hour)
+3. Display list with status badges (30 min)
+4. Add navigation to review page (30 min)
+5. Test with multiple mentees (30 min)
+
+---
+
+### Task 5: Build Coordinator Analytics
+**Estimated time:** 6-8 hours**
+
+**Sub-tasks:**
+1. Create `coordinator/analytics.html` (1 hour)
+2. Add cohort selector (30 min)
+3. Calculate and display metrics (2 hours)
+4. Build pairing table (2 hours)
+5. Add charts (optional, 2 hours)
+6. Test with real data (1 hour)
+
+---
+
+## 🎯 Recommended Implementation Order
+
+### **This Weekend (4-6 hours):**
+1. ✅ Review all changes carefully
+2. ⚠️ Enhance ONE mentee month page fully (month1.html)
+   - Add Firebase
+   - Add submit button
+   - Add feedback display section
+   - Test end-to-end
+3. ⚠️ Build mentor review page (review.html)
+   - Basic structure
+   - Load mentee data
+   - Submit feedback
+4. 🧪 **Test the complete flow:**
+   - Mentee submits → Mentor reviews → Mentee sees feedback
+
+### **Next Week (3-4 hours):**
+5. Copy changes to month2.html and month3.html for mentee
+6. Enhance all mentor month pages
+7. Build feedback list page for mentors
+
+### **Week After (4-6 hours):**
+8. Build coordinator analytics dashboard
+9. Add coordinator pairing management
+10. Polish and deploy
+
+---
+
+## 📊 Total Estimated Time
+
+| Task | Time |
+|------|------|
+| Enhance mentee pages (3) | 6-9 hours |
+| Enhance mentor pages (3) | 3-6 hours |
+| Build mentor review page | 4-6 hours |
+| Build feedback list page | 2-3 hours |
+| Build coordinator analytics | 6-8 hours |
+| Testing & debugging | 3-4 hours |
+| **TOTAL** | **24-36 hours** |
+
+---
+
+## 🚨 Critical Path (Must Complete First)
+
+```
+1. Mentee month1.html (enhanced) ← Start here
+   ↓
+2. Mentor review.html (to read mentee submissions) ← Then this
+   ↓
+3. Mentee feedback display (to see mentor feedback) ← Then this
+   ↓
+4. Test complete flow
+   ↓
+5. Copy to other months
+```
+
+**Without steps 2-3, the system is incomplete!**
+
+---
+
+## 💡 Quick Reference: What Goes Where
+
+### Mentee Pages Need:
+1. ✅ Submit button (to submit their work)
+2. ❌ Feedback display section (to READ mentor's feedback)
+
+### Mentor Pages Need:
+1. ✅ Submit button (for their own observations)
+2. ❌ Review page (to READ mentee's submissions)
+3. ❌ Feedback list (to see pending reviews)
+
+### Coordinator Pages Need:
+1. ✅ Submit button (for program notes)
+2. ❌ Analytics dashboard (to view metrics)
+3. ❌ Pairing management (to assign mentors)
+
+---
+
+## 🎯 Action Items for This Weekend
+
+### Saturday Morning (2-3 hours):
+- [ ] Carefully review all 3 parts of enhanced month1.html
+- [ ] Understand the Firebase flow
+- [ ] Test with your Firebase setup
+- [ ] Make sure submit works
+
+### Saturday Afternoon (2-3 hours):
+- [ ] Add mentor feedback display section to month1.html
+- [ ] Test loading feedback from Firestore
+- [ ] Verify it shows after mentor submits
+
+### Sunday Morning (2-3 hours):
+- [ ] Create mentor/review.html
+- [ ] Load mentee's submission data
+- [ ] Display all form fields (read-only)
+
+### Sunday Afternoon (2-3 hours):
+- [ ] Add feedback textarea to review.html
+- [ ] Test submit feedback workflow
+- [ ] **Test complete loop:** Mentee → Mentor → Mentee sees feedback
+
+---
+
+## ✅ Definition of "Complete"
+
+The system is complete when:
+
+1. ✅ Mentee can fill Month 1 and submit
+2. ✅ Mentor receives notification
+3. ✅ **Mentor can VIEW mentee's submission** ← Missing now
+4. ✅ **Mentor can WRITE and submit feedback** ← Partially done
+5. ✅ Mentee receives notification
+6. ✅ **Mentee can VIEW mentor's feedback** ← Missing now
+7. ✅ Coordinator can see analytics
+8. ✅ Coordinator can manage pairings
+
+**Currently have:** 1, 2, 5
+**Need to build:** 3, 4, 6, 7, 8
+
+---
+
+Would you like me to create the complete mentor review page code for you to tackle this weekend?

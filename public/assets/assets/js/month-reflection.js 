@@ -1,0 +1,105 @@
+// Initialize when page loads
+async function initMonthPage() {
+  const user = auth.currentUser;
+  
+  if (!user) {
+    window.location.href = '/auth.html';
+    return;
+  }
+
+  // Get user role
+  const userDoc = await db.collection('users').doc(user.uid).get();
+  const userData = userDoc.data();
+  const userRole = userData.role;
+
+  try {
+    // Determine what to load based on role
+    if (userRole === 'mentee') {
+      await loadMenteeReflection(user.uid);
+    } else if (userRole === 'mentor') {
+      await loadMentorObservation(user.uid);
+    } else if (userRole === 'coordinator') {
+      await loadCoordinatorNotes(user.uid);
+    }
+
+    // Set up auto-save for all roles
+    setupAutoSave();
+    setupAutoSaveListeners();
+
+  } catch (error) {
+    console.error('Error initializing page:', error);
+  }
+}
+
+// Load mentee's own reflection
+async function loadMenteeReflection(userId) {
+  const pairingSnapshot = await db.collection('pairings')
+    .where('menteeId', '==', userId)
+    .limit(1)
+    .get();
+
+  if (pairingSnapshot.empty) {
+    alert('No mentorship pairing found. Contact your coordinator.');
+    return;
+  }
+
+  const pairingId = pairingSnapshot.docs[0].id;
+  await loadOrCreateReflection(userId, 'mentee', pairingId);
+}
+
+// Load mentor's own observation
+async function loadMentorObservation(userId) {
+  // Mentors can have multiple mentees, but write one observation per month
+  // They choose which pairing when writing (or write general notes)
+  await loadOrCreateReflection(userId, 'mentor', null);
+}
+
+// Load coordinator's program notes
+async function loadCoordinatorNotes(userId) {
+  // Coordinators write cohort-level notes
+  const cohortSnapshot = await db.collection('cohorts')
+    .orderBy('createdAt', 'desc')
+    .limit(1)
+    .get();
+
+  const cohortId = cohortSnapshot.empty ? null : cohortSnapshot.docs[0].id;
+  await loadOrCreateReflection(userId, 'coordinator', null, cohortId);
+}
+
+// Generic function to load or create reflection for any role
+async function loadOrCreateReflection(userId, role, pairingId = null, cohortId = null) {
+  const query = db.collection('reflections')
+    .where('authorId', '==', userId)
+    .where('authorRole', '==', role)
+    .where('month', '==', currentMonth);
+
+  if (pairingId) {
+    query.where('pairingId', '==', pairingId);
+  }
+
+  const reflectionSnapshot = await query.limit(1).get();
+
+  if (!reflectionSnapshot.empty) {
+    // Load existing
+    currentReflectionId = reflectionSnapshot.docs[0].id;
+    const data = reflectionSnapshot.docs[0].data();
+    loadFormData(data);
+    
+    if (data.status === 'submitted') {
+      disableFormEditing();
+    }
+  } else {
+    // Create new
+    const newReflection = await db.collection('reflections').add({
+      authorId: userId,
+      authorRole: role,
+      pairingId: pairingId,
+      cohortId: cohortId,
+      month: currentMonth,
+      formData: {},
+      status: 'draft',
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    currentReflectionId = newReflection.id;
+  }
+}

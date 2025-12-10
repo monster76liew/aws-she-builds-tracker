@@ -4,6 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Month 1 - Mentor Dashboard</title>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .section-collapsed { display: none; }
@@ -91,6 +98,23 @@
 
         <!-- Content Sections -->
         <div id="sectionsContainer"></div>
+
+        <!-- SUBMIT BUTTON - NEW ADDITION FOR FIREBASE -->
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-6 border border-purple-200">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg font-bold text-gray-800 mb-1">Ready to Submit?</h3>
+                    <p class="text-sm text-gray-600">Once submitted, your mentee will be notified to review your Month 1 observation.</p>
+                </div>
+                <button 
+                    id="submitReflection" 
+                    onclick="handleSubmit()"
+                    class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700"
+                >
+                    Submit Month 1 Observations
+                </button>
+            </div>
+        </div>
 
         <!-- Footer -->
         <div class="mt-8 text-center text-sm text-gray-600 bg-white rounded-lg p-4 shadow">

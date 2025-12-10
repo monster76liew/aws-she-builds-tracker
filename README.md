@@ -155,3 +155,7 @@ For questions or support, contact: aws-shebuilds-community@amazon.com
 ---
 
 **Made with 💜 for women in tech**
+
+## 📋 Documentation
+- [Implementation Guide](IMPLEMENTATION.md) - Project roadmap and technical details
+- [User Guide](docs/USER_GUIDE.md) - How to use the system

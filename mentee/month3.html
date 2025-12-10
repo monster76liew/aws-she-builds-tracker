@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Month 3 - Mentee Dashboard</title>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .section-collapsed { display: none; }
@@ -92,6 +95,41 @@
 
         <!-- Content Sections -->
         <div id="sectionsContainer"></div>
+
+        <!-- SUBMIT BUTTON - NEW ADDITION FOR FIREBASE -->
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-6 border border-purple-200">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg font-bold text-gray-800 mb-1">Ready to Submit?</h3>
+                    <p class="text-sm text-gray-600">Once submitted, your mentor will be notified to review your Month 3 work.</p>
+                </div>
+                <button 
+                    id="submitReflection" 
+                    onclick="handleSubmit()"
+                    class="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors shadow-md font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                    Submit Month 3
+                </button>
+            </div>
+        </div>
+
+        <!-- ADD MENTOR FEEDBACK SECTION HERE ⬇️ -->
+        <!-- Mentor Feedback Section (appears after mentor reviews) -->
+        <div id="feedbackSection" class="hidden bg-white rounded-xl shadow-lg p-6 mb-6 border-l-4 border-blue-500">
+            <div class="flex items-center mb-4">
+                <svg class="w-6 h-6 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                <h3 class="text-lg font-semibold text-blue-900">Mentor Feedback</h3>
+            </div>
+            <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                <p id="mentorFeedbackText" class="text-gray-700 whitespace-pre-wrap leading-relaxed"></p>
+                <div class="mt-4 pt-3 border-t border-blue-300 text-sm text-gray-600">
+                    <span class="font-medium">Reviewed on:</span> <span id="feedbackDate" class="text-blue-700"></span>
+                </div>
+            </div>
+        </div>
+        <!-- END MENTOR FEEDBACK SECTION -->
 
         <!-- Footer -->
         <div class="mt-8 text-center text-sm text-gray-600 bg-white rounded-lg p-4 shadow">
@@ -641,6 +679,223 @@
         document.addEventListener('change', () => {
             setTimeout(updateProgress, 100);
         });
+    
+        // ==========================================
+        // FIREBASE INTEGRATION FOR MONTH 3
+        // ==========================================
+        
+        let currentReflectionId = null;
+        let isSubmitted = false;
+
+        // Initialize Firebase and load existing data
+        async function initializeFirebase() {
+            try {
+                const { auth, db } = window.firebaseApp;
+                
+                const user = auth.currentUser;
+                if (!user) {
+                    throw new Error('User not authenticated');
+                }
+                
+                // Fetch existing reflection data for Month 3
+                const reflectionsQuery = await db.collection('reflections')
+                    .where('userId', '==', user.uid)
+                    .where('month', '==', 3)
+                    .limit(1)
+                    .get();
+                
+                if (!reflectionsQuery.empty) {
+                    const reflectionDoc = reflectionsQuery.docs[0];
+                    const reflectionData = reflectionDoc.data();
+
+                    // Load saved data into appData
+                    if (reflectionData.formData) {
+                        appData = reflectionData.formData;
+                        renderSections();
+                        updateProgress();
+                    }
+                    
+                    isSubmitted = reflectionData.status === 'submitted';
+                    currentReflectionId = reflectionDoc.id;
+                    
+                    if (isSubmitted) {
+                        const submitBtn = document.getElementById('submitReflection');
+                        if (submitBtn) {
+                            submitBtn.disabled = true;
+                            submitBtn.textContent = '✓ Already Submitted';
+                            submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                        }
+                    }
+                }
+
+                // Load mentor feedback
+                await loadMentorFeedback();
+                
+            } catch (error) {
+                console.error('Error initializing Firebase:', error);
+            }
+        }
+
+        // Handle form submission
+        async function handleSubmit() {
+            try {
+                const { auth, db } = window.firebaseApp;
+                const user = auth.currentUser;
+                
+                if (!user) {
+                    alert('You must be logged in to submit');
+                    return;
+                }
+                
+                if (isSubmitted) {
+                    alert('You have already submitted this reflection');
+                    return;
+                }
+
+                const submitBtn = document.getElementById('submitReflection');
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Submitting...';
+                
+                // Get mentor pairing
+                const pairingsQuery = await db.collection('pairings')
+                    .where('menteeId', '==', user.uid)
+                    .limit(1)
+                    .get();
+                
+                let mentorId = null;
+                if (!pairingsQuery.empty) {
+                    mentorId = pairingsQuery.docs[0].data().mentorId;
+                }
+
+                // Prepare reflection data
+                const reflectionData = {
+                    userId: user.uid,
+                    month: 3,
+                    formData: appData,
+                    status: 'submitted',
+                    submittedAt: new Date(),
+                    mentorId: mentorId,
+                    updatedAt: new Date()
+                };
+                
+                // Save or update reflection
+                if (currentReflectionId) {
+                    await db.collection('reflections').doc(currentReflectionId).update(reflectionData);
+                } else {
+                    const docRef = await db.collection('reflections').add(reflectionData);
+                    currentReflectionId = docRef.id;
+                }
+
+                // Create notification for mentor
+                if (mentorId) {
+                    await db.collection('notifications').add({
+                        recipientId: mentorId,
+                        senderId: user.uid,
+                        type: 'reflection_submitted',
+                        message: 'A mentee has submitted their Month 3 reflection for review',
+                        reflectionId: currentReflectionId,
+                        month: 3,
+                        read: false,
+                        createdAt: new Date()
+                    });
+                }
+
+                isSubmitted = true;
+                submitBtn.textContent = '✓ Submitted Successfully!';
+                submitBtn.classList.add('bg-green-600');
+                
+                alert('Month 3 reflection submitted successfully! Your mentor will be notified.');
+                
+            } catch (error) {
+                console.error('Submission error:', error);
+                alert('Error submitting reflection. Please try again.');
+                const submitBtn = document.getElementById('submitReflection');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit Month 3';
+            }
+        }
+
+        // Load and display mentor feedback
+        async function loadMentorFeedback() {
+            try {
+                const { auth, db } = window.firebaseApp;
+                const user = auth.currentUser;
+                if (!user) return;
+
+                const reflectionsQuery = await db.collection('reflections')
+                    .where('userId', '==', user.uid)
+                    .where('month', '==', 2)
+                    .limit(1)
+                    .get();
+                
+                if (!reflectionsQuery.empty) {
+                    const reflectionDoc = reflectionsQuery.docs[0];
+                    const data = reflectionDoc.data();
+
+                    // Show feedback if status is 'reviewed' and feedback exists
+                    if (data.status === 'reviewed' && data.mentorFeedback) {
+                        document.getElementById('feedbackSection').classList.remove('hidden');
+                        document.getElementById('mentorFeedbackText').textContent = data.mentorFeedback;
+                        
+                        if (data.reviewedAt) {
+                            const reviewDate = data.reviewedAt.toDate();
+                            document.getElementById('feedbackDate').textContent = reviewDate.toLocaleDateString('en-US', {
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric'
+                            });
+                        }
+
+                        // Make form read-only after feedback is received
+                        makeFormReadOnly();
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading feedback:', error);
+            }
+        }
+
+        // Make form read-only
+        function makeFormReadOnly() {
+            const submitBtn = document.getElementById('submitReflection');
+            if (submitBtn) {
+                submitBtn.style.display = 'none';
+            }
+
+            // Disable all section toggle buttons
+            const toggleButtons = document.querySelectorAll('button[onclick^="toggleSection"]');
+            toggleButtons.forEach(btn => {
+                btn.disabled = true;
+                btn.classList.add('opacity-50', 'cursor-not-allowed');
+            });
+            
+            // Show read-only message
+            const container = document.getElementById('sectionsContainer');
+            if (container) {
+                const notice = document.createElement('div');
+                notice.className = 'bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4';
+                notice.innerHTML = '<p class="text-sm text-yellow-700">📝 This reflection has been reviewed by your mentor. No further edits are allowed.</p>';
+                container.parentElement.insertBefore(notice, container);
+            }
+        }
+
+        // Initialize Firebase when auth state changes
+        window.firebaseApp.auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                await initializeFirebase();
+            } else {
+                window.location.href = '../auth.html';
+            }
+        });
+
+        // ==========================================
+        // END FIREBASE INTEGRATION
+        // ==========================================
+    
+    
     </script>
+    <script src="../assets/js/firebase-config.js"></script>
+    <script src="../assets/js/auto-save.js"></script>
+    <script src="../assets/js/month-reflection.js"></script> <!-- NEW FILE - see below --> 
 </body>
 </html>

@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pairing Manager v2.0 - Coordinator Dashboard</title>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50">
+    
+    <!-- Navigation -->
+    <nav class="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-purple-600 to-orange-600 rounded-lg flex items-center justify-center">
+                        <span class="text-white font-bold text-lg">C</span>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold text-gray-900">AWS She Builds</h1>
+                        <p class="text-xs text-gray-500">Coordinator Portal</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <a href="dashboard.html" class="text-gray-600 hover:text-gray-900 text-sm font-medium transition">Dashboard</a>
+                    <a href="analytics.html" class="text-gray-600 hover:text-gray-900 text-sm font-medium transition">Analytics</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- Header -->
+        <div class="mb-8">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900 mb-2">Pairing Manager v2.0</h1>
+                    <p class="text-gray-600">Manage mentor-mentee relationships</p>
+                </div>
+                <button id="createBtn" class="flex items-center gap-2 px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition shadow-md font-semibold">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                    </svg>
+                    <span>Create Pairing</span>
+                </button>
+            </div>
+
+            <!-- Stats -->
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+                    <div class="flex items-start justify-between mb-2">
+                        <div class="flex-1">
+                            <p class="text-xs text-gray-600 mb-2">Mentors</p>
+                            <p class="text-3xl font-bold text-gray-900" id="totalMentors">-</p>
+                        </div>
+                        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">👨‍💼</div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+                    <div class="flex items-start justify-between mb-2">
+                        <div class="flex-1">
+                            <p class="text-xs text-gray-600 mb-2">Mentees</p>
+                            <p class="text-3xl font-bold text-gray-900" id="totalMentees">-</p>
+                        </div>
+                        <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">👩‍🎓</div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+                    <div class="flex items-start justify-between mb-2">
+                        <div class="flex-1">
+                            <p class="text-xs text-gray-600 mb-2">Active Pairs</p>
+                            <p class="text-3xl font-bold text-green-600" id="activePairs">-</p>
+                        </div>
+                        <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">🤝</div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+                    <div class="flex items-start justify-between mb-2">
+                        <div class="flex-1">
+                            <p class="text-xs text-gray-600 mb-2">Unmatched</p>
+                            <p class="text-3xl font-bold text-orange-600" id="unmatchedCount">-</p>
+                        </div>
+                        <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">⚠️</div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+                    <div class="flex items-start justify-between mb-2">
+                        <div class="flex-1">
+                            <p class="text-xs text-gray-600 mb-2">Pairing Rate</p>
+                            <p class="text-3xl font-bold text-indigo-600" id="pairingRate">-</p>
+                        </div>
+                        <div class="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">📊</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center" id="content">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
+            <p class="text-gray-600">Loading data...</p>
+        </div>
+    </div>
+
+    <!-- Create Pairing Modal -->
+    <div id="createModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div class="p-6 border-b border-gray-200 bg-gradient-to-r from-purple-50 to-pink-50">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-900">Create New Pairing</h2>
+                        <p class="text-sm text-gray-600 mt-1">Match a mentor with a mentee</p>
+                    </div>
+                    <button onclick="closeModal()" class="p-2 hover:bg-white rounded-lg transition">
+                        <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div class="p-6">
+                <form onsubmit="createPairing(event)">
+                    <!-- Mentor Selection -->
+                    <div class="mb-4">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                            <span class="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded font-semibold">MENTOR</span>
+                            Select Mentor
+                        </label>
+                        <select id="selectMentor" required onchange="showSelection()" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 text-sm">
+                            <option value="">Choose a mentor...</option>
+                        </select>
+                        <div id="mentorInfo" class="hidden mt-2 p-3 bg-blue-50 rounded-lg text-sm"></div>
+                    </div>
+
+                    <!-- Mentee Selection -->
+                    <div class="mb-4">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                            <span class="px-2 py-0.5 bg-purple-100 text-purple-700 text-xs rounded font-semibold">MENTEE</span>
+                            Select Mentee
+                        </label>
+                        <select id="selectMentee" required onchange="showSelection()" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 text-sm">
+                            <option value="">Choose a mentee...</option>
+                        </select>
+                        <div id="menteeInfo" class="hidden mt-2 p-3 bg-purple-50 rounded-lg text-sm"></div>
+                    </div>
+
+                    <!-- Compatibility Warning -->
+                    <div id="warningBox" class="hidden mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                        <div class="flex items-start gap-2">
+                            <span class="text-2xl">⚠️</span>
+                            <div class="flex-1">
+                                <h4 class="font-semibold text-yellow-900 mb-1 text-sm">Compatibility Notice</h4>
+                                <ul id="warnings" class="text-xs text-yellow-800 space-y-1"></ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Start Date -->
+                    <div class="mb-4">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Start Date</label>
+                        <input type="date" id="startDate" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 text-sm">
+                    </div>
+
+                    <!-- Notes -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Notes (Optional)</label>
+                        <textarea id="notes" rows="2" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 text-sm" placeholder="Add any notes..."></textarea>
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="flex gap-3">
+                        <button type="button" onclick="closeModal()" class="flex-1 px-6 py-2.5 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition text-sm">
+                            Cancel
+                        </button>
+                        <button type="submit" class="flex-1 px-6 py-2.5 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition text-sm">
+                            Create Pairing
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl max-w-md w-full">
+            <div class="p-6 text-center">
+                <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 mb-2">🎉 Pairing Created!</h3>
+                <p class="text-sm text-gray-600 mb-6" id="successMsg"></p>
+                <div class="flex gap-3">
+                    <button onclick="closeSuccess()" class="flex-1 px-4 py-2.5 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition text-sm">
+                        Done
+                    </button>
+                    <button onclick="createAnother()" class="flex-1 px-4 py-2.5 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition text-sm">
+                        Create Another
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('🚀 Script starting...');
+        
+        // STANDARDIZED OPTIONS for Dropdowns
+        const COHORT_OPTIONS = [
+            'Sep-Nov 2025',
+            'Jan-Mar 2026',
+            'Apr-Jun 2026',
+            'Sep-Nov 2026'
+        ];
+        
+        const COUNTRY_OPTIONS = [
+            'USA',
+            'UK',
+            'Singapore',
+            'India',
+            'Malaysia',
+            'Australia',
+            'Canada'
+        ];
+        
+        const CITY_OPTIONS = {
+            'USA': ['Seattle', 'San Francisco', 'New York', 'Austin', 'Boston', 'Chicago', 'Denver', 'Miami', 'Atlanta', 'Portland'],
+            'UK': ['London', 'Manchester', 'Edinburgh', 'Birmingham', 'Leeds'],
+            'Singapore': ['Singapore'],
+            'India': ['Bangalore', 'Mumbai', 'Hyderabad', 'Delhi'],
+            'Malaysia': ['Kuala Lumpur', 'Penang', 'Johor Bahru'],
+            'Australia': ['Sydney', 'Melbourne', 'Brisbane'],
+            'Canada': ['Toronto', 'Vancouver', 'Montreal']
+        };
+        
+        const POSITION_OPTIONS = {
+            mentee: [
+                'Junior Developer',
+                'Frontend Developer',
+                'Backend Developer',
+                'Full Stack Developer',
+                'Mobile Developer',
+                'DevOps Engineer',
+                'Data Analyst',
+                'Data Scientist',
+                'UX Designer',
+                'UI Designer',
+                'Product Manager',
+                'QA Engineer',
+                'Security Analyst',
+                'Cloud Engineer',
+                'Software Engineer',
+                'Python Developer',
+                'React Developer',
+                'Java Developer',
+                'AI Engineer',
+                'ML Engineer',
+                'Database Admin',
+                'Network Engineer',
+                'Solutions Architect',
+                'Scrum Master',
+                'Tech Lead',
+                'Game Developer'
+            ],
+            mentor: [
+                'Senior Cloud Architect',
+                'DevOps Lead',
+                'Data Engineering Manager',
+                'Security Specialist',
+                'ML Engineer',
+                'Engineering Manager',
+                'Tech Director',
+                'VP Engineering',
+                'Principal Engineer',
+                'Staff Engineer'
+            ]
+        };
+        
+        // Mock Data - EXPANDED for pagination testing
+        const mentors = [
+            { id: 1, name: 'Dr. Sarah Chen', country: 'USA', city: 'Seattle', timezone: 'PST (UTC-8)', role: 'mentor', position: 'Senior Cloud Architect' },
+            { id: 2, name: 'Jennifer Martinez', country: 'UK', city: 'London', timezone: 'GMT (UTC+0)', role: 'mentor', position: 'DevOps Lead' },
+            { id: 3, name: 'Rachel Thompson', country: 'Singapore', city: 'Singapore', timezone: 'SGT (UTC+8)', role: 'mentor', position: 'Data Engineering Manager' },
+            { id: 4, name: 'Amanda Foster', country: 'USA', city: 'New York', timezone: 'EST (UTC-5)', role: 'mentor', position: 'Security Specialist' },
+            { id: 5, name: 'Priya Sharma', country: 'India', city: 'Bangalore', timezone: 'IST (UTC+5:30)', role: 'mentor', position: 'ML Engineer' }
+        ];
+        
+        const mentees = [
+            { id: 1, name: 'Alice Johnson', country: 'USA', city: 'Seattle', timezone: 'PST (UTC-8)', role: 'mentee', position: 'Junior Developer', cohort: 'Sep-Nov 2025' },
+            { id: 2, name: 'Bob Smith', country: 'UK', city: 'London', timezone: 'GMT (UTC+0)', role: 'mentee', position: 'Data Analyst', cohort: 'Sep-Nov 2025' },
+            { id: 3, name: 'Carol Wang', country: 'Singapore', city: 'Singapore', timezone: 'SGT (UTC+8)', role: 'mentee', position: 'UX Designer', cohort: 'Sep-Nov 2025' },
+            { id: 4, name: 'David Lee', country: 'USA', city: 'Austin', timezone: 'CST (UTC-6)', role: 'mentee', position: 'Backend Developer', cohort: 'Sep-Nov 2025' },
+            { id: 5, name: 'Emma Garcia', country: 'UK', city: 'Manchester', timezone: 'GMT (UTC+0)', role: 'mentee', position: 'Frontend Developer', cohort: 'Sep-Nov 2025' },
+            { id: 6, name: 'Frank Zhang', country: 'Singapore', city: 'Singapore', timezone: 'SGT (UTC+8)', role: 'mentee', position: 'Mobile Developer', cohort: 'Sep-Nov 2025' },
+            { id: 7, name: 'Grace Kim', country: 'USA', city: 'San Francisco', timezone: 'PST (UTC-8)', role: 'mentee', position: 'Product Manager', cohort: 'Sep-Nov 2025' },
+            { id: 8, name: 'Henry Tan', country: 'Singapore', city: 'Singapore', timezone: 'SGT (UTC+8)', role: 'mentee', position: 'Data Scientist', cohort: 'Sep-Nov 2025' },
+            { id: 9, name: 'Iris Chen', country: 'USA', city: 'Boston', timezone: 'EST (UTC-5)', role: 'mentee', position: 'DevOps Engineer', cohort: 'Sep-Nov 2025' },
+            { id: 10, name: 'Jack Wilson', country: 'UK', city: 'Edinburgh', timezone: 'GMT (UTC+0)', role: 'mentee', position: 'Security Analyst', cohort: 'Sep-Nov 2025' },
+            { id: 11, name: 'Kelly Brown', country: 'USA', city: 'Chicago', timezone: 'CST (UTC-6)', role: 'mentee', position: 'Cloud Engineer', cohort: 'Sep-Nov 2025' },
+            { id: 12, name: 'Leo Martinez', country: 'Singapore', city: 'Singapore', timezone: 'SGT (UTC+8)', role: 'mentee', position: 'QA Engineer', cohort: 'Sep-Nov 2025' },
+            { id: 13, name: 'Mia Anderson', country: 'USA', city: 'Seattle', timezone: 'PST (UTC-8)', role: 'mentee', position: 'UI Designer', cohort: 'Jan-Mar 2026' },
+            { id: 14, name: 'Noah Davis', country: 'UK', city: 'London', timezone: 'GMT (UTC+0)', role: 'mentee', position: 'Full Stack Developer', cohort: 'Jan-Mar 2026' },
+            { id: 15, name: 'Olivia Taylor', country: 'USA', city: 'Portland', timezone: 'PST (UTC-8)', role: 'mentee', position: 'Software Engineer', cohort: 'Jan-Mar 2026' },
+            { id: 16, name: 'Peter Singh', country: 'India', city: 'Mumbai', timezone: 'IST (UTC+5:30)', role: 'mentee', position: 'Python Developer', cohort: 'Sep-Nov 2025' },
+            { id: 17, name: 'Quinn Roberts', country: 'USA', city: 'Denver', timezone: 'MST (UTC-7)', role: 'mentee', position: 'React Developer', cohort: 'Sep-Nov 2025' },
+            { id: 18, name: 'Ruby Patel', country: 'India', city: 'Bangalore', timezone: 'IST (UTC+5:30)', role: 'mentee', position: 'AI Engineer', cohort: 'Sep-Nov 2025' },
+            { id: 19, name: 'Sam Cooper', country: 'UK', city: 'Birmingham', timezone: 'GMT (UTC+0)', role: 'mentee', position: 'Tech Lead', cohort: 'Sep-Nov 2025' },
+            { id: 20, name: 'Tina Nguyen', country: 'Singapore', city: 'Singapore', timezone: 'SGT (UTC+8)', role: 'mentee', position: 'Scrum Master', cohort: 'Sep-Nov 2025' },
+            { id: 21, name: 'Uma Reddy', country: 'India', city: 'Hyderabad', timezone: 'IST (UTC+5:30)', role: 'mentee', position: 'Java Developer', cohort: 'Sep-Nov 2025' },
+            { id: 22, name: 'Victor Lopez', country: 'USA', city: 'Miami', timezone: 'EST (UTC-5)', role: 'mentee', position: 'Solutions Architect', cohort: 'Sep-Nov 2025' },
+            { id: 23, name: 'Wendy Clark', country: 'UK', city: 'Leeds', timezone: 'GMT (UTC+0)', role: 'mentee', position: 'Database Admin', cohort: 'Sep-Nov 2025' },
+            { id: 24, name: 'Xavier Moore', country: 'USA', city: 'Atlanta', timezone: 'EST (UTC-5)', role: 'mentee', position: 'Network Engineer', cohort: 'Sep-Nov 2025' },
+            { id: 25, name: 'Yuki Tanaka', country: 'Singapore', city: 'Singapore', timezone: 'SGT (UTC+8)', role: 'mentee', position: 'Game Developer', cohort: 'Sep-Nov 2025' }
+        ];
+        
+        let pairings = [
+            { id: 1, menteeId: 1, mentorId: 1, cohort: 'Sep-Nov 2025', status: 'Assigned', notes: 'Same location' },
+            { id: 2, menteeId: 2, mentorId: 2, cohort: 'Sep-Nov 2025', status: 'Assigned', notes: '' },
+            { id: 3, menteeId: 3, mentorId: 3, cohort: 'Sep-Nov 2025', status: 'Assigned', notes: '' },
+            { id: 4, menteeId: 4, mentorId: 1, cohort: 'Sep-Nov 2025', status: 'Assigned', notes: '' },
+            { id: 5, menteeId: 5, mentorId: 2, cohort: 'Sep-Nov 2025', status: 'Assigned', notes: '' },
+            { id: 6, menteeId: 6, mentorId: 3, cohort: 'Sep-Nov 2025', status: 'Assigned', notes: '' },
+            { id: 7, menteeId: 7, mentorId: 1, cohort: 'Sep-Nov 2025', status: 'Assigned', notes: '' },
+            { id: 8, menteeId: 8, mentorId: 3, cohort: 'Sep-Nov 2025', status: 'Assigned', notes: '' },
+            { id: 9, menteeId: 9, mentorId: 4, cohort: 'Sep-Nov 2025', status: 'Assigned', notes: '' },
+            { id: 10, menteeId: 10, mentorId: 4, cohort: 'Sep-Nov 2025', status: 'Assigned', notes: '' },
+            { id: 11, menteeId: 11, mentorId: null, cohort: 'Sep-Nov 2025', status: 'Unassigned', notes: '' },
+            { id: 12, menteeId: 12, mentorId: null, cohort: 'Sep-Nov 2025', status: 'Unassigned', notes: '' },
+            { id: 13, menteeId: 13, mentorId: null, cohort: 'Jan-Mar 2026', status: 'Unassigned', notes: '' },
+            { id: 14, menteeId: 14, mentorId: null, cohort: 'Jan-Mar 2026', status: 'Unassigned', notes: '' },
+            { id: 15, menteeId: 15, mentorId: null, cohort: 'Jan-Mar 2026', status: 'Unassigned', notes: '' },
+            { id: 16, menteeId: 16, mentorId: 5, cohort: 'Sep-Nov 2025', status: 'Assigned', notes: '' },
+            { id: 17, menteeId: 17, mentorId: null, cohort: 'Sep-Nov 2025', status: 'Unassigned', notes: '' },
+            { id: 18, menteeId: 18, mentorId: 5, cohort: 'Sep-Nov 2025', status: 'Assigned', notes: '' },
+            { id: 19, menteeId: 19, mentorId: null, cohort: 'Sep-Nov 2025', status: 'Drop', notes: 'Left program' },
+            { id: 20, menteeId: 20, mentorId: 3, cohort: 'Sep-Nov 2025', status: 'Assigned', notes: '' },
+            { id: 21, menteeId: 21, mentorId: 5, cohort: 'Sep-Nov 2025', status: 'Assigned', notes: '' },
+            { id: 22, menteeId: 22, mentorId: 4, cohort: 'Sep-Nov 2025', status: 'Assigned', notes: '' },
+            { id: 23, menteeId: 23, mentorId: null, cohort: 'Sep-Nov 2025', status: 'Unassigned', notes: '' },
+            { id: 24, menteeId: 24, mentorId: 4, cohort: 'Sep-Nov 2025', status: 'Assigned', notes: '' },
+            { id: 25, menteeId: 25, mentorId: null, cohort: 'Sep-Nov 2025', status: 'Unassigned', notes: '' }
+        ];
+        
+        // Filters
+        let searchQuery = '';
+        let filterCohort = 'all';
+        let filterStatus = 'all';
+        let filterCountry = 'all';
+        let filterPosition = 'all';
+        
+        console.log('📦 Data loaded:', mentors.length, 'mentors,', mentees.length, 'mentees,', pairings.length, 'pairings');
+        
+        // Update stats
+        function updateStats() {
+            console.log('📊 Updating stats...');
+            const assigned = pairings.filter(p => p.status === 'Assigned').length;
+            const unassigned = pairings.filter(p => p.status === 'Unassigned').length;
+            const totalMentees = pairings.length;
+            const rate = totalMentees > 0 ? Math.round((assigned / totalMentees) * 100) : 0;
+            
+            document.getElementById('totalMentors').textContent = mentors.length;
+            document.getElementById('totalMentees').textContent = totalMentees;
+            document.getElementById('activePairs').textContent = assigned;
+            document.getElementById('unmatchedCount').textContent = unassigned;
+            document.getElementById('pairingRate').textContent = rate + '%';
+        }
+        
+        // Open modal
+        function openModal() {
+            console.log('🎨 Opening modal...');
+            
+            // Populate mentor dropdown
+            const mentorSelect = document.getElementById('selectMentor');
+            mentorSelect.innerHTML = '<option value="">Choose a mentor...</option>';
+            mentors.forEach(m => {
+                mentorSelect.innerHTML += `<option value="${m.id}">${m.name} - ${m.city}, ${m.country}</option>`;
+            });
+            
+            // Populate mentee dropdown (only unpaired)
+            const pairedIds = new Set(pairings.map(p => p.menteeId));
+            const menteeSelect = document.getElementById('selectMentee');
+            menteeSelect.innerHTML = '<option value="">Choose a mentee...</option>';
+            mentees.filter(m => !pairedIds.has(m.id)).forEach(m => {
+                menteeSelect.innerHTML += `<option value="${m.id}">${m.name} - ${m.city}, ${m.country}</option>`;
+            });
+            
+            // Set today's date
+            document.getElementById('startDate').valueAsDate = new Date();
+            
+            document.getElementById('createModal').classList.remove('hidden');
+        }
+        
+        // Close modal
+        function closeModal() {
+            document.getElementById('createModal').classList.add('hidden');
+            document.getElementById('selectMentor').value = '';
+            document.getElementById('selectMentee').value = '';
+            document.getElementById('notes').value = '';
+            document.getElementById('mentorInfo').classList.add('hidden');
+            document.getElementById('menteeInfo').classList.add('hidden');
+            document.getElementById('warningBox').classList.add('hidden');
+        }
+        
+        // Show selection info
+        function showSelection() {
+            const mentorId = parseInt(document.getElementById('selectMentor').value);
+            const menteeId = parseInt(document.getElementById('selectMentee').value);
+            
+            // Show mentor info
+            if (mentorId) {
+                const mentor = mentors.find(m => m.id === mentorId);
+                document.getElementById('mentorInfo').innerHTML = `
+                    <p class="font-semibold text-gray-800">${mentor.name}</p>
+                    <p class="text-xs text-gray-600">📍 ${mentor.city}, ${mentor.country} • ${mentor.timezone}</p>
+                `;
+                document.getElementById('mentorInfo').classList.remove('hidden');
+            }
+            
+            // Show mentee info
+            if (menteeId) {
+                const mentee = mentees.find(m => m.id === menteeId);
+                document.getElementById('menteeInfo').innerHTML = `
+                    <p class="font-semibold text-gray-800">${mentee.name}</p>
+                    <p class="text-xs text-gray-600">📍 ${mentee.city}, ${mentee.country} • ${mentee.timezone}</p>
+                `;
+                document.getElementById('menteeInfo').classList.remove('hidden');
+            }
+            
+            // Check compatibility
+            if (mentorId && menteeId) {
+                const mentor = mentors.find(m => m.id === mentorId);
+                const mentee = mentees.find(m => m.id === menteeId);
+                const warnings = [];
+                
+                if (mentor.country !== mentee.country) {
+                    warnings.push(`📍 Different countries: ${mentor.country} ↔ ${mentee.country}`);
+                }
+                if (mentor.timezone !== mentee.timezone) {
+                    warnings.push(`🕐 Different timezones: ${mentor.timezone} ↔ ${mentee.timezone}`);
+                }
+                
+                if (warnings.length > 0) {
+                    document.getElementById('warnings').innerHTML = warnings.map(w => `<li>${w}</li>`).join('');
+                    document.getElementById('warningBox').classList.remove('hidden');
+                } else {
+                    document.getElementById('warningBox').classList.add('hidden');
+                }
+            }
+        }
+        
+        // Create pairing
+        function createPairing(e) {
+            e.preventDefault();
+            console.log('✨ Creating pairing...');
+            
+            const mentorId = parseInt(document.getElementById('selectMentor').value);
+            const menteeId = parseInt(document.getElementById('selectMentee').value);
+            const date = document.getElementById('startDate').value;
+            const notes = document.getElementById('notes').value;
+            
+            const mentor = mentors.find(m => m.id === mentorId);
+            const mentee = mentees.find(m => m.id === menteeId);
+            
+            // Create new pairing
+            const newPairing = {
+                id: pairings.length + 1,
+                mentorId,
+                menteeId,
+                date,
+                notes
+            };
+            
+            pairings.push(newPairing);
+            console.log('✅ Pairing created:', newPairing);
+            
+            // Update stats
+            updateStats();
+            
+            // Show success
+            document.getElementById('successMsg').innerHTML = `
+                <strong>${mentor.name}</strong> has been paired with <strong>${mentee.name}</strong>!<br>
+                <span class="text-xs">📍 ${mentor.city}, ${mentor.country} ↔ ${mentee.city}, ${mentee.country}</span>
+            `;
+            
+            closeModal();
+            document.getElementById('successModal').classList.remove('hidden');
+            
+            // Refresh content
+            showContent();
+        }
+        
+        // Close success modal
+        function closeSuccess() {
+            document.getElementById('successModal').classList.add('hidden');
+        }
+        
+        // Create another
+        function createAnother() {
+            document.getElementById('successModal').classList.add('hidden');
+            openModal();
+        }
+        
+        // Show content - REDESIGNED TABLE
+        function showContent() {
+            console.log('🎨 Showing redesigned table...');
+            
+            // Apply filters
+            let filtered = pairings.filter(p => {
+                const mentee = mentees.find(m => m.id === p.menteeId);
+                const mentor = p.mentorId ? mentors.find(m => m.id === p.mentorId) : null;
+                
+                if (!mentee) return false;
+                
+                // Search filter (includes position now!)
+                if (searchQuery) {
+                    const query = searchQuery.toLowerCase();
+                    const matchMentee = mentee.name.toLowerCase().includes(query);
+                    const matchMentor = mentor && mentor.name.toLowerCase().includes(query);
+                    const matchLocation = mentee.city.toLowerCase().includes(query) || mentee.country.toLowerCase().includes(query);
+                    const matchPosition = mentee.position.toLowerCase().includes(query);
+                    const matchMentorPosition = mentor && mentor.position.toLowerCase().includes(query);
+                    if (!matchMentee && !matchMentor && !matchLocation && !matchPosition && !matchMentorPosition) return false;
+                }
+                
+                // Cohort filter
+                if (filterCohort !== 'all' && p.cohort !== filterCohort) return false;
+                
+                // Status filter
+                if (filterStatus !== 'all' && p.status !== filterStatus) return false;
+                
+                // Country filter
+                if (filterCountry !== 'all' && mentee.country !== filterCountry) return false;
+                
+                // Position filter
+                if (filterPosition !== 'all' && mentee.position !== filterPosition) return false;
+                
+                return true;
+            });
+            
+            // Pagination
+            const rowsPerPage = 20;
+            const totalPages = Math.ceil(filtered.length / rowsPerPage);
+            const currentPage = window.currentPage || 1;
+            const startIdx = (currentPage - 1) * rowsPerPage;
+            const endIdx = startIdx + rowsPerPage;
+            const displayPairings = filtered.slice(startIdx, endIdx);
+            
+            document.getElementById('content').innerHTML = `
+                <div class="text-left">
+                    <!-- Search & Filters -->
+                    <div class="bg-white rounded-lg border border-gray-200 p-4 mb-4">
+                        <div class="grid grid-cols-1 md:grid-cols-5 gap-3">
+                            <input 
+                                type="text" 
+                                id="searchInput"
+                                placeholder="🔍 Search name, location, position..." 
+                                value="${searchQuery}"
+                                onkeyup="handleSearch(this.value)"
+                                class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 text-sm"
+                            />
+                            <select id="cohortFilter" onchange="handleFilter('cohort', this.value)" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 text-sm">
+                                <option value="all">All Cohorts</option>
+                                ${COHORT_OPTIONS.map(c => `<option value="${c}" ${filterCohort === c ? 'selected' : ''}>${c}</option>`).join('')}
+                            </select>
+                            <select id="statusFilter" onchange="handleFilter('status', this.value)" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 text-sm">
+                                <option value="all">All Status</option>
+                                <option value="Assigned" ${filterStatus === 'Assigned' ? 'selected' : ''}>Assigned</option>
+                                <option value="Unassigned" ${filterStatus === 'Unassigned' ? 'selected' : ''}>Unassigned</option>
+                                <option value="Drop" ${filterStatus === 'Drop' ? 'selected' : ''}>Drop</option>
+                            </select>
+                            <select id="countryFilter" onchange="handleFilter('country', this.value)" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 text-sm">
+                                <option value="all">All Countries</option>
+                                ${COUNTRY_OPTIONS.map(c => `<option value="${c}" ${filterCountry === c ? 'selected' : ''}>${c}</option>`).join('')}
+                            </select>
+                            <select id="positionFilter" onchange="handleFilter('position', this.value)" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 text-sm">
+                                <option value="all">All Positions</option>
+                                ${POSITION_OPTIONS.mentee.map(p => `<option value="${p}" ${filterPosition === p ? 'selected' : ''}>${p}</option>`).join('')}
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- Table Header -->
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-bold text-gray-900">All Pairings (${filtered.length})</h3>
+                        <div class="text-sm text-gray-600">
+                            Showing ${filtered.length === 0 ? 0 : startIdx + 1}-${Math.min(endIdx, filtered.length)} of ${filtered.length}
+                        </div>
+                    </div>
+                    
+                    <!-- Table -->
+                    <div class="bg-white rounded-lg border border-gray-200 overflow-hidden mb-4">
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-gray-50 border-b border-gray-200">
+                                    <tr>
+                                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Cohort</th>
+                                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Mentee</th>
+                                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Position</th>
+                                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Location</th>
+                                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Status</th>
+                                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Mentor</th>
+                                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Expertise</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200">
+                                    ${displayPairings.length === 0 ? `
+                                        <tr>
+                                            <td colspan="7" class="px-4 py-8 text-center text-gray-500">
+                                                No pairings found matching your filters.
+                                            </td>
+                                        </tr>
+                                    ` : displayPairings.map(p => {
+                                        const mentee = mentees.find(m => m.id === p.menteeId);
+                                        const mentor = p.mentorId ? mentors.find(m => m.id === p.mentorId) : null;
+                                        
+                                        const statusColors = {
+                                            'Assigned': 'bg-green-100 text-green-800',
+                                            'Unassigned': 'bg-orange-100 text-orange-800',
+                                            'Drop': 'bg-red-100 text-red-800'
+                                        };
+                                        
+                                        return `
+                                            <tr class="hover:bg-gray-50 transition">
+                                                <td class="px-4 py-3">
+                                                    <span class="px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded font-semibold">
+                                                        ${p.cohort}
+                                                    </span>
+                                                </td>
+                                                <td class="px-4 py-3">
+                                                    <button onclick="viewProfile('mentee', ${mentee.id})" class="font-semibold text-gray-900 hover:text-purple-600 transition text-left">
+                                                        ${mentee.name}
+                                                    </button>
+                                                </td>
+                                                <td class="px-4 py-3 text-sm text-gray-600">
+                                                    ${mentee.position}
+                                                </td>
+                                                <td class="px-4 py-3 text-sm text-gray-700">
+                                                    ${mentee.city}, ${mentee.country}
+                                                </td>
+                                                <td class="px-4 py-3">
+                                                    <span class="px-2 py-1 ${statusColors[p.status]} text-xs rounded font-semibold">
+                                                        ${p.status}
+                                                    </span>
+                                                </td>
+                                                <td class="px-4 py-3">
+                                                    ${mentor ? `
+                                                        <button onclick="viewProfile('mentor', ${mentor.id})" class="font-semibold text-gray-900 hover:text-blue-600 transition text-left">
+                                                            ${mentor.name}
+                                                        </button>
+                                                    ` : `
+                                                        <span class="text-gray-400 text-sm">-</span>
+                                                    `}
+                                                </td>
+                                                <td class="px-4 py-3 text-sm text-gray-600">
+                                                    ${mentor ? mentor.position : '-'}
+                                                </td>
+                                            </tr>
+                                        `;
+                                    }).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- Pagination -->
+                    ${filtered.length > rowsPerPage ? `
+                        <div class="flex items-center justify-between">
+                            <button 
+                                onclick="changePage(${currentPage - 1})" 
+                                ${currentPage === 1 ? 'disabled' : ''}
+                                class="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                            >
+                                ← Previous
+                            </button>
+                            
+                            <div class="text-sm text-gray-600">
+                                Page <span class="font-semibold">${currentPage}</span> of <span class="font-semibold">${totalPages}</span>
+                            </div>
+                            
+                            <button 
+                                onclick="changePage(${currentPage + 1})" 
+                                ${currentPage === totalPages ? 'disabled' : ''}
+                                class="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                            >
+                                Next →
+                            </button>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+        
+        // Handle search
+        function handleSearch(value) {
+            searchQuery = value;
+            window.currentPage = 1; // Reset to page 1
+            showContent();
+        }
+        
+        // Handle filters
+        function handleFilter(type, value) {
+            if (type === 'cohort') filterCohort = value;
+            if (type === 'status') filterStatus = value;
+            if (type === 'country') filterCountry = value;
+            if (type === 'position') filterPosition = value;
+            window.currentPage = 1; // Reset to page 1
+            showContent();
+        }
+        
+        // Change page
+        function changePage(page) {
+            window.currentPage = page;
+            showContent();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        // View profile (placeholder for now)
+        function viewProfile(role, id) {
+            const person = role === 'mentor' ? mentors.find(m => m.id === id) : mentees.find(m => m.id === id);
+            alert(`Profile page for ${person.name} will be built in the next section!\n\n📍 ${person.city}, ${person.country}\n⏰ ${person.timezone}`);
+        }
+        
+        // Unassign pairing (placeholder)
+        function unassignPairing(pairingId) {
+            if (confirm('Are you sure you want to unassign this pairing?')) {
+                pairings = pairings.filter(p => p.id !== pairingId);
+                updateStats();
+                showContent();
+                alert('✓ Pairing unassigned successfully!');
+            }
+        }
+        
+        // Initialize
+        setTimeout(() => {
+            console.log('⏰ Initializing...');
+            updateStats();
+            showContent();
+            
+            // Button handler
+            document.getElementById('createBtn').onclick = openModal;
+            
+            console.log('🎉 READY!');
+        }, 1000);
+        
+        console.log('📝 Script loaded');
+    </script>
+</body>
+</html>
