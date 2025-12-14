@@ -28,6 +28,12 @@
             </svg>
         </a>
 
+        <!-- ADD THIS LOGOUT BUTTON -->
+        <button onclick="firebase.auth().signOut().then(() => { alert('Signed out!'); window.location.href = '/auth.html'; })" 
+                class="ml-2 p-2 bg-red-100 hover:bg-red-200 rounded-lg transition-colors inline-block text-red-700 text-sm font-semibold">
+            Logout
+        </button>
+
         <!-- Header -->
         <div class="bg-white rounded-xl shadow-lg p-6 mb-6 border-t-4 border-purple-600">
             <div class="flex items-start justify-between mb-4">
@@ -264,7 +270,7 @@
         };
 
         // Start with all sections expanded by default
-        const expandedSections = {
+        const expandedSections = {};
             'meetings': true,
             'mission': true,
             'smart': true,
